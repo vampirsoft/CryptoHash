@@ -18,13 +18,12 @@
 
 // Указывается, что в приоритете будет использоваться реализация на ассемблере
 // (Если не указана опция USE_FORCE_DELPHI, то для компиляции под Windows desktop
-// принудительно будет выставляться эта опция. Так же для delphi ниже версии
-// XE2 принудительно будет выставляться эта опция)
+// принудительно будет выставляться эта опция.
 {$DEFINE USE_ASSEMBLER}
 
 // Если используется Jedy Core Lybrary (https://github.com/project-jedi/jcl),
 // имеет смысл включить эту опцию
-//{$DEFINE USE_JEDY_CORE_LIBRARY}
+//{$DEFINE USE_JEDI_CORE_LIBRARY}
 
 // Если используется OmniThreadLibrary (https://github.com/gabr42/OmniThreadLibrary),
 // то рекомендуется активировать эту опцию
@@ -39,34 +38,28 @@
 
 {$INCLUDE jedi\jedi.inc}
 
-{$IF DEFINED(DELPHIXE3_UP)}
-  {$LEGACYIFEND ON}
-{$IFEND}
-
-{$IF NOT DEFINED(DELPHIXE2_UP)}
-  {$DEFINE USE_ASSEMBLER}
-  {$UNDEF USE_FORCE_DELPHI}
-{$IFEND ~DELPHIXE2_UP}
-{$IF DEFINED(MSWINDOWS) AND NOT DEFINED(USE_FORCE_DELPHI)}
-  {$DEFINE USE_ASSEMBLER}
-{$ELSE}
+{$IF DEFINED(MSWINDOWS)}
+  {$IF NOT DEFINED(USE_FORCE_DELPHI)}
+    {$DEFINE USE_ASSEMBLER}
+  {$ENDIF ~ USE_FORCE_DELPHI}
+{$ELSE ~ NOT MSWINDOWS}
   {$DEFINE USE_FORCE_DELPHI}
-{$IFEND ~MSWINDOWS AND ~NOT USE_FORCE_DELPHI}
+  {$UNDEF USE_JEDI_CORE_LIBRARY}  // JEDI Core Library поддерживает только Windows
+{$ENDIF ~ MSWINDOWS}
 {$IF DEFINED(USE_FORCE_DELPHI)}
   {$UNDEF USE_ASSEMBLER}
-{$IFEND ~USE_FORCE_DELPHI}
+{$ENDIF ~ USE_FORCE_DELPHI}
 {$IF NOT DEFINED(USE_ASSEMBLER)}
   {$DEFINE USE_FORCE_DELPHI}
-{$IFEND ~USE_ASSEMBLER}
+{$ENDIF ~ USE_ASSEMBLER}
 
 {$WRITEABLECONST OFF}    // {$J-}
 {$OVERFLOWCHECKS OFF}    // {$Q-}
 {$RANGECHECKS OFF}       // {$R-}
 {$TYPEDADDRESS ON}       // {$T+}
 
-{$IF NOT DEFINED(DEBUG)}
+{$IF DEFINED(SUPPORTS_INLINE) AND NOT DEFINED(DEBUG)}
   {$DEFINE USE_INLINE}
-{$IFEND}
+{$ENDIF}
 
-{$IFEND ~CRYPTO_HASH_INC}
-
+{$ENDIF ~ CRYPTO_HASH_INC}

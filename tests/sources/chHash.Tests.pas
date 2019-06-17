@@ -39,49 +39,53 @@ type
     destructor Destroy; override;
     procedure SetUp; override;
   published
+    procedure ShortCheckTest;
     procedure CheckTest; virtual;
     procedure StressTest; virtual;
 //  Utils
     procedure CalculateTest;
   end;
 
+const MaxWord = Word.MaxValue;
+
 implementation
 
 uses
   System.Classes, System.Generics.Defaults,
-  System.Diagnostics;
+  System.Diagnostics,
+  chHash.Core.Bits;
 
 { TchAlgorithmTests<C, R, HA> }
 
 procedure TchAlgorithmTests<C, R, HA>.CalculateTest;
 begin
   Randomize;
-  const Tail: Word = Random(65536);
-  const DataSize: Cardinal = 64 * 1024 * 1023 + Tail;
+  const Tail = Random(MaxWord);
+  const DataSize = 64 * 1024 * 1023 + Tail;
   var Data: TBytes;
   SetLength(Data, DataSize);
-  for var I: Cardinal := 0 to DataSize - 1 do
+  for var I := 0 to DataSize - 1 do
   begin
     Data[I] := Random(256);
   end;
 
-  var Expected: C := FAlgorithm.Init;
+  var Expected := FAlgorithm.Init;
   FAlgorithm.Calculate(Expected, Data, DataSize);
 
-  var DataStream: TStream := TMemoryStream.Create;
+  var DataStream := TMemoryStream.Create;
   DataStream.Write(Data, DataSize);
   SetLength(Data, 0);
 
-  const Count: Byte = 16;
+  const Count = 16;
   var Actual: R;
   var Stopwatch := TStopwatch.StartNew;
-  for var J: Byte := 1 to Count do
+  for var J := 1 to Count do
   begin
     Actual := TchUtils.Calculate<C, R>(DataStream, FAlgorithm);
   end;
   Stopwatch.Stop;
   const TestSize = (DataSize/(1024 * 1024 * 1024)) * Count;
-  var S := Stopwatch.Elapsed.TotalSeconds;
+  const S = Stopwatch.Elapsed.TotalSeconds;
   FreeAndNil(DataStream);
   Status(Format('Test size = %.3f GB', [TestSize]));
   if S = 0 then Status(Format('%s: Speed         = 0s, %.3f MB/s', [FAlgorithm.ToString, DataSize/1 * Count]))
@@ -117,18 +121,24 @@ begin
   FAlgorithm := CreateAlgorithm;
 end;
 
+procedure TchAlgorithmTests<C, R, HA>.ShortCheckTest;
+begin
+  const TestBytes = ToBytes(FTestString[1], 9);
+  CheckResult(FAlgorithm.Check, FAlgorithm.Calculate(TestBytes));
+end;
+
 procedure TchAlgorithmTests<C, R, HA>.StressTest;
 begin
-  const MaxLength: Cardinal = GetMaxLength;
+  const MaxLength = GetMaxLength;
   var Data: TBytes;
   SetLength(Data, MaxLength);
   Randomize;
-  for var I: Cardinal := 0 to MaxLength - 1 do
+  for var I := 0 to MaxLength - 1 do
   begin
     Data[I] := Random(256);
   end;
 
-  const Count: Cardinal = GetCount;
+  const Count = GetCount;
   const TestSize = (MaxLength/(1024 * 1024 * 1024)) * Count;
   Status(Format('Test size = %.3f GB', [TestSize]));
 
@@ -141,7 +151,7 @@ begin
     FAlgorithm.Calculate(Actual, Data[0], MaxLength);
   end;
   Stopwatch.Stop;
-  var S := Stopwatch.Elapsed.TotalSeconds;
+  const S = Stopwatch.Elapsed.TotalSeconds;
   if S = 0 then Status(Format('%s: Speed         = 0s, %.3f MB/s', [FAlgorithm.ToString, MaxLength/1 * Count]))
   else Status(Format('%s: Speed         = %.3fs, %.3f MB/s', [FAlgorithm.ToString, S, (MaxLength/(1024 * 1024)/S) * Count]));
 

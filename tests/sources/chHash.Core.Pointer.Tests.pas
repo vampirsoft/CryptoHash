@@ -18,17 +18,13 @@ interface
 uses
   TestFramework,
   System.SysUtils,
-{$IF DEFINED(USE_JEDY_CORE_LIBRARY)}
-  JclLogic,
-{$IFEND ~USE_JEDY_CORE_LIBRARY}
-  chHash.Core.Bits,
   chHash.Core.Bits.Tests;
 
 type
 
-{ TPointerHelperTests }
+{ TPointerTests }
 
-  TPointerHelperTests = class(TBitsHelperTests<TBytes>)
+  TPointerTests = class(TBitsTests<TBytes>)
   strict private
     FLength: Cardinal;
   public
@@ -38,74 +34,24 @@ type
     procedure ReverseBytesTest; override;
     procedure TestBitTest; override;
     procedure ToBytesTest; override;
+    procedure HelperReverseBitsTest; override;
+    procedure HelperReverseBytesTest; override;
+    procedure HelperTestBitTest; override;
+    procedure HelperToBytesTest; override;
   end;
 
 implementation
 
 uses
-  System.Generics.Defaults;
+  System.Generics.Defaults,
+{$IF DEFINED(USE_JEDI_CORE_LIBRARY)}
+  JclLogic,
+{$ENDIF ~ USE_JEDI_CORE_LIBRARY}
+  chHash.Core.Bits;
 
-{ TPointerHelperTests }
+{ TPointerTests }
 
-procedure TPointerHelperTests.ReverseBitsTest;
-begin
-  var Expected: TBytes;
-  SetLength(Expected, FLength);
-  for var I: Byte := 1 to FLength do
-  begin
-  {$IF DEFINED(USE_JEDY_CORE_LIBRARY)}
-    Expected[FLength - I] := ReverseBits(FValue[I - 1]);
-  {$ELSE ~ NOT USE_JEDY_CORE_LIBRARY}
-    Expected[FLength - I] := FValue[I - 1].ReverseBits;
-  {$IFEND ~USE_JEDY_CORE_LIBRARY}
-  end;
-
-  Test(
-    procedure(ConvertCount: Cardinal)
-    begin
-      const Actual: TBytes = FValue;
-      while ConvertCount <> 0 do
-      begin
-      {$IF DEFINED(USE_JEDY_CORE_LIBRARY)}
-        ReverseBits(@Actual[0], FLength);
-      {$ELSE ~ NOT USE_JEDY_CORE_LIBRARY}
-        (@Actual[0]).ReverseBits(FLength);
-      {$IFEND ~USE_JEDY_CORE_LIBRARY}
-        Dec(ConvertCount);
-      end;
-      CheckTrue(TEqualityComparer<TBytes>.Default.Equals(Expected, Actual));
-    end
-  );
-end;
-
-procedure TPointerHelperTests.ReverseBytesTest;
-begin
-  var Expected: TBytes;
-  SetLength(Expected, FLength);
-  for var I: Byte := 1 to FLength do
-  begin
-    Expected[FLength - I] := FValue[I - 1];
-  end;
-
-  Test(
-    procedure(ConvertCount: Cardinal)
-    begin
-      const Actual: TBytes = FValue;
-      while ConvertCount <> 0 do
-      begin
-      {$IF DEFINED(USE_JEDY_CORE_LIBRARY)}
-        ReverseBytes(@Actual[0], FLength);
-      {$ELSE ~ NOT USE_JEDY_CORE_LIBRARY}
-        (@Actual[0]).ReverseBytes(FLength);
-      {$IFEND ~USE_JEDY_CORE_LIBRARY}
-        Dec(ConvertCount);
-      end;
-      CheckTrue(TEqualityComparer<TBytes>.Default.Equals(Expected, Actual));
-    end
-  );
-end;
-
-procedure TPointerHelperTests.SetUp;
+procedure TPointerTests.SetUp;
 begin
   FLength := 5;
   Randomize;
@@ -117,38 +63,139 @@ begin
   FBytePerConvert := FLength;
 end;
 
-procedure TPointerHelperTests.TestBitTest;
+procedure TPointerTests.ReverseBitsTest;
 begin
-  const Bit: Byte = (FLength - 1) * {$IF DEFINED(USE_JEDY_CORE_LIBRARY)}BitsPerByte{$ELSE}Byte.Bits{$IFEND} + 4;
-{$IF DEFINED(USE_JEDY_CORE_LIBRARY)}
-  const Expected: Boolean = TestBit(FValue[4], 4);
-{$ELSE ~ NOT USE_JEDY_CORE_LIBRARY}
-  const Expected: Boolean = FValue[4].TestBit(4);
-{$IFEND ~USE_JEDY_CORE_LIBRARY}
+  var Expected: TBytes;
+  SetLength(Expected, FLength);
+  for var I := 1 to FLength do
+  begin
+    Expected[FLength - I] := ReverseBits(FValue[I - 1]);
+  end;
+
   Test(
-    procedure(ConvertCount: Cardinal)
+    procedure(const ConvertCount: Cardinal)
     begin
-      var Actual: Boolean := not Expected;
-      while ConvertCount <> 0 do
+      const Actual: TBytes = FValue;
+      for var I := 1 to ConvertCount do
       begin
-      {$IF DEFINED(USE_JEDY_CORE_LIBRARY)}
-        Actual := TestBitBuffer(FValue[0], Bit);
-      {$ELSE ~ NOT USE_JEDY_CORE_LIBRARY}
-        Actual := (@FValue[0]).TestBit(Bit);
-      {$IFEND ~USE_JEDY_CORE_LIBRARY}
-        Dec(ConvertCount);
+        ReverseBits(Actual, FLength);
+      end;
+      CheckTrue(TEqualityComparer<TBytes>.Default.Equals(Expected, Actual));
+    end
+  );
+end;
+
+procedure TPointerTests.ReverseBytesTest;
+begin
+  var Expected: TBytes;
+  SetLength(Expected, FLength);
+  for var I := 1 to FLength do
+  begin
+    Expected[FLength - I] := FValue[I - 1];
+  end;
+
+  Test(
+    procedure(const ConvertCount: Cardinal)
+    begin
+      const Actual: TBytes = FValue;
+      for var I := 1 to ConvertCount do
+      begin
+        ReverseBytes(Actual, FLength);
+      end;
+      CheckTrue(TEqualityComparer<TBytes>.Default.Equals(Expected, Actual));
+    end
+  );
+end;
+
+procedure TPointerTests.TestBitTest;
+begin
+  const Bit = (FLength - 1) * BitsPerByte + 4;
+  const Expected = TestBit(FValue[4], 4);
+  Test(
+    procedure(const ConvertCount: Cardinal)
+    begin
+      var Actual := not Expected;
+      for var I := 1 to ConvertCount do
+      begin
+        Actual := TestBit(FValue, Bit);
       end;
       CheckEquals(Expected, Actual);
     end
   );
 end;
 
-procedure TPointerHelperTests.ToBytesTest;
+procedure TPointerTests.ToBytesTest;
+begin
+  CheckTrue(TEqualityComparer<TBytes>.Default.Equals(FValue, ToBytes(@FValue[0], FLength)));
+end;
+
+procedure TPointerTests.HelperReverseBitsTest;
+begin
+  var Expected: TBytes;
+  SetLength(Expected, FLength);
+  for var I := 1 to FLength do
+  begin
+    Expected[FLength - I] := ReverseBits(FValue[I - 1]);
+  end;
+
+  Test(
+    procedure(const ConvertCount: Cardinal)
+    begin
+      const Actual: TBytes = FValue;
+      for var I := 1 to ConvertCount do
+      begin
+        (@Actual[0]).ReverseBits(FLength);
+      end;
+      CheckTrue(TEqualityComparer<TBytes>.Default.Equals(Expected, Actual));
+    end
+  );
+end;
+
+procedure TPointerTests.HelperReverseBytesTest;
+begin
+  var Expected: TBytes;
+  SetLength(Expected, FLength);
+  for var I := 1 to FLength do
+  begin
+    Expected[FLength - I] := FValue[I - 1];
+  end;
+
+  Test(
+    procedure(const ConvertCount: Cardinal)
+    begin
+      const Actual: TBytes = FValue;
+      for var I := 1 to ConvertCount do
+      begin
+        (@Actual[0]).ReverseBytes(FLength);
+      end;
+      CheckTrue(TEqualityComparer<TBytes>.Default.Equals(Expected, Actual));
+    end
+  );
+end;
+
+procedure TPointerTests.HelperTestBitTest;
+begin
+  const Bit = (FLength - 1) * Byte.Bits + 4;
+  const Expected = FValue[4].TestBit(4);
+  Test(
+    procedure(const ConvertCount: Cardinal)
+    begin
+      var Actual := not Expected;
+      for var I := 1 to ConvertCount do
+      begin
+        Actual := (@FValue[0]).TestBit(Bit);
+      end;
+      CheckEquals(Expected, Actual);
+    end
+  );
+end;
+
+procedure TPointerTests.HelperToBytesTest;
 begin
   CheckTrue(TEqualityComparer<TBytes>.Default.Equals(FValue, (@FValue[0]).ToBytes(FLength)));
 end;
 
 initialization
-  RegisterTest(TPointerHelperTests.Suite);
+  RegisterTest(TPointerTests.Suite);
 
 end.

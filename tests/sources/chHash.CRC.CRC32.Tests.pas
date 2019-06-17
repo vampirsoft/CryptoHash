@@ -16,13 +16,6 @@ unit chHash.CRC.CRC32.Tests;
 interface
 
 uses
-  TestFramework,
-  System.SysUtils, System.Generics.Collections,
-{$IF DEFINED(USE_JEDY_CORE_LIBRARY)}
-  JclLogic,
-{$ELSE ~ NOT USE_JEDY_CORE_LIBRARY}
-  chHash.Core.Bits,
-{$IFEND ~USE_JEDY_CORE_LIBRARY}
   chHash.CRC.CRC32,
   chHash.CRC.Tests;
 
@@ -124,6 +117,15 @@ type
 
 implementation
 
+uses
+{$IF DEFINED(USE_JEDI_CORE_LIBRARY)}
+  JclLogic,
+{$ELSE ~ NOT USE_JEDI_CORE_LIBRARY}
+  chHash.Core.Bits,
+{$ENDIF ~ USE_JEDI_CORE_LIBRARY}
+  TestFramework,
+  System.SysUtils, System.Generics.Collections;
+
 { TchCrc32AlgorithmTests }
 
 function TchCrc32AlgorithmTests.BitsToHex(const Value: Cardinal): string;
@@ -159,8 +161,7 @@ begin
   var PData: PByte := @Data;
   while Length > 0 do
   begin
-    Current := (Current shl {$IF DEFINED(USE_JEDY_CORE_LIBRARY)}BitsPerByte{$ELSE}Byte.Bits{$IFEND}) xor
-      FCrcTable[(Ord(PData^) xor (Current shr 24)) and {$IF DEFINED(USE_JEDY_CORE_LIBRARY)}ByteMask{$ELSE}Byte.Mask{$IFEND}];
+    Current := (Current shl BitsPerByte) xor FCrcTable[Byte(Ord(PData^) xor (Current shr (BitsPerByte * 3)))];
     Inc(PData);
     Dec(Length);
   end;
@@ -175,8 +176,7 @@ begin
   var PData: PByte := @Data;
   while Length > 0 do
   begin
-    Current := (Current shr {$IF DEFINED(USE_JEDY_CORE_LIBRARY)}BitsPerByte{$ELSE}Byte.Bits{$IFEND})
-      xor FCrcTable[(PData^ xor Current) and {$IF DEFINED(USE_JEDY_CORE_LIBRARY)}ByteMask{$ELSE}Byte.Mask{$IFEND}];
+    Current := (Current shr BitsPerByte) xor FCrcTable[Byte(PData^ xor Current)];
     Inc(PData);
     Dec(Length);
   end;

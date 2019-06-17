@@ -34,7 +34,7 @@ type
     HighPart: LongWord
   );
   1: (
-    QuadPart: Int64
+    QuadPart: UInt64
   );
   end;
 

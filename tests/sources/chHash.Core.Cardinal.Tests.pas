@@ -17,18 +17,13 @@ interface
 
 uses
   TestFramework,
-  System.SysUtils,
-{$IF DEFINED(USE_JEDY_CORE_LIBRARY)}
-  JclLogic,
-{$IFEND ~USE_JEDY_CORE_LIBRARY}
-  chHash.Core.Bits,
   chHash.Core.Bits.Tests;
 
 type
 
-{ TCardinalHelperTests }
+{ TCardinalTests }
 
-  TCardinalHelperTests = class(TBitsHelperTests<Cardinal>)
+  TCardinalTests = class(TBitsTests<Cardinal>)
   public
     procedure SetUp; override;
   published
@@ -36,90 +31,139 @@ type
     procedure ReverseBytesTest; override;
     procedure TestBitTest; override;
     procedure ToBytesTest; override;
+    procedure HelperReverseBitsTest; override;
+    procedure HelperReverseBytesTest; override;
+    procedure HelperTestBitTest; override;
+    procedure HelperToBytesTest; override;
   end;
 
 implementation
 
 uses
-  System.Generics.Defaults;
+  System.SysUtils,
+  System.Generics.Defaults,
+{$IF DEFINED(USE_JEDI_CORE_LIBRARY)}
+  JclLogic,
+{$ENDIF ~ USE_JEDI_CORE_LIBRARY}
+  chHash.Core.Bits;
 
-{ TCardinalHelperTests }
+{ TCardinalTests }
 
-procedure TCardinalHelperTests.ReverseBitsTest;
-begin
-  const Expected: Cardinal = $649C2FD3;
-  Test(
-    procedure(ConvertCount: Cardinal)
-    begin
-      var Actual: Cardinal := $0;
-      while ConvertCount <> 0 do
-      begin
-      {$IF DEFINED(USE_JEDY_CORE_LIBRARY)}
-        Actual := ReverseBits(FValue);
-      {$ELSE ~ NOT USE_JEDY_CORE_LIBRARY}
-        Actual := FValue.ReverseBits;
-      {$IFEND ~USE_JEDY_CORE_LIBRARY}
-        Dec(ConvertCount);
-      end;
-      CheckEquals(Expected, Actual, Format('Expected = $%s, Actual = $%s', [IntToHex(Expected), IntToHex(Actual)]));
-    end
-  );
-end;
-
-procedure TCardinalHelperTests.ReverseBytesTest;
-begin
-  const Expected: Cardinal = $2639F4CB;
-  Test(
-    procedure(ConvertCount: Cardinal)
-    begin
-      var Actual: Cardinal := $0;
-      while ConvertCount <> 0 do
-      begin
-      {$IF DEFINED(USE_JEDY_CORE_LIBRARY)}
-        Actual := ReverseBytes(FValue);
-      {$ELSE ~ NOT USE_JEDY_CORE_LIBRARY}
-        Actual := FValue.ReverseBytes;
-      {$IFEND ~USE_JEDY_CORE_LIBRARY}
-        Dec(ConvertCount);
-      end;
-      CheckEquals(Expected, Actual, Format('Expected = $%s, Actual = $%s', [IntToHex(Expected), IntToHex(Actual)]));
-    end
-  );
-end;
-
-procedure TCardinalHelperTests.SetUp;
+procedure TCardinalTests.SetUp;
 begin
   FValue := $CBF43926;
   FBytePerConvert := SizeOf(FValue);
 end;
 
-procedure TCardinalHelperTests.TestBitTest;
+procedure TCardinalTests.ReverseBitsTest;
 begin
-  const Expected: Boolean = True;
+  const Expected = $649C2FD3;
   Test(
-    procedure(ConvertCount: Cardinal)
+    procedure(const ConvertCount: Cardinal)
     begin
-      var Actual: Boolean := False;
-      while ConvertCount <> 0 do
+      var Actual := $0;
+      for var I := 1 to ConvertCount do
       begin
-      {$IF DEFINED(USE_JEDY_CORE_LIBRARY)}
+        Actual := ReverseBits(FValue);
+      end;
+      CheckEquals(Expected, Actual, Format('Expected = $%s, Actual = $%s', [IntToHex(Expected), IntToHex(Actual)]));
+    end
+  );
+end;
+
+procedure TCardinalTests.ReverseBytesTest;
+begin
+  const Expected = $2639F4CB;
+  Test(
+    procedure(const ConvertCount: Cardinal)
+    begin
+      var Actual := $0;
+      for var I := 1 to ConvertCount do
+      begin
+        Actual := ReverseBytes(FValue);
+      end;
+      CheckEquals(Expected, Actual, Format('Expected = $%s, Actual = $%s', [IntToHex(Expected), IntToHex(Actual)]));
+    end
+  );
+end;
+
+procedure TCardinalTests.TestBitTest;
+begin
+  const Expected = True;
+  Test(
+    procedure(const ConvertCount: Cardinal)
+    begin
+      var Actual := False;
+      for var I := 1 to ConvertCount do
+      begin
         Actual := TestBit(FValue, 18);
-      {$ELSE ~ NOT USE_JEDY_CORE_LIBRARY}
-        Actual := FValue.TestBit(18);
-      {$IFEND ~USE_JEDY_CORE_LIBRARY}
-        Dec(ConvertCount);
       end;
       CheckEquals(Expected, Actual);
     end
   );
 end;
 
-procedure TCardinalHelperTests.ToBytesTest;
+procedure TCardinalTests.ToBytesTest;
+begin
+  CheckTrue(TEqualityComparer<TBytes>.Default.Equals([$CB, $F4, $39, $26], ToBytes(FValue)));
+end;
+
+procedure TCardinalTests.HelperReverseBitsTest;
+begin
+  const Expected = $649C2FD3;
+  Test(
+    procedure(const ConvertCount: Cardinal)
+    begin
+      var Actual := $0;
+      for var I := 1 to ConvertCount do
+      begin
+        Actual := FValue.ReverseBits;
+      end;
+      CheckEquals(Expected, Actual, Format('Expected = $%s, Actual = $%s', [IntToHex(Expected), IntToHex(Actual)]));
+      CheckNotEquals(Expected, FValue, Format('Expected = $%s, Value = $%s', [IntToHex(Expected), IntToHex(FValue)]));
+    end
+  );
+end;
+
+procedure TCardinalTests.HelperReverseBytesTest;
+begin
+  const Expected = $2639F4CB;
+  Test(
+    procedure(const ConvertCount: Cardinal)
+    begin
+      var Actual := $0;
+      for var I := 1 to ConvertCount do
+      begin
+        Actual := FValue.ReverseBytes;
+      end;
+      CheckEquals(Expected, Actual, Format('Expected = $%s, Actual = $%s', [IntToHex(Expected), IntToHex(Actual)]));
+      CheckNotEquals(Expected, FValue, Format('Expected = $%s, Value = $%s', [IntToHex(Expected), IntToHex(FValue)]));
+    end
+  );
+end;
+
+procedure TCardinalTests.HelperTestBitTest;
+begin
+  const Expected = True;
+  Test(
+    procedure(const ConvertCount: Cardinal)
+    begin
+      var Actual := False;
+      for var I := 1 to ConvertCount do
+      begin
+        Actual := FValue.TestBit(18);
+      end;
+      CheckEquals(Expected, Actual);
+    end
+  );
+end;
+
+procedure TCardinalTests.HelperToBytesTest;
 begin
   CheckTrue(TEqualityComparer<TBytes>.Default.Equals([$CB, $F4, $39, $26], FValue.ToBytes));
 end;
 
 initialization
-  RegisterTest(TCardinalHelperTests.Suite);
+  RegisterTest(TCardinalTests.Suite);
 
 end.

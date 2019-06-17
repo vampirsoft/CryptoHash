@@ -22,16 +22,16 @@ uses
 
 type
 
-{ TchCrcAlgorithmTests<B, HA> }
+{ TchCrcAlgorithmTests<Bits, HA> }
 
-  TchCrcAlgorithmTests<B; HA: TchCrcAlgorithm<B>> = class abstract(TchAlgorithmTests<B, B, HA>)
+  TchCrcAlgorithmTests<Bits; HA: TchCrcAlgorithm<Bits>> = class abstract(TchAlgorithmTests<Bits, Bits, HA>)
   strict protected
-    FCrcTable: TchCrcAlgorithm<B>.TOneLevelCrcTable;
-    function GetCheckMessage(const Expected, Actual: B): string; override;
-    function BitsToHex(const Value: B): string; virtual; abstract;
-    function FinalControlCalculate(const Value: B): B; virtual; abstract;
+    FCrcTable: TchCrcAlgorithm<Bits>.TOneLevelCrcTable;
+    function GetCheckMessage(const Expected, Actual: Bits): string; override;
+    function BitsToHex(const Value: Bits): string; virtual; abstract;
+    function FinalControlCalculate(const Value: Bits): Bits; virtual; abstract;
     procedure ControllStressTest(const Data: TBytes); override;
-    procedure ControlCalculate(var Current: B; const Data; Length: Integer); virtual; abstract;
+    procedure ControlCalculate(var Current: Bits; const Data; Length: Integer); virtual; abstract;
   public
     procedure SetUp; override;
   published
@@ -44,11 +44,11 @@ implementation
 uses
   System.Diagnostics;
 
-{ TchCrcAlgorithmTests<B, HA> }
+{ TchCrcAlgorithmTests<Bits, HA> }
 
-procedure TchCrcAlgorithmTests<B, HA>.CheckTest;
+procedure TchCrcAlgorithmTests<Bits, HA>.CheckTest;
 begin
-  var Expected: B := FAlgorithm.Init;
+  var Expected := FAlgorithm.Init;
   ControlCalculate(Expected, FTestString[1], Length(FTestString));
   CheckResult(FAlgorithm.Check, FinalControlCalculate(Expected));
 
@@ -56,44 +56,44 @@ begin
   const TestSize = Random(107) + 1;
   var Data: TBytes;
   SetLength(Data, TestSize);
-  for var I: Byte := 0 to TestSize - 1 do
+  for var I := 0 to TestSize - 1 do
   begin
     Data[I] := Random(256);
   end;
 
   Expected := FAlgorithm.Init;
-  for var I: Byte := 0 to 1 do
+  for var I := 0 to 1 do
   begin
     ControlCalculate(Expected, Data[0], TestSize);
   end;
 
-  var Actual: B := FAlgorithm.Init;
-  for var I: Byte := 0 to 1 do
+  var Actual := FAlgorithm.Init;
+  for var I := 0 to 1 do
   begin
     FAlgorithm.Calculate(Actual, Data[0], TestSize);
   end;
   CheckResult(FinalControlCalculate(Expected), FAlgorithm.Final(Actual));
 end;
 
-procedure TchCrcAlgorithmTests<B, HA>.CombineTest;
+procedure TchCrcAlgorithmTests<Bits, HA>.CombineTest;
 begin
   Randomize;
-  const RightLength: Byte = Random(10);
-  const LeftLength: Byte = Length(FTestString) - RightLength;
+  const RightLength = Random(10);
+  const LeftLength = Length(FTestString) - RightLength;
 
-  var LeftCrc: B := FAlgorithm.Init;
+  var LeftCrc := FAlgorithm.Init;
   FAlgorithm.Calculate(LeftCrc, FTestString[1], LeftLength);
   LeftCrc := FAlgorithm.Final(LeftCrc);
 
-  var RightCrc: B := FAlgorithm.Init;
+  var RightCrc := FAlgorithm.Init;
   FAlgorithm.Calculate(RightCrc, FTestString[1 + LeftLength], RightLength);
   RightCrc := FAlgorithm.Final(RightCrc);
 
-  const Actual: B = FAlgorithm.Combine(LeftCrc, RightCrc, RightLength);
+  const Actual = FAlgorithm.Combine(LeftCrc, RightCrc, RightLength);
   CheckResult(FAlgorithm.Check, Actual);
 end;
 
-procedure TchCrcAlgorithmTests<B, HA>.ControllStressTest(const Data: TBytes);
+procedure TchCrcAlgorithmTests<Bits, HA>.ControllStressTest(const Data: TBytes);
 begin
   var Actual := FAlgorithm.Init;
   const Stopwatch = TStopwatch.StartNew;
@@ -107,12 +107,12 @@ begin
   else Status(Format('%s: Control Speed = %.3fs, %.3f MB/s', [FAlgorithm.ToString, S, (GetMaxLength/(1024 * 1024)/S) * GetCount]));
 end;
 
-function TchCrcAlgorithmTests<B, HA>.GetCheckMessage(const Expected, Actual: B): string;
+function TchCrcAlgorithmTests<Bits, HA>.GetCheckMessage(const Expected, Actual: Bits): string;
 begin
   Result := Format('%s: Expected = $%s, Actual = $%s', [FAlgorithm.ToString, BitsToHex(Expected), BitsToHex(Actual)]);
 end;
 
-procedure TchCrcAlgorithmTests<B, HA>.SetUp;
+procedure TchCrcAlgorithmTests<Bits, HA>.SetUp;
 begin
   inherited SetUp;
   FCrcTable := FAlgorithm.CrcTable;

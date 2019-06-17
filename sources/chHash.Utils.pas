@@ -31,29 +31,21 @@ type
 
 implementation
 
-uses
-{$IF DEFINED(USE_JEDY_CORE_LIBRARY)}
-  JclLogic;
-{$ELSE ~ NOT USE_JEDY_CORE_LIBRARY}
-  chHash.Core.Bits;
-{$IFEND ~USE_JEDY_CORE_LIBRARY}
-
 { TchUtils }
 
 class function TchUtils.Calculate<C, R>(const Stream: TStream; const Algorithm: TchAlgorithm<C, R>): R;
 begin
-  var Current: C := Algorithm.Init;
+  var Current := Algorithm.Init;
 
-  const SavedPosition: Int64 = Stream.Position;
+  const SavedPosition = Stream.Position;
   var Buffer: TBytes;
   try
-    const BufferSize: Word = {$IF DEFINED(USE_JEDY_CORE_LIBRARY)}WordMask{$ELSE}Word.Mask{$IFEND};
-    SetLength(Buffer, BufferSize);
+    SetLength(Buffer, Word.MaxValue);
     Stream.Position := 0;
-    var Length: Word := BufferSize;
-    while Length = BufferSize do
+    var Length := Word.MaxValue;
+    while Length = Word.MaxValue do
     begin
-      Length := Stream.Read(Buffer, BufferSize);
+      Length := Stream.Read(Buffer, Word.MaxValue);
       Algorithm.Calculate(Current, Buffer, Length);
     end;
   finally

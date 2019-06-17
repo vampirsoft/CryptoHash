@@ -29,12 +29,17 @@ type
   strict protected
     FName: string;
     constructor Create(const Name: string; const Init: C; const Check: R); reintroduce;
-    function IfThenElse<T>(const Condition: Boolean; const ThenValue, ElseValue: T): T; inline;
+    class function IfThenElse<T>(const Condition: Boolean; const ThenValue, ElseValue: T): T; inline; static;
+    class function InitArray<T>(const Length: Cardinal): TArray<T>; inline; static;
   public
-    procedure Calculate(var Current: C; Data: TBytes; Length: Cardinal); overload; inline;
-    procedure Calculate(var Current: C; const Data; Length: Cardinal); overload; inline;
-    procedure Calculate(var Current: C; Data: Pointer; Length: Cardinal); overload; virtual; abstract;
-    function Final(Current: C): R; virtual; abstract;
+    function Calculate(const Data: TBytes): R; overload; inline;
+    function Calculate(const Data; const Length: Cardinal): R; overload; inline;
+    function Calculate(const Data: Pointer; const Length: Cardinal): R; overload; inline;
+    procedure Calculate(var Current: C; const Data: TBytes); overload; inline;
+    procedure Calculate(var Current: C; const Data: TBytes; const Length: Cardinal); overload; inline;
+    procedure Calculate(var Current: C; const Data; const Length: Cardinal); overload; inline;
+    procedure Calculate(var Current: C; const Data: Pointer; const Length: Cardinal); overload; virtual; abstract;
+    function Final(const Current: C): R; virtual; abstract;
     function ToString: string; override; abstract;
     property Name: string read FName;
     property Init: C read FInit;
@@ -45,12 +50,34 @@ implementation
 
 { TchAlgorithm<C, R> }
 
-procedure TchAlgorithm<C, R>.Calculate(var Current: C; Data: TBytes; Length: Cardinal);
+function TchAlgorithm<C, R>.Calculate(const Data: TBytes): R;
+begin
+  Result := Calculate(Data[0], Length(Data));
+end;
+
+function TchAlgorithm<C, R>.Calculate(const Data; const Length: Cardinal): R;
+begin
+  Result := Calculate(@Data, Length);
+end;
+
+function TchAlgorithm<C, R>.Calculate(const Data: Pointer; const Length: Cardinal): R;
+begin
+  var Current := Init;
+  Calculate(Current, Data, Length);
+  Result := Final(Current);
+end;
+
+procedure TchAlgorithm<C, R>.Calculate(var Current: C; const Data: TBytes);
+begin
+  Calculate(Current, Data, Length(Data));
+end;
+
+procedure TchAlgorithm<C, R>.Calculate(var Current: C; const Data: TBytes; const Length: Cardinal);
 begin
   Calculate(Current, Data[0], Length);
 end;
 
-procedure TchAlgorithm<C, R>.Calculate(var Current: C; const Data; Length: Cardinal);
+procedure TchAlgorithm<C, R>.Calculate(var Current: C; const Data; const Length: Cardinal);
 begin
   Calculate(Current, @Data, Length);
 end;
@@ -62,11 +89,15 @@ begin
   FCheck := Check;
 end;
 
-function TchAlgorithm<C, R>.IfThenElse<T>(const Condition: Boolean; const ThenValue, ElseValue: T): T;
+class function TchAlgorithm<C, R>.IfThenElse<T>(const Condition: Boolean; const ThenValue, ElseValue: T): T;
 begin
   if Condition then Exit(ThenValue);
   Result := ElseValue;
 end;
 
-end.
+class function TchAlgorithm<C, R>.InitArray<T>(const Length: Cardinal): TArray<T>;
+begin
+  SetLength(Result, Length);
+end;
 
+end.

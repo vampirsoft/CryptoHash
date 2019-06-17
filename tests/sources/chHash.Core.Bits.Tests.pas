@@ -16,20 +16,19 @@ unit chHash.Core.Bits.Tests;
 interface
 
 uses
-  TestFramework,
-  System.SysUtils;
+  TestFramework;
 
 type
 
-{ TBitsHelperTests<Bits> }
+{ TBitsTests<Bits> }
 
-  TBitsHelperTests<Bits> = class abstract(TTestCase)
+  TBitsTests<Bits> = class abstract(TTestCase)
   strict private type
-    TTestCallbask = reference to procedure(ConvertCount: Cardinal);
+    TTestCallbask = reference to procedure(const ConvertCount: Cardinal);
   strict protected
     FValue: Bits;
     FBytePerConvert: Byte;
-    procedure Test(TestCallback: TTestCallbask);
+    procedure Test(const TestCallback: TTestCallbask);
   public
     procedure SetUp; override; abstract;
   published
@@ -37,19 +36,24 @@ type
     procedure ReverseBytesTest; virtual; abstract;
     procedure TestBitTest; virtual; abstract;
     procedure ToBytesTest; virtual; abstract;
+    procedure HelperReverseBitsTest; virtual; abstract;
+    procedure HelperReverseBytesTest; virtual; abstract;
+    procedure HelperTestBitTest; virtual; abstract;
+    procedure HelperToBytesTest; virtual; abstract;
   end;
 
 implementation
 
 uses
+  System.SysUtils,
   System.Diagnostics;
 
-{ TBitsHelperTests<Bits> }
+{ TBitsTests<Bits> }
 
-procedure TBitsHelperTests<Bits>.Test(TestCallback: TTestCallbask);
+procedure TBitsTests<Bits>.Test(const TestCallback: TTestCallbask);
 begin
   const Stopwatch = TStopwatch.StartNew;
-  const ConvertCount: Cardinal = 536870911; // 536 870 911
+  const ConvertCount = 536870911; // 536 870 911
   TestCallback(ConvertCount);
   Stopwatch.Stop;
   const Size: UInt64 = FBytePerConvert * ConvertCount;

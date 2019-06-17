@@ -19,17 +19,17 @@ program Crc32;
 
 uses
   DUnitTestRunner,
-{$IF NOT DEFINED(USE_JEDY_CORE_LIBRARY)}
-  chHash.Core in '..\..\..\sources\chHash.Core.pas',
-{$IFEND ~USE_JEDY_CORE_LIBRARY}
-  chHash.Core.Bits in '..\..\..\sources\chHash.Core.Bits.pas',
-  chHash in '..\..\..\sources\chHash.pas',
-  chHash.Utils in '..\..\..\sources\chHash.Utils.pas',
-  chHash.CRC in '..\..\..\sources\chHash.CRC.pas',
-  chHash.CRC.CRC32 in '..\..\..\sources\chHash.CRC.CRC32.pas',
-  chHash.Tests in '..\..\sources\chHash.Tests.pas',
-  chHash.CRC.Tests in '..\..\sources\chHash.CRC.Tests.pas',
-  chHash.CRC.CRC32.Tests in '..\..\sources\chHash.CRC.CRC32.Tests.pas';
+{$IF NOT DEFINED(USE_JEDI_CORE_LIBRARY)}
+  chHash.Core,
+{$ENDIF ~USE_JEDI_CORE_LIBRARY}
+  chHash.Core.Bits,
+  chHash,
+  chHash.Utils,
+  chHash.CRC,
+  chHash.CRC.CRC32,
+  chHash.Tests,
+  chHash.CRC.Tests,
+  chHash.CRC.CRC32.Tests;
 
 {$R *.RES}
 
@@ -40,4 +40,3 @@ begin
   Readln;
 {$ENDIF ~CONSOLE_TESTRUNNER}
 end.
-

@@ -17,18 +17,13 @@ interface
 
 uses
   TestFramework,
-  System.SysUtils,
-{$IF DEFINED(USE_JEDY_CORE_LIBRARY)}
-  JclLogic,
-{$IFEND ~USE_JEDY_CORE_LIBRARY}
-  chHash.Core.Bits,
   chHash.Core.Bits.Tests;
 
 type
 
-{ TUInt64HelperTests }
+{ TUInt64Tests }
 
-  TUInt64HelperTests = class(TBitsHelperTests<UInt64>)
+  TUInt64Tests = class(TBitsTests<UInt64>)
   public
     procedure SetUp; override;
   published
@@ -36,90 +31,139 @@ type
     procedure ReverseBytesTest; override;
     procedure TestBitTest; override;
     procedure ToBytesTest; override;
+    procedure HelperReverseBitsTest; override;
+    procedure HelperReverseBytesTest; override;
+    procedure HelperTestBitTest; override;
+    procedure HelperToBytesTest; override;
   end;
 
 implementation
 
 uses
-  System.Generics.Defaults;
+  System.SysUtils,
+  System.Generics.Defaults,
+{$IF DEFINED(USE_JEDI_CORE_LIBRARY)}
+  JclLogic,
+{$ENDIF ~ USE_JEDI_CORE_LIBRARY}
+  chHash.Core.Bits;
 
-{ TUInt64HelperTests }
+{ TUInt64Tests }
 
-procedure TUInt64HelperTests.ReverseBitsTest;
-begin
-  const Expected: UInt64 = $5F9C98FBDD93BA99;
-  Test(
-    procedure(ConvertCount: Cardinal)
-    begin
-      var Actual: UInt64 := $0;
-      while ConvertCount <> 0 do
-      begin
-      {$IF DEFINED(USE_JEDY_CORE_LIBRARY)}
-        Actual := ReverseBits(FValue);
-      {$ELSE ~ NOT USE_JEDY_CORE_LIBRARY}
-        Actual := FValue.ReverseBits;
-      {$IFEND ~USE_JEDY_CORE_LIBRARY}
-        Dec(ConvertCount);
-      end;
-      CheckEquals(Expected, Actual, Format('Expected = $%s, Actual = $%s', [IntToHex(Expected), IntToHex(Actual)]));
-    end
-  );
-end;
-
-procedure TUInt64HelperTests.ReverseBytesTest;
-begin
-  const Expected: UInt64 = $FA3919DFBBC95D99;
-  Test(
-    procedure(ConvertCount: Cardinal)
-    begin
-      var Actual: UInt64 := $0;
-      while ConvertCount <> 0 do
-      begin
-      {$IF DEFINED(USE_JEDY_CORE_LIBRARY)}
-        Actual := ReverseBytes(FValue);
-      {$ELSE ~ NOT USE_JEDY_CORE_LIBRARY}
-        Actual := FValue.ReverseBytes;
-      {$IFEND ~USE_JEDY_CORE_LIBRARY}
-        Dec(ConvertCount);
-      end;
-      CheckEquals(Expected, Actual, Format('Expected = $%s, Actual = $%s', [IntToHex(Expected), IntToHex(Actual)]));
-    end
-  );
-end;
-
-procedure TUInt64HelperTests.SetUp;
+procedure TUInt64Tests.SetUp;
 begin
   FValue := $995DC9BBDF1939FA;
   FBytePerConvert := SizeOf(FValue);
 end;
 
-procedure TUInt64HelperTests.TestBitTest;
+procedure TUInt64Tests.ReverseBitsTest;
 begin
-  const Expected: Boolean = True;
+  const Expected = UInt64($5F9C98FBDD93BA99);
   Test(
-    procedure(ConvertCount: Cardinal)
+    procedure(const ConvertCount: Cardinal)
     begin
-      var Actual: Boolean := False;
-      while ConvertCount <> 0 do
+      var Actual: UInt64 := $0;
+      for var I := 1 to ConvertCount do
       begin
-      {$IF DEFINED(USE_JEDY_CORE_LIBRARY)}
+        Actual := ReverseBits(FValue);
+      end;
+      CheckEquals(Expected, Actual, Format('Expected = $%s, Actual = $%s', [IntToHex(Expected), IntToHex(Actual)]));
+    end
+  );
+end;
+
+procedure TUInt64Tests.ReverseBytesTest;
+begin
+  const Expected = UInt64($FA3919DFBBC95D99);
+  Test(
+    procedure(const ConvertCount: Cardinal)
+    begin
+      var Actual: UInt64 := $0;
+      for var I := 1 to ConvertCount do
+      begin
+        Actual := ReverseBytes(FValue);
+      end;
+      CheckEquals(Expected, Actual, Format('Expected = $%s, Actual = $%s', [IntToHex(Expected), IntToHex(Actual)]));
+    end
+  );
+end;
+
+procedure TUInt64Tests.TestBitTest;
+begin
+  const Expected = True;
+  Test(
+    procedure(const ConvertCount: Cardinal)
+    begin
+      var Actual := False;
+      for var I := 1 to ConvertCount do
+      begin
         Actual := TestBit(FValue, 40);
-      {$ELSE ~ NOT USE_JEDY_CORE_LIBRARY}
-        Actual := FValue.TestBit(40);
-      {$IFEND ~USE_JEDY_CORE_LIBRARY}
-        Dec(ConvertCount);
       end;
       CheckEquals(Expected, Actual);
     end
   );
 end;
 
-procedure TUInt64HelperTests.ToBytesTest;
+procedure TUInt64Tests.ToBytesTest;
+begin
+  CheckTrue(TEqualityComparer<TBytes>.Default.Equals([$99, $5D, $C9, $BB, $DF, $19, $39, $FA], ToBytes(FValue)));
+end;
+
+procedure TUInt64Tests.HelperReverseBitsTest;
+begin
+  const Expected = UInt64($5F9C98FBDD93BA99);
+  Test(
+    procedure(const ConvertCount: Cardinal)
+    begin
+      var Actual: UInt64 := $0;
+      for var I := 1 to ConvertCount do
+      begin
+        Actual := FValue.ReverseBits;
+      end;
+      CheckEquals(Expected, Actual, Format('Expected = $%s, Actual = $%s', [IntToHex(Expected), IntToHex(Actual)]));
+      CheckNotEquals(Expected, FValue, Format('Expected = $%s, Value = $%s', [IntToHex(Expected), IntToHex(FValue)]));
+    end
+  );
+end;
+
+procedure TUInt64Tests.HelperReverseBytesTest;
+begin
+  const Expected = UInt64($FA3919DFBBC95D99);
+  Test(
+    procedure(const ConvertCount: Cardinal)
+    begin
+      var Actual: UInt64 := $0;
+      for var I := 1 to ConvertCount do
+      begin
+        Actual := FValue.ReverseBytes;
+      end;
+      CheckEquals(Expected, Actual, Format('Expected = $%s, Actual = $%s', [IntToHex(Expected), IntToHex(Actual)]));
+      CheckNotEquals(Expected, FValue, Format('Expected = $%s, Value = $%s', [IntToHex(Expected), IntToHex(FValue)]));
+    end
+  );
+end;
+
+procedure TUInt64Tests.HelperTestBitTest;
+begin
+  const Expected = True;
+  Test(
+    procedure(const ConvertCount: Cardinal)
+    begin
+      var Actual := False;
+      for var I := 1 to ConvertCount do
+      begin
+        Actual := FValue.TestBit(40);
+      end;
+      CheckEquals(Expected, Actual);
+    end
+  );
+end;
+
+procedure TUInt64Tests.HelperToBytesTest;
 begin
   CheckTrue(TEqualityComparer<TBytes>.Default.Equals([$99, $5D, $C9, $BB, $DF, $19, $39, $FA], FValue.ToBytes));
 end;
 
 initialization
-  RegisterTest(TUInt64HelperTests.Suite);
+  RegisterTest(TUInt64Tests.Suite);
 
 end.

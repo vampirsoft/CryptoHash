@@ -9,7 +9,7 @@
 //*****************************************************************************//
 /////////////////////////////////////////////////////////////////////////////////
 
-program Bits;
+program Crc32;
 
 {$INCLUDE CryptoHash.inc}
 
@@ -18,28 +18,30 @@ program Bits;
 {$ENDIF ~CONSOLE_TESTRUNNER}
 
 uses
-  DUnitTestRunner,
-  {$IF NOT DEFINED(USE_JEDI_CORE_LIBRARY)}
-  chHash.Core,
-  {$ENDIF ~ NOT USE_JEDI_CORE_LIBRARY}
-  chHash.Core.Bits,
-  chHash.Core.Bits.Tests,
-  chHash.Core.Byte.Tests,
-  chHash.Core.ShortInt.Tests,
-  chHash.Core.Word.Tests,
-  chHash.Core.SmallInt.Tests,
-  chHash.Core.Cardinal.Tests,
-  chHash.Core.Integer.Tests,
-  chHash.Core.UInt64.Tests,
-  chHash.Core.Int64.Tests,
-  chHash.Core.NativeUInt.Tests,
-  chHash.Core.NativeInt.Tests,
-  chHash.Core.Pointer.Tests;
+  Forms,
+  TestFramework,
+  GUITestRunner,
+  TextTestRunner,
+{$IF NOT DEFINED(USE_JEDY_CORE_LIBRARY)}
+  chHash.Core in '..\..\..\sources\chHash.Core.pas',
+{$IFEND ~USE_JEDY_CORE_LIBRARY}
+  chHash.Core.Bits in '..\..\..\sources\chHash.Core.Bits.pas',
+  chHash in '..\..\..\sources\chHash.pas',
+  chHash.Utils in '..\..\..\sources\chHash.Utils.pas',
+  chHash.CRC in '..\..\..\sources\chHash.CRC.pas',
+  chHash.CRC.CRC32 in '..\..\..\sources\chHash.CRC.CRC32.pas',
+  chHash.Tests in '..\..\sources\chHash.Tests.pas',
+  chHash.CRC.Tests in '..\..\sources\chHash.CRC.Tests.pas',
+  chHash.CRC.CRC32.Tests in '..\..\sources\chHash.CRC.CRC32.Tests.pas';
 
 {$R *.RES}
 
 begin
-  DUnitTestRunner.RunRegisteredTests;
+  Application.Initialize;
+  if IsConsole then
+    TextTestRunner.RunRegisteredTests
+  else
+    GUITestRunner.RunRegisteredTests;
 {$IFDEF CONSOLE_TESTRUNNER}
   Write('Для завершения нажмите "ENTER"');
   Readln;

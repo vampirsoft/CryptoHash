@@ -17,18 +17,13 @@ interface
 
 uses
   TestFramework,
-  System.SysUtils,
-{$IF DEFINED(USE_JEDY_CORE_LIBRARY)}
-  JclLogic,
-{$IFEND ~USE_JEDY_CORE_LIBRARY}
-  chHash.Core.Bits,
   chHash.Core.Bits.Tests;
 
 type
 
-{ TShortIntHelperTests }
+{ TShortIntTests }
 
-  TShortIntHelperTests = class(TBitsHelperTests<ShortInt>)
+  TShortIntTests = class(TBitsTests<ShortInt>)
   public
     procedure SetUp; override;
   published
@@ -36,87 +31,138 @@ type
     procedure ReverseBytesTest; override;
     procedure TestBitTest; override;
     procedure ToBytesTest; override;
+    procedure HelperReverseBitsTest; override;
+    procedure HelperReverseBytesTest; override;
+    procedure HelperTestBitTest; override;
+    procedure HelperToBytesTest; override;
   end;
 
 implementation
 
 uses
-  System.Generics.Defaults;
+  System.SysUtils,
+  System.Generics.Defaults,
+{$IF DEFINED(USE_JEDI_CORE_LIBRARY)}
+  JclLogic,
+{$ENDIF ~ USE_JEDI_CORE_LIBRARY}
+  chHash.Core.Bits;
 
-{ TShortIntHelperTests }
+{ TShortIntTests }
 
-procedure TShortIntHelperTests.ReverseBitsTest;
-begin
-  const Expected = ShortInt($2F);
-  Test(
-    procedure(ConvertCount: Cardinal)
-    begin
-      var Actual := ShortInt($0);
-      while ConvertCount <> 0 do
-      begin
-      {$IF DEFINED(USE_JEDY_CORE_LIBRARY)}
-        Actual := ReverseBits(FValue);
-      {$ELSE ~ NOT USE_JEDY_CORE_LIBRARY}
-        Actual := FValue.ReverseBits;
-      {$IFEND ~USE_JEDY_CORE_LIBRARY}
-        Dec(ConvertCount);
-      end;
-      CheckEquals(Expected, Actual, Format('Expected = $%s, Actual = $%s', [IntToHex(Expected), IntToHex(Actual)]));
-    end
-  );
-end;
-
-procedure TShortIntHelperTests.ReverseBytesTest;
-begin
-  const Expected = ShortInt($F4);
-  Test(
-    procedure(ConvertCount: Cardinal)
-    begin
-      var Actual := ShortInt($0);
-      while ConvertCount <> 0 do
-      begin
-        Actual := FValue;
-        Dec(ConvertCount);
-      end;
-      CheckEquals(Expected, Actual, Format('Expected = $%s, Actual = $%s', [IntToHex(Expected), IntToHex(Actual)]));
-    end
-  );
-end;
-
-procedure TShortIntHelperTests.SetUp;
+procedure TShortIntTests.SetUp;
 begin
   FValue := ShortInt($F4);
   FBytePerConvert := SizeOf(FValue);
 end;
 
-procedure TShortIntHelperTests.TestBitTest;
+procedure TShortIntTests.ReverseBitsTest;
 begin
-  const Expected: Boolean = True;
+  const Expected = ShortInt($2F);
   Test(
-    procedure(ConvertCount: Cardinal)
+    procedure(const ConvertCount: Cardinal)
     begin
-      var Actual: Boolean := False;
-      while ConvertCount <> 0 do
+      var Actual := $0;
+      for var I := 1 to ConvertCount do
       begin
-      {$IF DEFINED(USE_JEDY_CORE_LIBRARY)}
+        Actual := ReverseBits(FValue);
+      end;
+      CheckEquals(Expected, Actual, Format('Expected = $%s, Actual = $%s', [IntToHex(Expected), IntToHex(Actual)]));
+    end
+  );
+end;
+
+procedure TShortIntTests.ReverseBytesTest;
+begin
+  const Expected = ShortInt($F4);
+  Test(
+    procedure(const ConvertCount: Cardinal)
+    begin
+      var Actual := $0;
+      for var I := 1 to ConvertCount do
+      begin
+        Actual := FValue;
+      end;
+      CheckEquals(Expected, Actual, Format('Expected = $%s, Actual = $%s', [IntToHex(Expected), IntToHex(Actual)]));
+    end
+  );
+end;
+
+procedure TShortIntTests.TestBitTest;
+begin
+  const Expected = True;
+  Test(
+    procedure(const ConvertCount: Cardinal)
+    begin
+      var Actual := False;
+      for var I := 1 to ConvertCount do
+      begin
         Actual := TestBit(FValue, 2);
-      {$ELSE ~ NOT USE_JEDY_CORE_LIBRARY}
-        Actual := FValue.TestBit(2);
-      {$IFEND ~USE_JEDY_CORE_LIBRARY}
-        Dec(ConvertCount);
       end;
       CheckEquals(Expected, Actual);
     end
   );
 end;
 
-procedure TShortIntHelperTests.ToBytesTest;
+procedure TShortIntTests.ToBytesTest;
+begin
+  CheckTrue(TEqualityComparer<TBytes>.Default.Equals([$F4], ToBytes(FValue)));
+end;
+
+procedure TShortIntTests.HelperReverseBitsTest;
+begin
+  const Expected = ShortInt($2F);
+  Test(
+    procedure(const ConvertCount: Cardinal)
+    begin
+      var Actual := $0;
+      for var I := 1 to ConvertCount do
+      begin
+        Actual := FValue.ReverseBits;
+      end;
+      CheckEquals(Expected, Actual, Format('Expected = $%s, Actual = $%s', [IntToHex(Expected), IntToHex(Actual)]));
+      CheckNotEquals(Expected, FValue, Format('Expected = $%s, Value = $%s', [IntToHex(Expected), IntToHex(FValue)]));
+    end
+  );
+end;
+
+procedure TShortIntTests.HelperReverseBytesTest;
+begin
+  const Expected = ShortInt($F4);
+  Test(
+    procedure(const ConvertCount: Cardinal)
+    begin
+      var Actual := $0;
+      for var I := 1 to ConvertCount do
+      begin
+        Actual := FValue;
+      end;
+      CheckEquals(Expected, Actual, Format('Expected = $%s, Actual = $%s', [IntToHex(Expected), IntToHex(Actual)]));
+    end
+  );
+end;
+
+procedure TShortIntTests.HelperTestBitTest;
+begin
+  const Expected = True;
+  Test(
+    procedure(const ConvertCount: Cardinal)
+    begin
+      var Actual := False;
+      for var I := 1 to ConvertCount do
+      begin
+        Actual := FValue.TestBit(2);
+      end;
+      CheckEquals(Expected, Actual);
+    end
+  );
+end;
+
+procedure TShortIntTests.HelperToBytesTest;
 begin
   CheckTrue(TEqualityComparer<TBytes>.Default.Equals([$F4], FValue.ToBytes));
 end;
 
 initialization
-  RegisterTest(TShortIntHelperTests.Suite);
+  RegisterTest(TShortIntTests.Suite);
 
 end.
-
