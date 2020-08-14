@@ -51,13 +51,13 @@ uses
 
 procedure TNativeIntTests.SetUp;
 begin
-  FValue := NativeInt({$IF DEFINED(CPUX64)}$E2CE92D0FAFB0236{$ELSE}$F4ACFB13{$ENDIF});
+  FValue := NativeInt({$IF DEFINED(X64)}$E2CE92D0FAFB0236{$ELSE}$F4ACFB13{$ENDIF});
   FBytePerConvert := SizeOf(FValue);
 end;
 
 procedure TNativeIntTests.ReverseBitsTest;
 begin
-  const Expected = NativeInt({$IF DEFINED(CPUX64)}$6C40DF5F0B497347{$ELSE}$C8DF352F{$ENDIF});
+  const Expected = NativeInt({$IF DEFINED(X64)}$6C40DF5F0B497347{$ELSE}$C8DF352F{$ENDIF});
   Test(
     procedure(const ConvertCount: Cardinal)
     begin
@@ -73,7 +73,7 @@ end;
 
 procedure TNativeIntTests.ReverseBytesTest;
 begin
-  const Expected = NativeInt({$IF DEFINED(CPUX64)}$3602FBFAD092CEE2{$ELSE}$13FBACF4{$ENDIF});
+  const Expected = NativeInt({$IF DEFINED(X64)}$3602FBFAD092CEE2{$ELSE}$13FBACF4{$ENDIF});
   Test(
     procedure(const ConvertCount: Cardinal)
     begin
@@ -96,7 +96,7 @@ begin
       var Actual := False;
       for var I := 1 to ConvertCount do
       begin
-        Actual := TestBit(FValue, {$IF DEFINED(CPUX64)}36{$ELSE}21{$ENDIF});
+        Actual := TestBit(FValue, {$IF DEFINED(X64)}36{$ELSE}21{$ENDIF});
       end;
       CheckEquals(Expected, Actual);
     end
@@ -107,7 +107,7 @@ procedure TNativeIntTests.ToBytesTest;
 begin
   CheckTrue(
     TEqualityComparer<TBytes>.Default.Equals(
-      {$IF DEFINED(CPUX64)}[$E2, $CE, $92, $D0, $FA, $FB, $02, $36]{$ELSE}[$F4, $AC, $FB, $13]{$ENDIF},
+      {$IF DEFINED(X64)}[$E2, $CE, $92, $D0, $FA, $FB, $02, $36]{$ELSE}[$F4, $AC, $FB, $13]{$ENDIF},
       ToBytes(FValue)
     )
   );
@@ -115,7 +115,7 @@ end;
 
 procedure TNativeIntTests.HelperReverseBitsTest;
 begin
-  const Expected = NativeInt({$IF DEFINED(CPUX64)}$6C40DF5F0B497347{$ELSE}$C8DF352F{$ENDIF});
+  const Expected = NativeInt({$IF DEFINED(X64)}$6C40DF5F0B497347{$ELSE}$C8DF352F{$ENDIF});
   Test(
     procedure(const ConvertCount: Cardinal)
     begin
@@ -131,7 +131,7 @@ end;
 
 procedure TNativeIntTests.HelperReverseBytesTest;
 begin
-  const Expected = NativeInt({$IF DEFINED(CPUX64)}$3602FBFAD092CEE2{$ELSE}$13FBACF4{$ENDIF});
+  const Expected = NativeInt({$IF DEFINED(X64)}$3602FBFAD092CEE2{$ELSE}$13FBACF4{$ENDIF});
   Test(
     procedure(const ConvertCount: Cardinal)
     begin
@@ -154,7 +154,7 @@ begin
       var Actual := False;
       for var I := 1 to ConvertCount do
       begin
-        Actual := FValue.TestBit({$IF DEFINED(CPUX64)}36{$ELSE}21{$ENDIF});
+        Actual := FValue.TestBit({$IF DEFINED(X64)}36{$ELSE}21{$ENDIF});
       end;
       CheckEquals(Expected, Actual);
     end
@@ -165,7 +165,7 @@ procedure TNativeIntTests.HelperToBytesTest;
 begin
   CheckTrue(
     TEqualityComparer<TBytes>.Default.Equals(
-      {$IF DEFINED(CPUX64)}[$E2, $CE, $92, $D0, $FA, $FB, $02, $36]{$ELSE}[$F4, $AC, $FB, $13]{$ENDIF},
+      {$IF DEFINED(X64)}[$E2, $CE, $92, $D0, $FA, $FB, $02, $36]{$ELSE}[$F4, $AC, $FB, $13]{$ENDIF},
       FValue.ToBytes
     )
   );
