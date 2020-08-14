@@ -162,7 +162,7 @@ end;
 {$IF DEFINED(USE_ASSEMBLER)}
 procedure TchCrc32Algorithm.Calculate(var Current: Cardinal; const Data: Pointer; const Length: Cardinal);
 asm
-{$IF DEFINED(CPUX64)}
+{$IF DEFINED(X64)}
   PUSH      RSI
   // Start
   // --> RCX    addres Self
@@ -186,7 +186,7 @@ asm
   MOV       EBX,        [RDX]          // Current -> EBX
   PUSH      RDX
   SUB       RSI,        RCX
-{$ELSE ~ CPUX86}
+{$ELSE ~ X86}
   PUSH      ESI
   // Start
   // --> EAX       address Self
@@ -210,214 +210,214 @@ asm
   MOV       EBX,        [EDX]          // Current -> EBX
   PUSH      EDX
   SUB       ESI,        ECX
-{$ENDIF ~ CPUX64}
+{$ENDIF ~ X64}
   // Initialized
 
-{$IF DEFINED(CPUX64)}
+{$IF DEFINED(X64)}
   ADD       RCX,        8
-{$ELSE ~ CPUX86}
+{$ELSE ~ X86}
   ADD       ECX,        8
-{$ENDIF ~ CPUX64}
+{$ENDIF ~ X64}
   JG        @NoBody
-{$IF DEFINED(CPUX64)}
+{$IF DEFINED(X64)}
   PUSH      RDI
-{$ELSE ~ CPUX86}
+{$ELSE ~ X86}
   PUSH      EDI
-{$ENDIF ~ CPUX64}
+{$ENDIF ~ X64}
   MOV       EDX,        EBX
 
 @BodyNext:
-{$IF DEFINED(CPUX64)}
+{$IF DEFINED(X64)}
   XOR       EDX,        [RSI + RCX - 8]
   MOV       EAX,        [RSI + RCX - 4]
-{$ELSE ~ CPUX86}
+{$ELSE ~ X86}
   XOR       EDX,        [ESI + ECX - 8]
   MOV       EAX,        [ESI + ECX - 4]
-{$ENDIF ~ CPUX64}
+{$ENDIF ~ X64}
 
   MOVZX     EDI,        AL
-{$IF DEFINED(CPUX64)}
+{$IF DEFINED(X64)}
   MOV       EBX,        [RDI * 4 + RBP + $0C00]      // (255 * 4) * 3
-{$ELSE ~ CPUX86}
+{$ELSE ~ X86}
   MOV       EBX,        [EDI * 4 + EBP + $0C00]      // (255 * 4) * 3
-{$ENDIF ~ CPUX64}
+{$ENDIF ~ X64}
   MOVZX     EDI,        AH
-{$IF DEFINED(CPUX64)}
+{$IF DEFINED(X64)}
   XOR       EBX,        [RDI * 4 + RBP + $0800]      // (255 * 4) * 2
-{$ELSE ~ CPUX86}
+{$ELSE ~ X86}
   XOR       EBX,        [EDI * 4 + EBP + $0800]      // (255 * 4) * 2
-{$ENDIF ~ CPUX64}
+{$ENDIF ~ X64}
   SHR       EAX,        16
   MOVZX     EDI,        AL
-{$IF DEFINED(CPUX64)}
+{$IF DEFINED(X64)}
   XOR       EBX,        [RDI * 4 + RBP + $0400]      // (255 * 4) * 1
-{$ELSE ~ CPUX86}
+{$ELSE ~ X86}
   XOR       EBX,        [EDI * 4 + EBP + $0400]      // (255 * 4) * 1
-{$ENDIF ~ CPUX64}
+{$ENDIF ~ X64}
   MOVZX     EDI,        AH
-{$IF DEFINED(CPUX64)}
+{$IF DEFINED(X64)}
   XOR       EBX,        [RDI * 4 + RBP]              // (255 * 4) * 0
-{$ELSE ~ CPUX86}
+{$ELSE ~ X86}
   XOR       EBX,        [EDI * 4 + EBP]              // (255 * 4) * 0
-{$ENDIF ~ CPUX64}
+{$ENDIF ~ X64}
 
   MOVZX     EDI,        DL
-{$IF DEFINED(CPUX64)}
+{$IF DEFINED(X64)}
   XOR       EBX,        [RDI * 4 + RBP + $1C00]      // (255 * 4) * 7
-{$ELSE ~ CPUX86}
+{$ELSE ~ X86}
   XOR       EBX,        [EDI * 4 + EBP + $1C00]      // (255 * 4) * 7
-{$ENDIF ~ CPUX64}
+{$ENDIF ~ X64}
   MOVZX     EDI,        DH
-{$IF DEFINED(CPUX64)}
+{$IF DEFINED(X64)}
   XOR       EBX,        [RDI * 4 + RBP + $1800]      // (255 * 4) * 6
-{$ELSE ~ CPUX86}
+{$ELSE ~ X86}
   XOR       EBX,        [EDI * 4 + EBP + $1800]      // (255 * 4) * 6
-{$ENDIF ~ CPUX64}
+{$ENDIF ~ X64}
   SHR       EDX,        16
   MOVZX     EDI,        DL
-{$IF DEFINED(CPUX64)}
+{$IF DEFINED(X64)}
   XOR       EBX,        [RDI * 4 + RBP + $1400]      // (255 * 4) * 5
-{$ELSE ~ CPUX86}
+{$ELSE ~ X86}
   XOR       EBX,        [EDI * 4 + EBP + $1400]      // (255 * 4) * 5
-{$ENDIF ~ CPUX64}
+{$ENDIF ~ X64}
   MOVZX     EDI,        DH
-{$IF DEFINED(CPUX64)}
+{$IF DEFINED(X64)}
   XOR       EBX,        [RDI * 4 + RBP + $1000]      // (255 * 4) * 4
-{$ELSE ~ CPUX86}
+{$ELSE ~ X86}
   XOR       EBX,        [EDI * 4 + EBP + $1000]      // (255 * 4) * 4
-{$ENDIF ~ CPUX64}
+{$ENDIF ~ X64}
 
-{$IF DEFINED(CPUX64)}
+{$IF DEFINED(X64)}
   ADD       RCX,        8
-{$ELSE ~ CPUX86}
+{$ELSE ~ X86}
   ADD       ECX,        8
-{$ENDIF ~ CPUX64}
+{$ENDIF ~ X64}
   JG        @BodyDone
 
-{$IF DEFINED(CPUX64)}
+{$IF DEFINED(X64)}
   XOR       EBX,        [RSI + RCX - 8]
   MOV       EAX,        [RSI + RCX - 4]
-{$ELSE ~ CPUX86}
+{$ELSE ~ X86}
   XOR       EBX,        [ESI + ECX - 8]
   MOV       EAX,        [ESI + ECX - 4]
-{$ENDIF ~ CPUX64}
+{$ENDIF ~ X64}
 
   MOVZX     EDI,        AL
-{$IF DEFINED(CPUX64)}
+{$IF DEFINED(X64)}
   MOV       EDX,        [RDI * 4 + RBP + $0C00]      // (255 * 4) * 3
-{$ELSE ~ CPUX86}
+{$ELSE ~ X86}
   MOV       EDX,        [EDI * 4 + EBP + $0C00]      // (255 * 4) * 3
-{$ENDIF ~ CPUX64}
+{$ENDIF ~ X64}
   MOVZX     EDI,        AH
-{$IF DEFINED(CPUX64)}
+{$IF DEFINED(X64)}
   XOR       EDX,        [RDI * 4 + RBP + $0800]      // (255 * 4) * 2
-{$ELSE ~ CPUX86}
+{$ELSE ~ X86}
   XOR       EDX,        [EDI * 4 + EBP + $0800]      // (255 * 4) * 2
-{$ENDIF ~ CPUX64}
+{$ENDIF ~ X64}
   SHR       EAX,        16
   MOVZX     EDI,        AL
-{$IF DEFINED(CPUX64)}
+{$IF DEFINED(X64)}
   XOR       EDX,        [RDI * 4 + RBP + $0400]      // (255 * 4) * 1
-{$ELSE ~ CPUX86}
+{$ELSE ~ X86}
   XOR       EDX,        [EDI * 4 + EBP + $0400]      // (255 * 4) * 1
-{$ENDIF ~ CPUX64}
+{$ENDIF ~ X64}
   MOVZX     EDI,        AH
-{$IF DEFINED(CPUX64)}
+{$IF DEFINED(X64)}
   XOR       EDX,        [RDI * 4 + RBP]              // (255 * 4) * 0
-{$ELSE ~ CPUX86}
+{$ELSE ~ X86}
   XOR       EDX,        [EDI * 4 + EBP]              // (255 * 4) * 0
-{$ENDIF ~ CPUX64}
+{$ENDIF ~ X64}
 
   MOVZX     EDI,        BL
-{$IF DEFINED(CPUX64)}
+{$IF DEFINED(X64)}
   XOR       EDX,        [RDI * 4 + RBP + $1C00]      // (255 * 4) * 7
-{$ELSE ~ CPUX86}
+{$ELSE ~ X86}
   XOR       EDX,        [EDI * 4 + EBP + $1C00]      // (255 * 4) * 7
-{$ENDIF ~ CPUX64}
+{$ENDIF ~ X64}
   MOVZX     EDI,        BH
-{$IF DEFINED(CPUX64)}
+{$IF DEFINED(X64)}
   XOR       EDX,        [RDI * 4 + RBP + $1800]      // (255 * 4) * 6
-{$ELSE ~ CPUX86}
+{$ELSE ~ X86}
   XOR       EDX,        [EDI * 4 + EBP + $1800]      // (255 * 4) * 6
-{$ENDIF ~ CPUX64}
+{$ENDIF ~ X64}
   SHR       EBX,        16
   MOVZX     EDI,        BL
-{$IF DEFINED(CPUX64)}
+{$IF DEFINED(X64)}
   XOR       EDX,        [RDI * 4 + RBP + $1400]      // (255 * 4) * 5
-{$ELSE ~ CPUX86}
+{$ELSE ~ X86}
   XOR       EDX,        [EDI * 4 + EBP + $1400]      // (255 * 4) * 5
-{$ENDIF ~ CPUX64}
+{$ENDIF ~ X64}
   MOVZX     EDI,        BH
-{$IF DEFINED(CPUX64)}
+{$IF DEFINED(X64)}
   XOR       EDX,        [RDI * 4 + RBP + $1000]      // (255 * 4) * 4
-{$ELSE ~ CPUX86}
+{$ELSE ~ X86}
   XOR       EDX,        [EDI * 4 + EBP + $1000]      // (255 * 4) * 4
-{$ENDIF ~ CPUX64}
+{$ENDIF ~ X64}
 
-{$IF DEFINED(CPUX64)}
+{$IF DEFINED(X64)}
   ADD       RCX,        8
-{$ELSE ~ CPUX86}
+{$ELSE ~ X86}
   ADD       ECX,        8
-{$ENDIF ~ CPUX64}
+{$ENDIF ~ X64}
   JLE       @BodyNext
   MOV       EBX,        EDX
 
 @BodyDone:
-{$IF DEFINED(CPUX64)}
+{$IF DEFINED(X64)}
   POP       RDI
-{$ELSE ~ CPUX86}
+{$ELSE ~ X86}
   POP       EDI
-{$ENDIF ~ CPUX64}
+{$ENDIF ~ X64}
 
 @NoBody:
-{$IF DEFINED(CPUX64)}
+{$IF DEFINED(X64)}
   SUB       RCX,        8
-{$ELSE ~ CPUX86}
+{$ELSE ~ X86}
   SUB       ECX,        8
-{$ENDIF ~ CPUX64}
+{$ENDIF ~ X64}
   JGE       @Done
 
 @Tail:
-{$IF DEFINED(CPUX64)}
+{$IF DEFINED(X64)}
   MOVZX     EAX,        [RSI + RCX]
-{$ELSE ~ CPUX86}
+{$ELSE ~ X86}
   MOVZX     EAX,        [ESI + ECX]
-{$ENDIF ~ CPUX64}
+{$ENDIF ~ X64}
   XOR       AL,          BL
   SHR       EBX,        8
-{$IF DEFINED(CPUX64)}
+{$IF DEFINED(X64)}
   XOR       EBX,        [RAX * 4 + RBP]
-{$ELSE ~ CPUX86}
+{$ELSE ~ X86}
   XOR       EBX,        [EAX * 4 + EBP]
-{$ENDIF ~ CPUX64}
-{$IF DEFINED(CPUX64)}
+{$ENDIF ~ X64}
+{$IF DEFINED(X64)}
   INC       RCX
-{$ELSE ~ CPUX86}
+{$ELSE ~ X86}
   INC       ECX
-{$ENDIF ~ CPUX64}
+{$ENDIF ~ X64}
   JNZ       @Tail
 
 @Done:
-{$IF DEFINED(CPUX64)}
+{$IF DEFINED(X64)}
   POP       RDX
   MOV       [RDX],      EBX            // Result -> Current
   POP       RBX
   POP       RCX
   POP       RBP
-{$ELSE ~ CPUX86}
+{$ELSE ~ X86}
   POP       EDX
   MOV       [EDX],      EBX            // Result -> Current
   POP       EBX
   POP       EAX
   POP       EBP
-{$ENDIF ~ CPUX64}
+{$ENDIF ~ X64}
 @Ret:
   // Finish
-{$IF DEFINED(CPUX64)}
+{$IF DEFINED(X64)}
   POP       RSI
-{$ELSE ~ CPUX86}
+{$ELSE ~ X86}
   POP       ESI
-{$ENDIF ~ CPUX64}
+{$ENDIF ~ X64}
 end;
 {$ELSE ~ USE_FORCE_DELPHI}
 procedure TchCrc32Algorithm.Calculate(var Current: Cardinal; const Data: Pointer; const Length: Cardinal);

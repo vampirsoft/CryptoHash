@@ -13,13 +13,13 @@ unit chHash.Core.Bits;
 
 {$INCLUDE CryptoHash.inc}
 
-{$IF NOT DEFINED(CPUX64) AND DEFINED(USE_FORCE_DELPHI)}
+{$IF NOT DEFINED(X64) AND DEFINED(USE_FORCE_DELPHI)}
   {$DEFINE USE_FORCE_DELPHI_X86}
-{$ENDIF ~ NOT CPUX64 OR NOT USE_FORCE_DELPHI}
+{$ENDIF ~ NOT X64 OR NOT USE_FORCE_DELPHI}
 
-{$IF NOT DEFINED(CPUX64) AND DEFINED(USE_ASSEMBLER)}
+{$IF NOT DEFINED(X64) AND DEFINED(USE_ASSEMBLER)}
   {$DEFINE LARGE_INT_SPLIT}
-{$ENDIF ~ NOT CPUX64 OR USE_FORCE_DELPHI}
+{$ENDIF ~ NOT X64 OR USE_FORCE_DELPHI}
 
 interface
 
@@ -81,22 +81,22 @@ function ReverseBits(const Value: SmallInt): SmallInt; overload;{$IF DEFINED(USE
 function ReverseBits(const Value: Cardinal): Cardinal; overload;
 function ReverseBits(const Value: Integer): Integer; overload;
 function ReverseBits(const Value: Int64): Int64; overload;{$IF DEFINED(USE_INLINE) AND DEFINED(LARGE_INT_SPLIT)}inline;{$ENDIF}
-procedure ReverseBits(const Address: Pointer; const Length: NativeUInt); overload;{$IF DEFINED(USE_INLINE) AND NOT DEFINED(CPUX64)}inline;{$ENDIF}
+procedure ReverseBits(const Address: Pointer; const Length: NativeUInt); overload;{$IF DEFINED(USE_INLINE) AND NOT DEFINED(X64)}inline;{$ENDIF}
 {$ENDIF ~ NOT USE_JEDI_CORE_LIBRARY}
 {$ENDREGION 'Not use JEDI Core Library'}
 function ReverseBits(const Value: UInt64): UInt64; overload;{$IF DEFINED(USE_INLINE) AND DEFINED(LARGE_INT_SPLIT) AND NOT DEFINED(USE_JEDI_CORE_LIBRARY)}inline;{$ENDIF}
-function ReverseBits(const Value: NativeUInt): NativeUInt; overload;{$IF DEFINED(USE_JEDI_CORE_LIBRARY) AND NOT DEFINED(CPUX64)}inline;{$ENDIF}
-function ReverseBits(const Value: NativeInt): NativeInt; overload;{$IF DEFINED(USE_JEDI_CORE_LIBRARY) AND NOT DEFINED(CPUX64)}inline;{$ENDIF}
+function ReverseBits(const Value: NativeUInt): NativeUInt; overload;{$IF DEFINED(USE_JEDI_CORE_LIBRARY) AND NOT DEFINED(X64)}inline;{$ENDIF}
+function ReverseBits(const Value: NativeInt): NativeInt; overload;{$IF DEFINED(USE_JEDI_CORE_LIBRARY) AND NOT DEFINED(X64)}inline;{$ENDIF}
 procedure ReverseBits(var Bytes: TBytes; const Length: NativeUInt); overload;{$IF DEFINED(USE_INLINE)}inline;{$ENDIF}
 
 {$REGION 'Not use JEDI Core Library'}
 {$IF NOT DEFINED(USE_JEDI_CORE_LIBRARY)}
-function ReverseBytes(const Value: Word): Word; overload;{$IF DEFINED(USE_INLINE) AND NOT DEFINED(CPUX64)}inline;{$ENDIF}
-function ReverseBytes(const Value: SmallInt): SmallInt; overload;{$IF DEFINED(USE_INLINE) AND NOT DEFINED(CPUX64)}inline;{$ENDIF}
+function ReverseBytes(const Value: Word): Word; overload;{$IF DEFINED(USE_INLINE) AND NOT DEFINED(X64)}inline;{$ENDIF}
+function ReverseBytes(const Value: SmallInt): SmallInt; overload;{$IF DEFINED(USE_INLINE) AND NOT DEFINED(X64)}inline;{$ENDIF}
 function ReverseBytes(const Value: Cardinal): Cardinal; overload;{$IF DEFINED(USE_INLINE) AND DEFINED(USE_FORCE_DELPHI_X86)}inline;{$ENDIF}
 function ReverseBytes(const Value: Integer): Integer; overload;{$IF DEFINED(USE_INLINE) AND DEFINED(USE_FORCE_DELPHI_X86)}inline;{$ENDIF}
 function ReverseBytes(const Value: Int64): Int64; overload;{$IF DEFINED(USE_INLINE) AND DEFINED(USE_FORCE_DELPHI_X86)}inline;{$ENDIF}
-procedure ReverseBytes(const Address: Pointer; const Length: NativeUInt); overload;{$IF DEFINED(USE_INLINE) AND NOT DEFINED(CPUX64)}inline;{$ENDIF}
+procedure ReverseBytes(const Address: Pointer; const Length: NativeUInt); overload;{$IF DEFINED(USE_INLINE) AND NOT DEFINED(X64)}inline;{$ENDIF}
 {$ENDIF ~ NOT USE_JEDI_CORE_LIBRARY}
 {$ENDREGION 'Not use JEDI Core Library'}
 function ReverseBytes(const Value: UInt64): UInt64; overload;{$IF DEFINED(USE_INLINE) AND DEFINED(USE_FORCE_DELPHI_X86)}inline;{$ENDIF}
@@ -347,7 +347,7 @@ function ReverseBits(const Value: Word): Word;
 type TReverse = TByteHelper.TReverse;
 {$IF DEFINED(USE_ASSEMBLER)}
 asm
-{$IF DEFINED(CPUX64)}
+{$IF DEFINED(X64)}
   // Start
   // --> CX Value
   // <-- AX Result
@@ -361,7 +361,7 @@ asm
   MOVZX     R9,         CL
   MOV       AL,         [R8 + R9]
   // Finish
-{$ELSE ~ CPUX86}
+{$ELSE ~ X86}
   // Start
   // --> AX Value
   // <-- AX Result
@@ -375,7 +375,7 @@ asm
   ADD       ECX,        offset TReverse.FTable  // address TReverse.FTable + ECX
   MOV       AL,         [ECX]
   // Finish
-{$ENDIF ~ CPUX64}
+{$ENDIF ~ X64}
 end;
 {$ELSE ~ USE_FORCE_DELPHI}
 const Size = Byte(SizeOf(Value));
@@ -394,7 +394,7 @@ function ReverseBits(const Value: SmallInt): SmallInt;
 type TReverse = TByteHelper.TReverse;
 {$IF DEFINED(USE_ASSEMBLER)}
 asm
-{$IF DEFINED(CPUX64)}
+{$IF DEFINED(X64)}
   // Start
   // --> CX Value
   // <-- AX Result
@@ -408,7 +408,7 @@ asm
   MOVZX     R9,         CL
   MOV       AL,         [R8 + R9]
   // Finish
-{$ELSE ~ CPUX86}
+{$ELSE ~ X86}
   // Start
   // --> AX Value
   // <-- AX Result
@@ -422,7 +422,7 @@ asm
   ADD       ECX,        offset TReverse.FTable  // address TReverse.FTable + ECX
   MOV       AL,         [ECX]
   // Finish
-{$ENDIF ~ CPUX64}
+{$ENDIF ~ X64}
 end;
 {$ELSE ~ USE_FORCE_DELPHI}
 const Size = Byte(SizeOf(Value));
@@ -442,7 +442,7 @@ const Size = Byte(SizeOf(Value));
 type TReverse = TByteHelper.TReverse;
 {$IF DEFINED(USE_ASSEMBLER)}
 asm
-{$IF DEFINED(CPUX64)}
+{$IF DEFINED(X64)}
   // Start
   // --> ECX Value
   // <-- EAX Result
@@ -459,7 +459,7 @@ asm
   SHR       RDX,        BitsPerByte
   LOOP      @Body
   // Finish
-{$ELSE ~ CPUX86}
+{$ELSE ~ X86}
   PUSH      EBP
   PUSH      EBX
   // Start
@@ -480,7 +480,7 @@ asm
   // Finish
   POP       EBX
   POP       EBP
-{$ENDIF ~ CPUX64}
+{$ENDIF ~ X64}
 end;
 {$ELSE ~ USE_FORCE_DELPHI}
 begin
@@ -499,7 +499,7 @@ const Size = Byte(SizeOf(Value));
 type TReverse = TByteHelper.TReverse;
 {$IF DEFINED(USE_ASSEMBLER)}
 asm
-{$IF DEFINED(CPUX64)}
+{$IF DEFINED(X64)}
   // Start
   // --> ECX Value
   // <-- EAX Result
@@ -516,7 +516,7 @@ asm
   SHR       RDX,        BitsPerByte
   LOOP      @Body
   // Finish
-{$ELSE ~ CPUX86}
+{$ELSE ~ X86}
   PUSH      EBP
   PUSH      EBX
   // Start
@@ -537,7 +537,7 @@ asm
   // Finish
   POP       EBX
   POP       EBP
-{$ENDIF ~ CPUX64}
+{$ENDIF ~ X64}
 end;
 {$ELSE ~ USE_FORCE_DELPHI}
 begin
@@ -552,7 +552,7 @@ end;
 {$ENDIF ~ USE_ASSEMBLER}
 
 function ReverseBits(const Value: Int64): Int64;
-{$IF DEFINED(CPUX64)}
+{$IF DEFINED(X64)}
 const Size = Byte(SizeOf(Value));
 type TReverse = TByteHelper.TReverse;
 {$IF DEFINED(USE_ASSEMBLER)}
@@ -584,12 +584,12 @@ begin
   end;
 end;
 {$ENDIF ~ USE_ASSEMBLER}
-{$ELSE ~ CPUX86}
+{$ELSE ~ X86}
 begin
   TLargeInteger(Result).LowPart := ReverseBits(TLargeInteger(Value).HighPart);
   TLargeInteger(Result).HighPart := ReverseBits(TLargeInteger(Value).LowPart);
 end;
-{$ENDIF ~ CPUX64}
+{$ENDIF ~ X64}
 
 procedure ReverseBits(const Address: Pointer; const Length: NativeUInt);
 type TReverse = TByteHelper.TReverse;
@@ -618,7 +618,7 @@ begin
   Result := JclLogic.ReverseBits(Int64(Value));
 end;
 {$ELSE ~ NOT USE_JEDI_CORE_LIBRARY}
-{$IF DEFINED(CPUX64)}
+{$IF DEFINED(X64)}
 const Size = Byte(SizeOf(Value));
 type TReverse = TByteHelper.TReverse;
 {$IF DEFINED(USE_ASSEMBLER)}
@@ -651,25 +651,25 @@ begin
   end;
 end;
 {$ENDIF ~ USE_ASSEMBLER}
-{$ELSE ~ CPUX86}
+{$ELSE ~ X86}
 begin
   TULargeInteger(Result).LowPart := ReverseBits(TULargeInteger(Value).HighPart);
   TULargeInteger(Result).HighPart := ReverseBits(TULargeInteger(Value).LowPart);
 end;
-{$ENDIF ~ CPUX64}
+{$ENDIF ~ X64}
 {$ENDIF ~ USE_JEDI_CORE_LIBRARY}
 
 function ReverseBits(const Value: NativeUInt): NativeUInt;
 {$IF DEFINED(USE_JEDI_CORE_LIBRARY)}
 begin
-  Result := JclLogic.ReverseBits({$IF DEFINED(CPUX64)}Int64{$ELSE}Cardinal{$ENDIF}(Value));
+  Result := JclLogic.ReverseBits({$IF DEFINED(X64)}Int64{$ELSE}Cardinal{$ENDIF}(Value));
 end;
 {$ELSE ~ NOT USE_JEDI_CORE_LIBRARY}
 const Size = Byte(SizeOf(Value));
 type TReverse = TByteHelper.TReverse;
 {$IF DEFINED(USE_ASSEMBLER)}
 asm
-{$IF DEFINED(CPUX64)}
+{$IF DEFINED(X64)}
   // Start
   // --> RCX Value
   // <-- EAX Result
@@ -686,7 +686,7 @@ asm
   SHR       RDX,        BitsPerByte
   LOOP      @Body
   // Finish
-{$ELSE ~ CPUX86}
+{$ELSE ~ X86}
   PUSH      EBP
   PUSH      EBX
   // Start
@@ -707,7 +707,7 @@ asm
   // Finish
   POP       EBX
   POP       EBP
-{$ENDIF ~ CPUX64}
+{$ENDIF ~ X64}
 end;
 {$ELSE ~ USE_FORCE_DELPHI}
 begin
@@ -725,14 +725,14 @@ end;
 function ReverseBits(const Value: NativeInt): NativeInt;
 {$IF DEFINED(USE_JEDI_CORE_LIBRARY)}
 begin
-  Result := JclLogic.ReverseBits({$IF DEFINED(CPUX64)}Int64{$ELSE}Integer{$ENDIF}(Value));
+  Result := JclLogic.ReverseBits({$IF DEFINED(X64)}Int64{$ELSE}Integer{$ENDIF}(Value));
 end;
 {$ELSE ~ NOT USE_JEDI_CORE_LIBRARY}
 const Size = Byte(SizeOf(Value));
 type TReverse = TByteHelper.TReverse;
 {$IF DEFINED(USE_ASSEMBLER)}
 asm
-{$IF DEFINED(CPUX64)}
+{$IF DEFINED(X64)}
   // Start
   // --> RCX Value
   // <-- EAX Result
@@ -748,7 +748,7 @@ asm
   MOV       AL,         [R8 + R9]
   SHR       RDX,        BitsPerByte
   LOOP      @Body
-{$ELSE ~ CPUX86}
+{$ELSE ~ X86}
   PUSH      EBP
   PUSH      EBX
   // Start
@@ -769,7 +769,7 @@ asm
   // Finish
   POP       EBX
   POP       EBP
-{$ENDIF ~ CPUX64}
+{$ENDIF ~ X64}
 end;
 {$ELSE ~ USE_FORCE_DELPHI}
 begin
@@ -794,7 +794,7 @@ end;
 {$REGION 'Not use JEDI Core Library'}
 {$IF NOT DEFINED(USE_JEDI_CORE_LIBRARY)}
 function ReverseBytes(const Value: Word): Word; overload;
-{$IF DEFINED(CPUX64) AND DEFINED(USE_ASSEMBLER)}
+{$IF DEFINED(X64) AND DEFINED(USE_ASSEMBLER)}
 asm
   // Start
   // --> CX Value
@@ -804,14 +804,14 @@ asm
   // Initialized
   // Finish
 end;
-{$ELSE ~ CPUX86 OR USE_FORCE_DELPHI}
+{$ELSE ~ X86 OR USE_FORCE_DELPHI}
 begin
   Result := (Value shl BitsPerByte) or (Value shr BitsPerByte);
 end;
-{$ENDIF ~ CPUX64 AND USE_ASSEMBLER}
+{$ENDIF ~ X64 AND USE_ASSEMBLER}
 
 function ReverseBytes(const Value: SmallInt): SmallInt; overload;
-{$IF DEFINED(CPUX64) AND DEFINED(USE_ASSEMBLER)}
+{$IF DEFINED(X64) AND DEFINED(USE_ASSEMBLER)}
 asm
   // Start
   // --> CX Value
@@ -821,24 +821,24 @@ asm
   // Initialized
   // Finish
 end;
-{$ELSE ~ CPUX86 OR USE_FORCE_DELPHI}
+{$ELSE ~ X86 OR USE_FORCE_DELPHI}
 begin
   Result := (Value shl BitsPerByte) or (Byte(Value shr BitsPerByte));
 end;
-{$ENDIF ~ CPUX64 AND USE_ASSEMBLER}
+{$ENDIF ~ X64 AND USE_ASSEMBLER}
 
 function ReverseBytes(const Value: Cardinal): Cardinal; overload;
 {$IF DEFINED(USE_ASSEMBLER)}
 asm
   // Start
-{$IF DEFINED(CPUX64)}
+{$IF DEFINED(X64)}
   // --> ECX Value
   // <-- EAX Result
   MOV       EAX,        ECX   // Value -> EAX
-{$ELSE ~ CPUX86}
+{$ELSE ~ X86}
   // --> EAX Value
   // <-- EAX Result
-{$ENDIF ~ CPUX64}
+{$ENDIF ~ X64}
   // Initialized
   BSWAP     EAX
   // Finish
@@ -855,14 +855,14 @@ function ReverseBytes(const Value: Integer): Integer; overload;
 {$IF DEFINED(USE_ASSEMBLER)}
 asm
   // Start
-{$IF DEFINED(CPUX64)}
+{$IF DEFINED(X64)}
   // --> ECX Value
   // <-- EAX Result
   MOV       EAX,        ECX   // Value -> EAX
-{$ELSE ~ CPUX86}
+{$ELSE ~ X86}
   // --> EAX Value
   // <-- EAX Result
-{$ENDIF ~ CPUX64}
+{$ENDIF ~ X64}
   // Initialized
   BSWAP     EAX
   // Finish
@@ -878,7 +878,7 @@ end;
 function ReverseBytes(const Value: Int64): Int64; overload;
 {$IF DEFINED(USE_ASSEMBLER)}
 asm
-{$IF DEFINED(CPUX64)}
+{$IF DEFINED(X64)}
   // Start
   // --> RCX Value
   // <-- RAX Result
@@ -886,7 +886,7 @@ asm
   // Initialized
   BSWAP     RAX
   // Finish
-{$ELSE ~ CPUX86}
+{$ELSE ~ X86}
   // Start
   // --> on stack  Value
   // <-- EAX       Hi 4 bytes of Result
@@ -897,25 +897,25 @@ asm
   BSWAP     EAX
   BSWAP     EDX
   // Finish
-{$ENDIF ~ CPUX64}
+{$ENDIF ~ X64}
 end;
 {$ELSE ~ USE_FORCE_DELPHI}
-{$IF NOT DEFINED(CPUX64)}
+{$IF NOT DEFINED(X64)}
 type TWrapper = TLargeInteger;
-{$ENDIF ~ NOT CPUX64}
+{$ENDIF ~ NOT X64}
 begin
-{$IF DEFINED(CPUX64)}
+{$IF DEFINED(X64)}
   Result :=
     ( Value                        shr (BitsPerByte * 7)) or ( Value                        shl (BitsPerByte * 7)) or
     ((Value and $00FF000000000000) shr (BitsPerByte * 5)) or ((Value and $000000000000FF00) shl (BitsPerByte * 5)) or
     ((Value and $0000FF0000000000) shr (BitsPerByte * 3)) or ((Value and $0000000000FF0000) shl (BitsPerByte * 3)) or
     ((Value and $000000FF00000000) shr  BitsPerByte)      or ((Value and $00000000FF000000) shl  BitsPerByte);
-{$ELSE ~ CPUX86}
+{$ELSE ~ X86}
   TWrapper(Result).HighPart :=
     {$IF DEFINED(USE_JEDI_CORE_LIBRARY)}JclLogic{$ELSE}chHash.Core.Bits{$ENDIF}.ReverseBytes(TWrapper(Value).LowPart);
   TWrapper(Result).LowPart :=
     {$IF DEFINED(USE_JEDI_CORE_LIBRARY)}JclLogic{$ELSE}chHash.Core.Bits{$ENDIF}.ReverseBytes(TWrapper(Value).HighPart);
-{$ENDIF ~ CPUX64}
+{$ENDIF ~ X64}
 end;
 {$ENDIF ~ USE_ASSEMBLER}
 
@@ -941,7 +941,7 @@ end;
 function ReverseBytes(const Value: UInt64): UInt64; overload;
 {$IF DEFINED(USE_ASSEMBLER)}
 asm
-{$IF DEFINED(CPUX64)}
+{$IF DEFINED(X64)}
   // Start
   // --> RCX Value
   // <-- RAX Result
@@ -949,7 +949,7 @@ asm
   // Initialized
   BSWAP     RAX
   // Finish
-{$ELSE ~ CPUX86}
+{$ELSE ~ X86}
   // Start
   // --> on stack  Value
   // <-- EAX       Hi 4 bytes of Result
@@ -960,32 +960,32 @@ asm
   BSWAP     EAX
   BSWAP     EDX
   // Finish
-{$ENDIF ~ CPUX64}
+{$ENDIF ~ X64}
 end;
 {$ELSE ~ USE_FORCE_DELPHI}
-{$IF NOT DEFINED(CPUX64)}
+{$IF NOT DEFINED(X64)}
 type TWrapper = TULargeInteger;
-{$ENDIF ~ NOT CPUX64}
+{$ENDIF ~ NOT X64}
 begin
-{$IF DEFINED(CPUX64)}
+{$IF DEFINED(X64)}
   Result :=
     ( Value                        shr (BitsPerByte * 7)) or ( Value                        shl (BitsPerByte * 7)) or
     ((Value and $00FF000000000000) shr (BitsPerByte * 5)) or ((Value and $000000000000FF00) shl (BitsPerByte * 5)) or
     ((Value and $0000FF0000000000) shr (BitsPerByte * 3)) or ((Value and $0000000000FF0000) shl (BitsPerByte * 3)) or
     ((Value and $000000FF00000000) shr  BitsPerByte)      or ((Value and $00000000FF000000) shl  BitsPerByte);
-{$ELSE ~CPUX86}
+{$ELSE ~ X86}
   TWrapper(Result).HighPart :=
     {$IF DEFINED(USE_JEDI_CORE_LIBRARY)}JclLogic{$ELSE}chHash.Core.Bits{$ENDIF}.ReverseBytes(TWrapper(Value).LowPart);
   TWrapper(Result).LowPart :=
     {$IF DEFINED(USE_JEDI_CORE_LIBRARY)}JclLogic{$ELSE}chHash.Core.Bits{$ENDIF}.ReverseBytes(TWrapper(Value).HighPart);
-{$ENDIF ~ CPUX64}
+{$ENDIF ~ X64}
 end;
 {$ENDIF ~ USE_ASSEMBLER}
 
 function ReverseBytes(const Value: NativeUInt): NativeUInt; overload;
 {$IF DEFINED(USE_ASSEMBLER)}
 asm
-{$IF DEFINED(CPUX64)}
+{$IF DEFINED(X64)}
   // Start
   // --> RCX Value
   // <-- RAX Result
@@ -993,34 +993,34 @@ asm
   // Initialized
   BSWAP     RAX
   // Finish
-{$ELSE ~ CPUX86}
+{$ELSE ~ X86}
   // --> EAX Value
   // <-- EAX Result
   // Initialized
   BSWAP     EAX
   // Finish
-{$ENDIF ~ NOT CPUX64}
+{$ENDIF ~ NOT X64}
 end;
 {$ELSE ~ USE_FORCE_DELPHI}
 begin
-{$IF DEFINED(CPUX64)}
+{$IF DEFINED(X64)}
   Result :=
     ( Value                        shr (BitsPerByte * 7)) or ( Value                        shl (BitsPerByte * 7)) or
     ((Value and $00FF000000000000) shr (BitsPerByte * 5)) or ((Value and $000000000000FF00) shl (BitsPerByte * 5)) or
     ((Value and $0000FF0000000000) shr (BitsPerByte * 3)) or ((Value and $0000000000FF0000) shl (BitsPerByte * 3)) or
     ((Value and $000000FF00000000) shr  BitsPerByte)      or ((Value and $00000000FF000000) shl  BitsPerByte);
-{$ELSE ~ CPUX86}
+{$ELSE ~ X86}
   Result :=
     ( Value shr                (BitsPerByte * 3)) or ( Value shl                (BitsPerByte * 3)) or
     ((Value and $00FF0000) shr  BitsPerByte)      or ((Value and $0000FF00) shl  BitsPerByte);
-{$ENDIF ~ NOT CPUX64}
+{$ENDIF ~ NOT X64}
 end;
 {$ENDIF ~ USE_ASSEMBLER}
 
 function ReverseBytes(const Value: NativeInt): NativeInt; overload;
 {$IF DEFINED(USE_ASSEMBLER)}
 asm
-{$IF DEFINED(CPUX64)}
+{$IF DEFINED(X64)}
   // Start
   // --> RCX Value
   // <-- RAX Result
@@ -1028,27 +1028,27 @@ asm
   // Initialized
   BSWAP     RAX
   // Finish
-{$ELSE ~ CPUX86}
+{$ELSE ~ X86}
   // --> EAX Value
   // <-- EAX Result
   // Initialized
   BSWAP     EAX
   // Finish
-{$ENDIF ~ NOT CPUX64}
+{$ENDIF ~ NOT X64}
 end;
 {$ELSE ~ USE_FORCE_DELPHI}
 begin
-{$IF DEFINED(CPUX64)}
+{$IF DEFINED(X64)}
   Result :=
     ( Value                        shr (BitsPerByte * 7)) or ( Value                        shl (BitsPerByte * 7)) or
     ((Value and $00FF000000000000) shr (BitsPerByte * 5)) or ((Value and $000000000000FF00) shl (BitsPerByte * 5)) or
     ((Value and $0000FF0000000000) shr (BitsPerByte * 3)) or ((Value and $0000000000FF0000) shl (BitsPerByte * 3)) or
     ((Value and $000000FF00000000) shr  BitsPerByte)      or ((Value and $00000000FF000000) shl  BitsPerByte);
-{$ELSE ~ CPUX86}
+{$ELSE ~ X86}
   Result :=
     ( Value                shr (BitsPerByte * 3)) or ( Value                shl (BitsPerByte * 3)) or
     ((Value and $00FF0000) shr  BitsPerByte)      or ((Value and $0000FF00) shl  BitsPerByte);
-{$ENDIF ~ NOT CPUX64}
+{$ENDIF ~ NOT X64}
 end;
 {$ENDIF ~ USE_ASSEMBLER}
 
@@ -1093,15 +1093,15 @@ end;
 
 function TestBit(const Value: Int64; const Bit: Byte): Boolean;
 begin
-{$IF DEFINED(CPUX64)}
+{$IF DEFINED(X64)}
   Result := (Value shr (Bit and (BitsPerInt64 - 1))) and 1 <> 0;
-{$ELSE ~ CPUX86}
+{$ELSE ~ X86}
   if Bit > BitsPerInteger - 1 then
   begin
     Exit(TestBit(TLargeInteger(Value).HighPart, Bit - BitsPerInteger));
   end;
   Result := TestBit(TLargeInteger(Value).LowPart, Bit);
-{$ENDIF ~ CPUX64}
+{$ENDIF ~ X64}
 end;
 
 function TestBitBuffer(const Buffer; const Bit: NativeUInt): Boolean;
@@ -1113,15 +1113,15 @@ end;
 
 function TestBit(const Value: UInt64; const Bit: Byte): Boolean;
 begin
-{$IF DEFINED(CPUX64)}
+{$IF DEFINED(X64)}
   Result := (Value shr (Bit and (BitsPerUInt64 - 1))) and 1 <> 0;
-{$ELSE ~ CPUX86}
+{$ELSE ~ X86}
   if Bit > BitsPerCardinal - 1 then
   begin
     Exit(TestBit(TULargeInteger(Value).HighPart, Bit - BitsPerCardinal));
   end;
   Result := TestBit(TULargeInteger(Value).LowPart, Bit);
-{$ENDIF ~ CPUX64}
+{$ENDIF ~ X64}
 end;
 
 function TestBit(const Value: NativeUInt; const Bit: Byte): Boolean;
@@ -1138,19 +1138,19 @@ function TestBit(const Address: Pointer; const Bit: NativeUInt): Boolean;
 {$IF DEFINED(USE_ASSEMBLER)}
 asm
   // Start
-{$IF DEFINED(CPUX64)}
+{$IF DEFINED(X64)}
   // --> RCX Address
   //     DL  Bit
   // <-- AL  Result
   // Initialized
   BT        [RCX],      Bit
-{$ELSE ~ CPUX86}
+{$ELSE ~ X86}
   // --> EAX Address
   //     DL  Bit
   // <-- AL  Result
   // Initialized
   BT        [EAX],      Bit
-{$ENDIF ~ CPUX64}
+{$ENDIF ~ X64}
   SETC      AL
   // Finish
 end;
@@ -1234,19 +1234,19 @@ end;
 
 function ToBytes(const Value: UInt64): TBytes;
 const Size = Byte(SizeOf(Value));
-{$IF NOT DEFINED(CPUX64)}
+{$IF NOT DEFINED(X64)}
 const CardinalSize = Byte(SizeOf(Cardinal));
-{$ENDIF ~ NOT CPUX64}
+{$ENDIF ~ NOT X64}
 begin
   SetLength(Result, Size);
-{$IF DEFINED(CPUX64)}
+{$IF DEFINED(X64)}
   var V := Value;
   for var I := Size - 1 downto 0 do
   begin
     Result[I] := V;
     V := V shr BitsPerByte;
   end;
-{$ELSE ~ CPUX86}
+{$ELSE ~ X86}
   var V := TULargeInteger(Value).LowPart;
   for var I := CardinalSize - 1 downto 0 do
   begin
@@ -1259,24 +1259,24 @@ begin
     Result[I] := V;
     V := V shr BitsPerByte;
   end;
-{$ENDIF ~ CPUX64}
+{$ENDIF ~ X64}
 end;
 
 function ToBytes(const Value: Int64): TBytes;
 const Size = Byte(SizeOf(Value));
-{$IF NOT DEFINED(CPUX64)}
+{$IF NOT DEFINED(X64)}
 const CardinalSize = Byte(SizeOf(Cardinal));
-{$ENDIF ~ NOT CPUX64}
+{$ENDIF ~ NOT X64}
 begin
   SetLength(Result, Size);
-{$IF DEFINED(CPUX64)}
+{$IF DEFINED(X64)}
   var V := Value;
   for var I := Size - 1 downto 0 do
   begin
     Result[I] := V;
     V := V shr BitsPerByte;
   end;
-{$ELSE ~ CPUX86}
+{$ELSE ~ X86}
   var V := TLargeInteger(Value).LowPart;
   for var I := CardinalSize - 1 downto 0 do
   begin
@@ -1289,7 +1289,7 @@ begin
     Result[I] := V;
     V := V shr BitsPerByte;
   end;
-{$ENDIF ~ CPUX64}
+{$ENDIF ~ X64}
 end;
 
 function ToBytes(const Value: NativeUInt): TBytes;
