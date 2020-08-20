@@ -27,6 +27,7 @@ type
   TchCrcAlgorithmTests<Bits; HA: TchCrcAlgorithm<Bits>> = class abstract(TchAlgorithmTests<Bits, Bits, HA>)
   strict protected
     FCrcTable: TchCrcAlgorithm<Bits>.TOneLevelCrcTable;
+    function GetCheckValueForEmpty: Bits; override;
     function GetCheckMessage(const Expected, Actual: Bits): string; override;
     function BitsToHex(const Value: Bits): string; virtual; abstract;
     function FinalControlCalculate(const Value: Bits): Bits; virtual; abstract;
@@ -110,6 +111,11 @@ end;
 function TchCrcAlgorithmTests<Bits, HA>.GetCheckMessage(const Expected, Actual: Bits): string;
 begin
   Result := Format('%s: Expected = $%s, Actual = $%s', [FAlgorithm.ToString, BitsToHex(Expected), BitsToHex(Actual)]);
+end;
+
+function TchCrcAlgorithmTests<Bits, HA>.GetCheckValueForEmpty: Bits;
+begin
+  Result := FAlgorithm.Final(FAlgorithm.Init);
 end;
 
 procedure TchCrcAlgorithmTests<Bits, HA>.SetUp;

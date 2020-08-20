@@ -31,6 +31,7 @@ type
     FAlgorithm: HA;
     function GetCount: Cardinal; virtual; abstract;
     function GetMaxLength: Cardinal; virtual; abstract;
+    function GetCheckValueForEmpty: R; virtual; abstract;
     function CreateAlgorithm: HA; virtual; abstract;
     function GetCheckMessage(const Expected, Actual: R): string; virtual; abstract;
     procedure ControllStressTest(const Data: TBytes); virtual;
@@ -39,6 +40,7 @@ type
     destructor Destroy; override;
     procedure SetUp; override;
   published
+    procedure EmptyDataTest;
     procedure ShortCheckTest;
     procedure CheckTest; virtual;
     procedure StressTest; virtual;
@@ -114,6 +116,19 @@ destructor TchAlgorithmTests<C, R, HA>.Destroy;
 begin
   FreeAndNil(FAlgorithm);
   inherited Destroy;
+end;
+
+procedure TchAlgorithmTests<C, R, HA>.EmptyDataTest;
+begin
+  const Expected = GetCheckValueForEmpty;
+
+  var Actual := FAlgorithm.Init;
+  FAlgorithm.Calculate(Actual, nil, 9);
+  CheckResult(Expected, FAlgorithm.Final(Actual));
+
+  Actual := FAlgorithm.Init;
+  FAlgorithm.Calculate(Actual, FTestString[1], 0);
+  CheckResult(Expected, FAlgorithm.Final(Actual));
 end;
 
 procedure TchAlgorithmTests<C, R, HA>.SetUp;

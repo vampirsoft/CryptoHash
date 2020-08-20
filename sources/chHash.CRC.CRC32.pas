@@ -78,26 +78,6 @@ begin
   Result := TchCrc32Algorithm.Create('Custom', Polynomial, Init, XorOut, Check, RefIn, RefOut);
 end;
 
-function TchCrc32Algorithm.IsZero(const Value: Cardinal): Boolean;
-begin
-  Result := Value = 0;
-end;
-
-function TchCrc32Algorithm.BitsToByte(const Value: Cardinal): Byte;
-begin
-  Result := Byte(Value);
-end;
-
-function TchCrc32Algorithm.LeftShift(const Value: Cardinal; const Bits: Byte): Cardinal;
-begin
-  Result := Value shl Bits;
-end;
-
-function TchCrc32Algorithm.RightShift(const Value: Cardinal; const Bits: Byte): Cardinal;
-begin
-  Result := Value shr Bits;
-end;
-
 class function TchCrc32Algorithm.CreateBASE91D: TchCrc32Algorithm;
 begin
   Result := TchCrc32Algorithm.Create('CRC-32/BASE91-D', $A833982B, CardinalMask, CardinalMask, $87315576, True, True);
@@ -149,381 +129,6 @@ begin
   Result := TchCrc32Algorithm.Create('CRC-32/MPEG-2', $04C11DB7, CardinalMask, $00000000, $0376E6E7, False, False);
 end;
 
-function TchCrc32Algorithm.BitwiseXor(const Left, Right: Cardinal): Cardinal;
-begin
-  Result := Left xor Right;
-end;
-
-function TchCrc32Algorithm.ByteToBits(const Value: Byte): Cardinal;
-begin
-  Result := Value;
-end;
-
-{$IF DEFINED(USE_ASSEMBLER)}
-procedure TchCrc32Algorithm.Calculate(var Current: Cardinal; const Data: Pointer; const Length: Cardinal);
-asm
-{$IF DEFINED(X64)}
-  PUSH      RSI
-  // Start
-  // --> RCX    addres Self
-  //     RDX    address Current
-  //     R8     addres Data
-  //     R9     Length
-  // <-- EBX -> [RDX]
-  TEST      R8,         R8
-  JZ        @Ret
-  NEG       R9
-  JGE       @Ret
-
-@Init:
-  MOV       RSI,        R8             // addresss Data -> RSI
-  PUSH      RBP
-  MOV       RBP,        RCX            // addresss Self -> RBP
-  ADD       RBP,        $18            // offset to Self.FTable -> RBP
-  PUSH      RCX
-  MOV       RCX,        R9             // Length -> RCX
-  PUSH      RBX
-  MOV       EBX,        [RDX]          // Current -> EBX
-  PUSH      RDX
-  SUB       RSI,        RCX
-{$ELSE ~ X86}
-  PUSH      ESI
-  // Start
-  // --> EAX       address Self
-  //     EDX       address Current
-  //     ECX       address Data
-  //     on stack  Length
-  // <-- EBX    -> [EDX]
-  TEST      ECX,        ECX
-  JZ        @Ret
-  MOV       ESI,        ECX            // addresss Data -> ESI
-  MOV       ECX, DWORD PTR [Length]    // Length -> ECX
-  NEG       ECX
-  JGE       @Ret
-
-@Init:
-  PUSH      EBP
-  MOV       EBP,        EAX            // addresss Self -> EBP
-  ADD       EBP,        $10            // offset to Self.FTable -> EBP
-  PUSH      EAX
-  PUSH      EBX
-  MOV       EBX,        [EDX]          // Current -> EBX
-  PUSH      EDX
-  SUB       ESI,        ECX
-{$ENDIF ~ X64}
-  // Initialized
-
-{$IF DEFINED(X64)}
-  ADD       RCX,        8
-{$ELSE ~ X86}
-  ADD       ECX,        8
-{$ENDIF ~ X64}
-  JG        @NoBody
-{$IF DEFINED(X64)}
-  PUSH      RDI
-{$ELSE ~ X86}
-  PUSH      EDI
-{$ENDIF ~ X64}
-  MOV       EDX,        EBX
-
-@BodyNext:
-{$IF DEFINED(X64)}
-  XOR       EDX,        [RSI + RCX - 8]
-  MOV       EAX,        [RSI + RCX - 4]
-{$ELSE ~ X86}
-  XOR       EDX,        [ESI + ECX - 8]
-  MOV       EAX,        [ESI + ECX - 4]
-{$ENDIF ~ X64}
-
-  MOVZX     EDI,        AL
-{$IF DEFINED(X64)}
-  MOV       EBX,        [RDI * 4 + RBP + $0C00]      // (255 * 4) * 3
-{$ELSE ~ X86}
-  MOV       EBX,        [EDI * 4 + EBP + $0C00]      // (255 * 4) * 3
-{$ENDIF ~ X64}
-  MOVZX     EDI,        AH
-{$IF DEFINED(X64)}
-  XOR       EBX,        [RDI * 4 + RBP + $0800]      // (255 * 4) * 2
-{$ELSE ~ X86}
-  XOR       EBX,        [EDI * 4 + EBP + $0800]      // (255 * 4) * 2
-{$ENDIF ~ X64}
-  SHR       EAX,        16
-  MOVZX     EDI,        AL
-{$IF DEFINED(X64)}
-  XOR       EBX,        [RDI * 4 + RBP + $0400]      // (255 * 4) * 1
-{$ELSE ~ X86}
-  XOR       EBX,        [EDI * 4 + EBP + $0400]      // (255 * 4) * 1
-{$ENDIF ~ X64}
-  MOVZX     EDI,        AH
-{$IF DEFINED(X64)}
-  XOR       EBX,        [RDI * 4 + RBP]              // (255 * 4) * 0
-{$ELSE ~ X86}
-  XOR       EBX,        [EDI * 4 + EBP]              // (255 * 4) * 0
-{$ENDIF ~ X64}
-
-  MOVZX     EDI,        DL
-{$IF DEFINED(X64)}
-  XOR       EBX,        [RDI * 4 + RBP + $1C00]      // (255 * 4) * 7
-{$ELSE ~ X86}
-  XOR       EBX,        [EDI * 4 + EBP + $1C00]      // (255 * 4) * 7
-{$ENDIF ~ X64}
-  MOVZX     EDI,        DH
-{$IF DEFINED(X64)}
-  XOR       EBX,        [RDI * 4 + RBP + $1800]      // (255 * 4) * 6
-{$ELSE ~ X86}
-  XOR       EBX,        [EDI * 4 + EBP + $1800]      // (255 * 4) * 6
-{$ENDIF ~ X64}
-  SHR       EDX,        16
-  MOVZX     EDI,        DL
-{$IF DEFINED(X64)}
-  XOR       EBX,        [RDI * 4 + RBP + $1400]      // (255 * 4) * 5
-{$ELSE ~ X86}
-  XOR       EBX,        [EDI * 4 + EBP + $1400]      // (255 * 4) * 5
-{$ENDIF ~ X64}
-  MOVZX     EDI,        DH
-{$IF DEFINED(X64)}
-  XOR       EBX,        [RDI * 4 + RBP + $1000]      // (255 * 4) * 4
-{$ELSE ~ X86}
-  XOR       EBX,        [EDI * 4 + EBP + $1000]      // (255 * 4) * 4
-{$ENDIF ~ X64}
-
-{$IF DEFINED(X64)}
-  ADD       RCX,        8
-{$ELSE ~ X86}
-  ADD       ECX,        8
-{$ENDIF ~ X64}
-  JG        @BodyDone
-
-{$IF DEFINED(X64)}
-  XOR       EBX,        [RSI + RCX - 8]
-  MOV       EAX,        [RSI + RCX - 4]
-{$ELSE ~ X86}
-  XOR       EBX,        [ESI + ECX - 8]
-  MOV       EAX,        [ESI + ECX - 4]
-{$ENDIF ~ X64}
-
-  MOVZX     EDI,        AL
-{$IF DEFINED(X64)}
-  MOV       EDX,        [RDI * 4 + RBP + $0C00]      // (255 * 4) * 3
-{$ELSE ~ X86}
-  MOV       EDX,        [EDI * 4 + EBP + $0C00]      // (255 * 4) * 3
-{$ENDIF ~ X64}
-  MOVZX     EDI,        AH
-{$IF DEFINED(X64)}
-  XOR       EDX,        [RDI * 4 + RBP + $0800]      // (255 * 4) * 2
-{$ELSE ~ X86}
-  XOR       EDX,        [EDI * 4 + EBP + $0800]      // (255 * 4) * 2
-{$ENDIF ~ X64}
-  SHR       EAX,        16
-  MOVZX     EDI,        AL
-{$IF DEFINED(X64)}
-  XOR       EDX,        [RDI * 4 + RBP + $0400]      // (255 * 4) * 1
-{$ELSE ~ X86}
-  XOR       EDX,        [EDI * 4 + EBP + $0400]      // (255 * 4) * 1
-{$ENDIF ~ X64}
-  MOVZX     EDI,        AH
-{$IF DEFINED(X64)}
-  XOR       EDX,        [RDI * 4 + RBP]              // (255 * 4) * 0
-{$ELSE ~ X86}
-  XOR       EDX,        [EDI * 4 + EBP]              // (255 * 4) * 0
-{$ENDIF ~ X64}
-
-  MOVZX     EDI,        BL
-{$IF DEFINED(X64)}
-  XOR       EDX,        [RDI * 4 + RBP + $1C00]      // (255 * 4) * 7
-{$ELSE ~ X86}
-  XOR       EDX,        [EDI * 4 + EBP + $1C00]      // (255 * 4) * 7
-{$ENDIF ~ X64}
-  MOVZX     EDI,        BH
-{$IF DEFINED(X64)}
-  XOR       EDX,        [RDI * 4 + RBP + $1800]      // (255 * 4) * 6
-{$ELSE ~ X86}
-  XOR       EDX,        [EDI * 4 + EBP + $1800]      // (255 * 4) * 6
-{$ENDIF ~ X64}
-  SHR       EBX,        16
-  MOVZX     EDI,        BL
-{$IF DEFINED(X64)}
-  XOR       EDX,        [RDI * 4 + RBP + $1400]      // (255 * 4) * 5
-{$ELSE ~ X86}
-  XOR       EDX,        [EDI * 4 + EBP + $1400]      // (255 * 4) * 5
-{$ENDIF ~ X64}
-  MOVZX     EDI,        BH
-{$IF DEFINED(X64)}
-  XOR       EDX,        [RDI * 4 + RBP + $1000]      // (255 * 4) * 4
-{$ELSE ~ X86}
-  XOR       EDX,        [EDI * 4 + EBP + $1000]      // (255 * 4) * 4
-{$ENDIF ~ X64}
-
-{$IF DEFINED(X64)}
-  ADD       RCX,        8
-{$ELSE ~ X86}
-  ADD       ECX,        8
-{$ENDIF ~ X64}
-  JLE       @BodyNext
-  MOV       EBX,        EDX
-
-@BodyDone:
-{$IF DEFINED(X64)}
-  POP       RDI
-{$ELSE ~ X86}
-  POP       EDI
-{$ENDIF ~ X64}
-
-@NoBody:
-{$IF DEFINED(X64)}
-  SUB       RCX,        8
-{$ELSE ~ X86}
-  SUB       ECX,        8
-{$ENDIF ~ X64}
-  JGE       @Done
-
-@Tail:
-{$IF DEFINED(X64)}
-  MOVZX     EAX,        [RSI + RCX]
-{$ELSE ~ X86}
-  MOVZX     EAX,        [ESI + ECX]
-{$ENDIF ~ X64}
-  XOR       AL,          BL
-  SHR       EBX,        8
-{$IF DEFINED(X64)}
-  XOR       EBX,        [RAX * 4 + RBP]
-{$ELSE ~ X86}
-  XOR       EBX,        [EAX * 4 + EBP]
-{$ENDIF ~ X64}
-{$IF DEFINED(X64)}
-  INC       RCX
-{$ELSE ~ X86}
-  INC       ECX
-{$ENDIF ~ X64}
-  JNZ       @Tail
-
-@Done:
-{$IF DEFINED(X64)}
-  POP       RDX
-  MOV       [RDX],      EBX            // Result -> Current
-  POP       RBX
-  POP       RCX
-  POP       RBP
-{$ELSE ~ X86}
-  POP       EDX
-  MOV       [EDX],      EBX            // Result -> Current
-  POP       EBX
-  POP       EAX
-  POP       EBP
-{$ENDIF ~ X64}
-@Ret:
-  // Finish
-{$IF DEFINED(X64)}
-  POP       RSI
-{$ELSE ~ X86}
-  POP       ESI
-{$ENDIF ~ X64}
-end;
-{$ELSE ~ USE_FORCE_DELPHI}
-procedure TchCrc32Algorithm.Calculate(var Current: Cardinal; const Data: Pointer; const Length: Cardinal);
-begin
-  if Length = 0 then Exit;
-
-  var PData: PByte := Data;
-  var L: Cardinal := Length;
-  const Unroll: Byte = 4;
-
-  var BytesAtOnce: Byte := Unroll * TABLE_LEVEL_SIZE;
-  while L >= BytesAtOnce do
-  begin
-    for var I: Byte := 1 to Unroll do
-    begin
-      var One, Two, Three, Four: Cardinal;
-      Move( PData^,        One,   $04);
-      Move((PData + $04)^, Two,   $04);
-      Move((PData + $08)^, Three, $04);
-      Move((PData + $0C)^, Four,  $04);
-      One := One xor Current;
-
-      Current :=
-        FCrcTable[ 1, Byte(Four shr (BitsPerByte * 3))]  xor
-        FCrcTable[ 2, Byte(Four shr (BitsPerByte * 2))]  xor
-        FCrcTable[ 3, Byte(Four shr  BitsPerByte)]       xor
-        FCrcTable[ 4, Byte(Four)]                        xor
-
-        FCrcTable[ 5, Byte(Three shr (BitsPerByte * 3))] xor
-        FCrcTable[ 6, Byte(Three shr (BitsPerByte * 2))] xor
-        FCrcTable[ 7, Byte(Three shr  BitsPerByte)]      xor
-        FCrcTable[ 8, Byte(Three)]                       xor
-
-        FCrcTable[ 9, Byte(Two   shr (BitsPerByte * 3))] xor
-        FCrcTable[10, Byte(Two   shr (BitsPerByte * 2))] xor
-        FCrcTable[11, Byte(Two   shr  BitsPerByte)]      xor
-        FCrcTable[12, Byte(Two)]                         xor
-
-        FCrcTable[13, Byte(One   shr (BitsPerByte * 3))] xor
-        FCrcTable[14, Byte(One   shr (BitsPerByte * 2))] xor
-        FCrcTable[15, Byte(One   shr  BitsPerByte)]      xor
-        FCrcTable[16, Byte(One)];
-
-      Inc(PData, BytesAtOnce div Unroll);
-    end;
-    Dec(L, BytesAtOnce);
-  end;
-
-  BytesAtOnce := BytesAtOnce div 2;
-  while L >= BytesAtOnce do
-  begin
-    for var I: Byte := 1 to Unroll do
-    begin
-      var One, Two: Cardinal;
-      Move( PData^,        One, $04);
-      Move((PData + $04)^, Two, $04);
-      One := One xor Current;
-
-      Current :=
-        FCrcTable[ 1, Byte(Two shr (BitsPerByte * 3))] xor
-        FCrcTable[ 2, Byte(Two shr (BitsPerByte * 2))] xor
-        FCrcTable[ 3, Byte(Two shr  BitsPerByte)]      xor
-        FCrcTable[ 4, Byte(Two)]                       xor
-
-        FCrcTable[ 5, Byte(One shr (BitsPerByte * 3))] xor
-        FCrcTable[ 6, Byte(One shr (BitsPerByte * 2))] xor
-        FCrcTable[ 7, Byte(One shr  BitsPerByte)]      xor
-        FCrcTable[ 8, Byte(One)];
-
-      Inc(PData, BytesAtOnce div Unroll);
-    end;
-    Dec(L, BytesAtOnce);
-  end;
-
-  BytesAtOnce := BytesAtOnce div 4;
-  while L >= BytesAtOnce do
-  begin
-  var One, Two: Cardinal;
-    Move( PData^,         One, $04);
-    Move((PData + $04)^,  Two, $04);
-    One := One xor Current;
-
-    Current :=
-      FCrcTable[ 1, Byte(Two shr (BitsPerByte * 3))] xor
-      FCrcTable[ 2, Byte(Two shr (BitsPerByte * 2))] xor
-      FCrcTable[ 3, Byte(Two shr  BitsPerByte)]      xor
-      FCrcTable[ 4, Byte(Two)]                       xor
-
-      FCrcTable[ 5, Byte(One shr (BitsPerByte * 3))] xor
-      FCrcTable[ 6, Byte(One shr (BitsPerByte * 2))] xor
-      FCrcTable[ 7, Byte(One shr  BitsPerByte)]      xor
-      FCrcTable[ 8, Byte(One)];
-
-    Inc(PData, BytesAtOnce);
-    Dec(L, BytesAtOnce);
-  end;
-
-  while L > 0 do
-  begin
-    Current := (Current shr BitsPerByte) xor FCrcTable[1, Byte((PData^ xor Current))];
-    Inc(PData);
-    Dec(L);
-  end;
-end;
-{$ENDIF ~ USE_ASSEMBLER}
-
 class function TchCrc32Algorithm.CreateAIXM: TchCrc32Algorithm;
 begin
   Result := TchCrc32Algorithm.Create('CRC-32/AIXM', $814141AB, $00000000, $00000000, $3010BF7F, False, False);
@@ -540,5 +145,429 @@ begin
   Result := TchCrc32Algorithm.Create('CRC-32/XFER', $000000AF, $00000000, $00000000, $BD0BE338, False, False);
   Result.FAliases.Add('XFER');
 end;
+
+function TchCrc32Algorithm.IsZero(const Value: Cardinal): Boolean;
+{$IF DEFINED(USE_ASSEMBLER)}
+asm
+  // --> EDX   Value
+  // <--  AL   Result
+  CMP       EDX,        $0
+  SETZ      AL
+end;
+{$ELSE ~ USE_FORCE_DELPHI}
+begin
+  Result := Value = 0;
+end;
+{$ENDIF ~ USE_ASSEMBLER}
+
+function TchCrc32Algorithm.BitsToByte(const Value: Cardinal): Byte;
+{$IF DEFINED(USE_ASSEMBLER)}
+asm
+  // --> EDX   Value
+  // <--  AL   Result
+  MOV       AL,         DL
+end;
+{$ELSE ~ USE_FORCE_DELPHI}
+begin
+  Result := Byte(Value);
+end;
+{$ENDIF ~ USE_ASSEMBLER}
+
+function TchCrc32Algorithm.ByteToBits(const Value: Byte): Cardinal;
+{$IF DEFINED(USE_ASSEMBLER)}
+asm
+  // --> EDX   Value
+  // <-- EAX   Result
+  MOVZX     EAX,        DL
+end;
+{$ELSE ~ USE_FORCE_DELPHI}
+begin
+  Result := Value;
+end;
+{$ENDIF ~ USE_ASSEMBLER}
+
+function TchCrc32Algorithm.LeftShift(const Value: Cardinal; const Bits: Byte): Cardinal;
+{$IF DEFINED(USE_ASSEMBLER)}
+asm
+{$IF DEFINED(X64)}
+  // Start
+  // --> EDX   Value
+  //     R8B   Bits
+  // <-- EAX   Result
+  MOV       CL,         R8B
+{$ELSE ~ X86}
+  // Start
+  // --> EDX   Value
+  //      CL   Bits
+  // <-- EAX   Result
+{$ENDIF ~ X64}
+  // Initialized
+  MOV       EAX,        EDX
+  SHL       EAX,        CL
+  // Finish
+end;
+{$ELSE ~ USE_FORCE_DELPHI}
+begin
+  Result := Value shl Bits;
+end;
+{$ENDIF ~ USE_ASSEMBLER}
+
+function TchCrc32Algorithm.RightShift(const Value: Cardinal; const Bits: Byte): Cardinal;
+{$IF DEFINED(USE_ASSEMBLER)}
+asm
+{$IF DEFINED(X64)}
+  // Start
+  // --> EDX   Value
+  //     R8B   Bits
+  // <-- EAX   Result
+  MOV       CL,         R8B
+{$ELSE ~ X86}
+  // Start
+  // --> EDX   Value
+  //      CL   Bits
+  // <-- EAX   Result
+{$ENDIF ~ X64}
+  // Initialized
+  MOV       EAX,        EDX
+  SHR       EAX,        CL
+  // Finish
+end;
+{$ELSE ~ USE_FORCE_DELPHI}
+begin
+  Result := Value shr Bits;
+end;
+{$ENDIF ~ USE_ASSEMBLER}
+
+function TchCrc32Algorithm.BitwiseXor(const Left, Right: Cardinal): Cardinal;
+{$IF DEFINED(USE_ASSEMBLER)}
+asm
+{$IF DEFINED(X64)}
+  // Start
+  // --> EDX   Left
+  //     R8D   Right
+  // <-- EAX   Result
+  MOV       EAX,        R8D
+{$ELSE ~ X86}
+  // Start
+  // --> EDX   Left
+  //     ECX   Right
+  // <-- EAX   Result
+  MOV       EAX,        ECX
+{$ENDIF ~ X64}
+  // Initialized
+  XOR       EAX,        EDX
+  // Finish
+end;
+{$ELSE ~ USE_FORCE_DELPHI}
+begin
+  Result := Left xor Right;
+end;
+{$ENDIF ~ USE_ASSEMBLER}
+
+{$IF DEFINED(USE_ASSEMBLER)}
+procedure TchCrc32Algorithm.Calculate(var Current: Cardinal; const Data: Pointer; const Length: Cardinal);
+asm
+{$IF DEFINED(X64)}
+  // Start
+  // --> RCX    addres Self
+  //     RDX    address Current
+  //      R8    addres Data
+  //      R9    Length
+  // <-- EBX -> [RDX]
+  TEST      R8,         R8
+  JZ        @Ret
+  NEG       R9
+  JGE       @Ret
+
+@Init:
+  PUSH      RSI
+  MOV       RSI,        R8             // addresss Data -> RSI
+  PUSH      RBP
+  MOV       RBP,        RCX            // addresss Self -> RBP
+  ADD       RBP,        $18            // offset to Self.FTable -> RBP
+  MOV       RCX,        R9             // Length -> RCX
+  PUSH      RBX
+  MOV       EBX,        [RDX]          // Current -> EBX
+  PUSH      RDX
+  SUB       RSI,        RCX
+{$ELSE ~ X86}
+  // Start
+  // --> EAX       address Self
+  //     EDX       address Current
+  //     ECX       address Data
+  //     on stack  Length
+  // <-- EBX    -> [EDX]
+  TEST      ECX,        ECX
+  JZ        @Ret
+  NEG       DWORD PTR [Length]
+  JGE       @Ret
+
+@Init:
+  PUSH      ESI
+  MOV       ESI,        ECX            // addresss Data -> ESI
+  MOV       ECX, DWORD PTR [Length]    // Length -> ECX
+  PUSH      EBP
+  MOV       EBP,        EAX            // addresss Self -> EBP
+  ADD       EBP,        $10            // offset to Self.FTable -> EBP
+  PUSH      EBX
+  MOV       EBX,        [EDX]          // Current -> EBX
+  PUSH      EDX
+  SUB       ESI,        ECX
+{$ENDIF ~ X64}
+  // Initialized
+
+{$IF DEFINED(X64)}
+  ADD       RCX,        $08
+{$ELSE ~ X86}
+  ADD       ECX,        $08
+{$ENDIF ~ X64}
+  JG        @NoBlock
+{$IF DEFINED(X64)}
+  PUSH      RDI
+{$ELSE ~ X86}
+  PUSH      EDI
+{$ENDIF ~ X64}
+  MOV       EDX,        EBX
+
+@BlockNext:
+{$IF DEFINED(X64)}
+  XOR       EDX,        [RSI + RCX - $08]
+  MOV       EAX,        [RSI + RCX - $04]
+{$ELSE ~ X86}
+  XOR       EDX,        [ESI + ECX - $08]
+  MOV       EAX,        [ESI + ECX - $04]
+{$ENDIF ~ X64}
+
+  MOVZX     EDI,        AL
+{$IF DEFINED(X64)}
+  MOV       EBX,        [RBP + $0C00 + RDI * 4]      // (255 * 4) * 3
+{$ELSE ~ X86}
+  MOV       EBX,        [EBP + $0C00 + EDI * 4]      // (255 * 4) * 3
+{$ENDIF ~ X64}
+  MOVZX     EDI,        AH
+{$IF DEFINED(X64)}
+  XOR       EBX,        [RBP + $0800 + RDI * 4]      // (255 * 4) * 2
+{$ELSE ~ X86}
+  XOR       EBX,        [EBP + $0800 + EDI * 4]      // (255 * 4) * 2
+{$ENDIF ~ X64}
+  SHR       EAX,        16
+  MOVZX     EDI,        AL
+{$IF DEFINED(X64)}
+  XOR       EBX,        [RBP + $0400 + RDI * 4]      // (255 * 4) * 1
+{$ELSE ~ X86}
+  XOR       EBX,        [EBP + $0400 + EDI * 4]      // (255 * 4) * 1
+{$ENDIF ~ X64}
+  MOVZX     EDI,        AH
+{$IF DEFINED(X64)}
+  XOR       EBX,        [RBP + RDI * 4]              // (255 * 4) * 0
+{$ELSE ~ X86}
+  XOR       EBX,        [EBP + EDI * 4]              // (255 * 4) * 0
+{$ENDIF ~ X64}
+
+  MOVZX     EDI,        DL
+{$IF DEFINED(X64)}
+  XOR       EBX,        [RBP + $1C00 + RDI * 4]      // (255 * 4) * 7
+{$ELSE ~ X86}
+  XOR       EBX,        [EBP + $1C00 + EDI * 4]      // (255 * 4) * 7
+{$ENDIF ~ X64}
+  MOVZX     EDI,        DH
+{$IF DEFINED(X64)}
+  XOR       EBX,        [RBP + $1800 + RDI * 4]      // (255 * 4) * 6
+{$ELSE ~ X86}
+  XOR       EBX,        [EBP + $1800 + EDI * 4]      // (255 * 4) * 6
+{$ENDIF ~ X64}
+  SHR       EDX,        16
+  MOVZX     EDI,        DL
+{$IF DEFINED(X64)}
+  XOR       EBX,        [RBP + $1400 + RDI * 4]      // (255 * 4) * 5
+{$ELSE ~ X86}
+  XOR       EBX,        [EBP + $1400 + EDI * 4]      // (255 * 4) * 5
+{$ENDIF ~ X64}
+  MOVZX     EDI,        DH
+{$IF DEFINED(X64)}
+  XOR       EBX,        [RBP + $1000 + RDI * 4]      // (255 * 4) * 4
+{$ELSE ~ X86}
+  XOR       EBX,        [EBP + $1000 + EDI * 4]      // (255 * 4) * 4
+{$ENDIF ~ X64}
+
+{$IF DEFINED(X64)}
+  ADD       RCX,        $08
+{$ELSE ~ X86}
+  ADD       ECX,        $08
+{$ENDIF ~ X64}
+  JG        @BlockDone
+
+{$IF DEFINED(X64)}
+  XOR       EBX,        [RSI + RCX - $08]
+  MOV       EAX,        [RSI + RCX - $04]
+{$ELSE ~ X86}
+  XOR       EBX,        [ESI + ECX - $08]
+  MOV       EAX,        [ESI + ECX - $04]
+{$ENDIF ~ X64}
+
+  MOVZX     EDI,        AL
+{$IF DEFINED(X64)}
+  MOV       EDX,        [RBP + $0C00 + RDI * 4]      // (255 * 4) * 3
+{$ELSE ~ X86}
+  MOV       EDX,        [EBP + $0C00 + EDI * 4]      // (255 * 4) * 3
+{$ENDIF ~ X64}
+  MOVZX     EDI,        AH
+{$IF DEFINED(X64)}
+  XOR       EDX,        [RBP + $0800 + RDI * 4]      // (255 * 4) * 2
+{$ELSE ~ X86}
+  XOR       EDX,        [EBP + $0800 + EDI * 4]      // (255 * 4) * 2
+{$ENDIF ~ X64}
+  SHR       EAX,        16
+  MOVZX     EDI,        AL
+{$IF DEFINED(X64)}
+  XOR       EDX,        [RBP + $0400 + RDI * 4]      // (255 * 4) * 1
+{$ELSE ~ X86}
+  XOR       EDX,        [EBP + $0400 + EDI * 4]      // (255 * 4) * 1
+{$ENDIF ~ X64}
+  MOVZX     EDI,        AH
+{$IF DEFINED(X64)}
+  XOR       EDX,        [RBP + RDI * 4]              // (255 * 4) * 0
+{$ELSE ~ X86}
+  XOR       EDX,        [EBP + EDI * 4]              // (255 * 4) * 0
+{$ENDIF ~ X64}
+
+  MOVZX     EDI,        BL
+{$IF DEFINED(X64)}
+  XOR       EDX,        [RBP + $1C00 + RDI * 4]      // (255 * 4) * 7
+{$ELSE ~ X86}
+  XOR       EDX,        [EBP + $1C00 + EDI * 4]      // (255 * 4) * 7
+{$ENDIF ~ X64}
+  MOVZX     EDI,        BH
+{$IF DEFINED(X64)}
+  XOR       EDX,        [RBP + $1800 + RDI * 4]      // (255 * 4) * 6
+{$ELSE ~ X86}
+  XOR       EDX,        [EBP + $1800 + EDI * 4]      // (255 * 4) * 6
+{$ENDIF ~ X64}
+  SHR       EBX,        16
+  MOVZX     EDI,        BL
+{$IF DEFINED(X64)}
+  XOR       EDX,        [RBP + $1400 + RDI * 4]      // (255 * 4) * 5
+{$ELSE ~ X86}
+  XOR       EDX,        [EBP + $1400 + EDI * 4]      // (255 * 4) * 5
+{$ENDIF ~ X64}
+  MOVZX     EDI,        BH
+{$IF DEFINED(X64)}
+  XOR       EDX,        [RBP + $1000 + RDI * 4]      // (255 * 4) * 4
+{$ELSE ~ X86}
+  XOR       EDX,        [EBP + $1000 + EDI * 4]      // (255 * 4) * 4
+{$ENDIF ~ X64}
+
+{$IF DEFINED(X64)}
+  ADD       RCX,        $08
+{$ELSE ~ X86}
+  ADD       ECX,        $08
+{$ENDIF ~ X64}
+  JLE       @BlockNext
+  MOV       EBX,        EDX
+
+@BlockDone:
+{$IF DEFINED(X64)}
+  POP       RDI
+{$ELSE ~ X86}
+  POP       EDI
+{$ENDIF ~ X64}
+
+@NoBlock:
+{$IF DEFINED(X64)}
+  SUB       RCX,        $08
+{$ELSE ~ X86}
+  SUB       ECX,        $08
+{$ENDIF ~ X64}
+  JGE       @Done
+
+@Tail:
+{$IF DEFINED(X64)}
+  MOVZX     EAX,        [RSI + RCX]
+{$ELSE ~ X86}
+  MOVZX     EAX,        [ESI + ECX]
+{$ENDIF ~ X64}
+  XOR       AL,         BL
+  SHR       EBX,        8
+{$IF DEFINED(X64)}
+  XOR       EBX,        [RBP + RAX * 4]
+{$ELSE ~ X86}
+  XOR       EBX,        [EBP + EAX * 4]
+{$ENDIF ~ X64}
+{$IF DEFINED(X64)}
+  INC       RCX
+{$ELSE ~ X86}
+  INC       ECX
+{$ENDIF ~ X64}
+  JNZ       @Tail
+
+@Done:
+{$IF DEFINED(X64)}
+  POP       RDX
+  MOV       [RDX],      EBX            // Result -> Current
+  POP       RBX
+  POP       RBP
+  POP       RSI
+{$ELSE ~ X86}
+  POP       EDX
+  MOV       [EDX],      EBX            // Result -> Current
+  POP       EBX
+  POP       EBP
+  POP       ESI
+{$ENDIF ~ X64}
+@Ret:
+  // Finish
+end;
+{$ELSE ~ USE_FORCE_DELPHI}
+procedure TchCrc32Algorithm.Calculate(var Current: Cardinal; const Data: Pointer; const Length: Cardinal);
+begin
+  if (Data = nil) or (Length = 0) then Exit;
+
+  var L := Length;
+
+  var PData: PCardinal := Data;
+  while L >= TABLE_LEVEL_SIZE do
+  begin
+    const Block01 = PData^ xor Current;
+    Inc(PData);
+    const Block02 = PData^;
+    Inc(PData);
+    const Block03 = PData^;
+    Inc(PData);
+    const Block04 = PData^;
+    Inc(PData);
+
+    Current :=
+      FCrcTable[ 1, Byte(Block04 shr (BitsPerByte * 3))] xor
+      FCrcTable[ 2, Byte(Block04 shr (BitsPerByte * 2))] xor
+      FCrcTable[ 3, Byte(Block04 shr  BitsPerByte)]      xor
+      FCrcTable[ 4, Byte(Block04)]                       xor
+
+      FCrcTable[ 5, Byte(Block03 shr (BitsPerByte * 3))] xor
+      FCrcTable[ 6, Byte(Block03 shr (BitsPerByte * 2))] xor
+      FCrcTable[ 7, Byte(Block03 shr  BitsPerByte)]      xor
+      FCrcTable[ 8, Byte(Block03)]                       xor
+
+      FCrcTable[ 9, Byte(Block02 shr (BitsPerByte * 3))] xor
+      FCrcTable[10, Byte(Block02 shr (BitsPerByte * 2))] xor
+      FCrcTable[11, Byte(Block02 shr  BitsPerByte)]      xor
+      FCrcTable[12, Byte(Block02)]                       xor
+
+      FCrcTable[13, Byte(Block01 shr (BitsPerByte * 3))] xor
+      FCrcTable[14, Byte(Block01 shr (BitsPerByte * 2))] xor
+      FCrcTable[15, Byte(Block01 shr  BitsPerByte)]      xor
+      FCrcTable[16, Byte(Block01)];
+
+    Dec(L, TABLE_LEVEL_SIZE);
+  end;
+
+  var PByteData := PByte(PData);
+  while L > 0 do
+  begin
+    Current := (Current shr BitsPerByte) xor FCrcTable[1, Byte((PByteData^ xor Current))];
+    Inc(PByteData);
+    Dec(L);
+  end;
+end;
+{$ENDIF ~ USE_ASSEMBLER}
 
 end.
