@@ -21,6 +21,9 @@
 // принудительно будет выставляться эта опция.
 {$DEFINE USE_ASSEMBLER}
 
+// Если необходима поддержка интерфейсов, активируйте эту опцию
+{$DEFINE SUPPORTS_INTERFACES}
+
 // Если используется Jedy Core Lybrary (https://github.com/project-jedi/jcl),
 // имеет смысл включить эту опцию
 //{$DEFINE USE_JEDI_CORE_LIBRARY}

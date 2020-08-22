@@ -15,18 +15,21 @@ program Crc32;
 
 {$IFDEF CONSOLE_TESTRUNNER}
 {$APPTYPE CONSOLE}
-{$ENDIF ~CONSOLE_TESTRUNNER}
+{$ENDIF ~ CONSOLE_TESTRUNNER}
 
 uses
   DUnitTestRunner,
 {$IF NOT DEFINED(USE_JEDI_CORE_LIBRARY)}
   chHash.Core,
-{$ENDIF ~USE_JEDI_CORE_LIBRARY}
+{$ENDIF ~ USE_JEDI_CORE_LIBRARY}
   chHash.Core.Bits,
   chHash,
-  chHash.Utils,
   chHash.CRC,
   chHash.CRC.CRC32,
+  chHash.Impl,
+  chHash.Utils,
+  chHash.CRC.Impl,
+  chHash.CRC.CRC32.Impl,
   chHash.Tests,
   chHash.CRC.Tests,
   chHash.CRC.CRC32.Tests;
@@ -38,5 +41,5 @@ begin
 {$IFDEF CONSOLE_TESTRUNNER}
   Write('Для завершения нажмите "ENTER"');
   Readln;
-{$ENDIF ~CONSOLE_TESTRUNNER}
+{$ENDIF ~ CONSOLE_TESTRUNNER}
 end.
