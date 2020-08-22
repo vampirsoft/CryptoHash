@@ -16,88 +16,34 @@ unit chHash;
 interface
 
 uses
+{$IF DEFINED(SUPPORTS_INTERFACES)}
   System.SysUtils;
+{$ELSE ~ NOT SUPPORTS_INTERFACES}
+  chHash.Impl;
+{$ENDIF ~ SUPPORTS_INTERFACES}
 
 type
-
-{ TchAlgorithm<C, R> }
-
-  TchAlgorithm<C, R> = class abstract
-  strict private
-    FInit: C;
-    FCheck: R;
-  strict protected
-    FName: string;
-    constructor Create(const Name: string; const Init: C; const Check: R); reintroduce;
-    class function IfThenElse<T>(const Condition: Boolean; const ThenValue, ElseValue: T): T; inline; static;
-    class function InitArray<T>(const Length: Cardinal): TArray<T>; inline; static;
-  public
-    function Calculate(const Data: TBytes): R; overload; inline;
-    function Calculate(const Data; const Length: Cardinal): R; overload; inline;
-    function Calculate(const Data: Pointer; const Length: Cardinal): R; overload; inline;
-    procedure Calculate(var Current: C; const Data: TBytes); overload; inline;
-    procedure Calculate(var Current: C; const Data: TBytes; const Length: Cardinal); overload; inline;
-    procedure Calculate(var Current: C; const Data; const Length: Cardinal); overload; inline;
-    procedure Calculate(var Current: C; const Data: Pointer; const Length: Cardinal); overload; virtual; abstract;
-    function Final(const Current: C): R; virtual; abstract;
-    function ToString: string; override; abstract;
-    property Name: string read FName;
-    property Init: C read FInit;
-    property Check: R read FCheck;
+{$IF DEFINED(SUPPORTS_INTERFACES)}
+  IchAlgorithm<C, R> = interface
+    ['{D210C023-E513-42EB-B87F-4ADFF2CB68A8}']
+    function Init: C;
+    function Calculate(const Data: TBytes): R; overload;
+    function Calculate(const Data; const Length: Cardinal): R; overload;
+    function Calculate(const Data: Pointer; const Length: Cardinal): R; overload;
+    procedure Calculate(var Current: C; const Data: TBytes); overload;
+    procedure Calculate(var Current: C; const Data: TBytes; const Length: Cardinal); overload;
+    procedure Calculate(var Current: C; const Data; const Length: Cardinal); overload;
+    procedure Calculate(var Current: C; const Data: Pointer; const Length: Cardinal); overload;
+    function Final(const Current: C): R;
+    function Name: string;
+    function Check: R;
+    function ToString: string;
   end;
+{$ELSE ~ NOT SUPPORTS_INTERFACES}
+  TchAlgorithm<C, R> = class abstract(chHash.Impl.TchAlgorithm<C, R>)
+  end;
+{$ENDIF ~ SUPPORTS_INTERFACES}
 
 implementation
-
-{ TchAlgorithm<C, R> }
-
-function TchAlgorithm<C, R>.Calculate(const Data: TBytes): R;
-begin
-  Result := Calculate(Data[0], Length(Data));
-end;
-
-function TchAlgorithm<C, R>.Calculate(const Data; const Length: Cardinal): R;
-begin
-  Result := Calculate(@Data, Length);
-end;
-
-function TchAlgorithm<C, R>.Calculate(const Data: Pointer; const Length: Cardinal): R;
-begin
-  var Current := Init;
-  Calculate(Current, Data, Length);
-  Result := Final(Current);
-end;
-
-procedure TchAlgorithm<C, R>.Calculate(var Current: C; const Data: TBytes);
-begin
-  Calculate(Current, Data, Length(Data));
-end;
-
-procedure TchAlgorithm<C, R>.Calculate(var Current: C; const Data: TBytes; const Length: Cardinal);
-begin
-  Calculate(Current, Data[0], Length);
-end;
-
-procedure TchAlgorithm<C, R>.Calculate(var Current: C; const Data; const Length: Cardinal);
-begin
-  Calculate(Current, @Data, Length);
-end;
-
-constructor TchAlgorithm<C, R>.Create(const Name: string; const Init: C; const Check: R);
-begin
-  FName := Name;
-  FInit := Init;
-  FCheck := Check;
-end;
-
-class function TchAlgorithm<C, R>.IfThenElse<T>(const Condition: Boolean; const ThenValue, ElseValue: T): T;
-begin
-  if Condition then Exit(ThenValue);
-  Result := ElseValue;
-end;
-
-class function TchAlgorithm<C, R>.InitArray<T>(const Length: Cardinal): TArray<T>;
-begin
-  SetLength(Result, Length);
-end;
 
 end.

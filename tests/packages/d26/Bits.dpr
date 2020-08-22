@@ -15,13 +15,13 @@ program Bits;
 
 {$IFDEF CONSOLE_TESTRUNNER}
 {$APPTYPE CONSOLE}
-{$ENDIF ~CONSOLE_TESTRUNNER}
+{$ENDIF ~ CONSOLE_TESTRUNNER}
 
 uses
   DUnitTestRunner,
-  {$IF NOT DEFINED(USE_JEDI_CORE_LIBRARY)}
+{$IF NOT DEFINED(USE_JEDI_CORE_LIBRARY)}
   chHash.Core,
-  {$ENDIF ~ NOT USE_JEDI_CORE_LIBRARY}
+{$ENDIF ~ NOT USE_JEDI_CORE_LIBRARY}
   chHash.Core.Bits,
   chHash.Core.Bits.Tests,
   chHash.Core.Byte.Tests,
@@ -43,5 +43,5 @@ begin
 {$IFDEF CONSOLE_TESTRUNNER}
   Write('Для завершения нажмите "ENTER"');
   Readln;
-{$ENDIF ~CONSOLE_TESTRUNNER}
+{$ENDIF ~ CONSOLE_TESTRUNNER}
 end.

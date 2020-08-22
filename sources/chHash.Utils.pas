@@ -17,7 +17,11 @@ interface
 
 uses
   System.Classes, System.SysUtils,
+{$IF DEFINED(SUPPORTS_INTERFACES)}
   chHash;
+{$ELSE ~ NOT SUPPORTS_INTERFACES}
+  chHash.Impl;
+{$ENDIF ~ SUPPORTS_INTERFACES}
 
 type
   TchUtils = class sealed
@@ -26,14 +30,16 @@ type
     constructor Create;
   {$HINTS ON}
   public
-    class function Calculate<C, R>(const Stream: TStream; const Algorithm: TchAlgorithm<C, R>): R; static;
+    class function Calculate<C, R>(const Stream: TStream;
+      const Algorithm: {$IF DEFINED(SUPPORTS_INTERFACES)}IchAlgorithm<C, R>{$ELSE}TchAlgorithm<C, R>{$ENDIF}): R; static;
   end;
 
 implementation
 
 { TchUtils }
 
-class function TchUtils.Calculate<C, R>(const Stream: TStream; const Algorithm: TchAlgorithm<C, R>): R;
+class function TchUtils.Calculate<C, R>(const Stream: TStream;
+  const Algorithm: {$IF DEFINED(SUPPORTS_INTERFACES)}IchAlgorithm<C, R>{$ELSE}TchAlgorithm<C, R>{$ENDIF}): R;
 begin
   var Current := Algorithm.Init;
 

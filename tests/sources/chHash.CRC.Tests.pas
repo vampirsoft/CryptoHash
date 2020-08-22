@@ -17,14 +17,18 @@ interface
 
 uses
   System.SysUtils,
+{$IF DEFINED(SUPPORTS_INTERFACES)}
   chHash.CRC,
+{$ENDIF ~ SUPPORTS_INTERFACES}
+  chHash.CRC.Impl,
   chHash.Tests;
 
 type
 
 { TchCrcAlgorithmTests<Bits, HA> }
 
-  TchCrcAlgorithmTests<Bits; HA: TchCrcAlgorithm<Bits>> = class abstract(TchAlgorithmTests<Bits, Bits, HA>)
+  TchCrcAlgorithmTests<Bits; HA: {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrcAlgorithm<Bits>{$ELSE}TchCrcAlgorithm<Bits>{$ENDIF}> =
+    class abstract(TchAlgorithmTests<Bits, Bits, HA>)
   strict protected
     FCrcTable: TchCrcAlgorithm<Bits>.TOneLevelCrcTable;
     function GetCheckValueForEmpty: Bits; override;
@@ -121,7 +125,7 @@ end;
 procedure TchCrcAlgorithmTests<Bits, HA>.SetUp;
 begin
   inherited SetUp;
-  FCrcTable := FAlgorithm.CrcTable;
+  FCrcTable := TchCrcAlgorithm<Bits>(FAlgorithm).CrcTable;
 end;
 
 end.

@@ -16,14 +16,18 @@ unit chHash.CRC.CRC32.Tests;
 interface
 
 uses
+{$IF DEFINED(SUPPORTS_INTERFACES)}
   chHash.CRC.CRC32,
+{$ENDIF ~ SUPPORTS_INTERFACES}
+  chHash.CRC.CRC32.Impl,
   chHash.CRC.Tests;
 
 type
+  TAlgorithm = {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc32Algorithm{$ELSE}TchCrc32Algorithm{$ENDIF};
 
 { TchCrc32AlgorithmTests }
 
-  TchCrc32AlgorithmTests = class abstract(TchCrcAlgorithmTests<Cardinal, TchCrc32Algorithm>)
+  TchCrc32AlgorithmTests = class abstract(TchCrcAlgorithmTests<Cardinal, TAlgorithm>)
   strict protected
     function BitsToHex(const Value: Cardinal): string; override;
     function FinalControlCalculate(const Value: Cardinal): Cardinal; override;
@@ -49,70 +53,70 @@ type
 
   TchCrc32CRC32Tests = class(TchCrc32ReverseAlgorithmTests)
   strict protected
-    function CreateAlgorithm: TchCrc32Algorithm; override;
+    function CreateAlgorithm: TAlgorithm; override;
   end;
 
 { TchCrc32BZip2Tests }
 
   TchCrc32BZip2Tests = class(TchCrc32NormalAlgorithmTests)
   strict protected
-    function CreateAlgorithm: TchCrc32Algorithm; override;
+    function CreateAlgorithm: TAlgorithm; override;
   end;
 
 { TchCrc32ISCSITests }
 
   TchCrc32ISCSITests = class(TchCrc32ReverseAlgorithmTests)
   strict protected
-    function CreateAlgorithm: TchCrc32Algorithm; override;
+    function CreateAlgorithm: TAlgorithm; override;
   end;
 
 { TchCrc32BASE91DTests }
 
   TchCrc32BASE91DTests = class(TchCrc32ReverseAlgorithmTests)
   strict protected
-    function CreateAlgorithm: TchCrc32Algorithm; override;
+    function CreateAlgorithm: TAlgorithm; override;
   end;
 
 { TchCrc32MPEG2Tests }
 
   TchCrc32MPEG2Tests = class(TchCrc32NormalAlgorithmTests)
   strict protected
-    function CreateAlgorithm: TchCrc32Algorithm; override;
+    function CreateAlgorithm: TAlgorithm; override;
   end;
 
 { TchCrc32CKSUMTests }
 
   TchCrc32CKSUMTests = class(TchCrc32NormalAlgorithmTests)
   strict protected
-    function CreateAlgorithm: TchCrc32Algorithm; override;
+    function CreateAlgorithm: TAlgorithm; override;
   end;
 
 { TchCrc32AIXMTests }
 
   TchCrc32AIXMTests = class(TchCrc32NormalAlgorithmTests)
   strict protected
-    function CreateAlgorithm: TchCrc32Algorithm; override;
+    function CreateAlgorithm: TAlgorithm; override;
   end;
 
 { TchCrc32JAMCRCTests }
 
   TchCrc32JAMCRCTests = class(TchCrc32ReverseAlgorithmTests)
   strict protected
-    function CreateAlgorithm: TchCrc32Algorithm; override;
+    function CreateAlgorithm: TAlgorithm; override;
   end;
 
 { TchCrc32XFERTests }
 
   TchCrc32XFERTests = class(TchCrc32NormalAlgorithmTests)
   strict protected
-    function CreateAlgorithm: TchCrc32Algorithm; override;
+    function CreateAlgorithm: TAlgorithm; override;
   end;
 
 { TchCrc32AUTOSARTests }
 
   TchCrc32AUTOSARTests = class(TchCrc32ReverseAlgorithmTests)
   strict protected
-    function CreateAlgorithm: TchCrc32Algorithm; override;
+    function CreateAlgorithm: TAlgorithm; override;
   end;
 
 implementation
@@ -184,70 +188,70 @@ end;
 
 { TchCrc32CRC32Tests }
 
-function TchCrc32CRC32Tests.CreateAlgorithm: TchCrc32Algorithm;
+function TchCrc32CRC32Tests.CreateAlgorithm: TAlgorithm;
 begin
   Result := TchCrc32Algorithm.CRC32;
 end;
 
 { TchCrc32BZip2Tests }
 
-function TchCrc32BZip2Tests.CreateAlgorithm: TchCrc32Algorithm;
+function TchCrc32BZip2Tests.CreateAlgorithm: TAlgorithm;
 begin
   Result := TchCrc32Algorithm.BZIP2;
 end;
 
 { TchCrc32ISCSITests }
 
-function TchCrc32ISCSITests.CreateAlgorithm: TchCrc32Algorithm;
+function TchCrc32ISCSITests.CreateAlgorithm: TAlgorithm;
 begin
   Result := TchCrc32Algorithm.ISCSI;
 end;
 
 { TchCrc32BASE91DTests }
 
-function TchCrc32BASE91DTests.CreateAlgorithm: TchCrc32Algorithm;
+function TchCrc32BASE91DTests.CreateAlgorithm: TAlgorithm;
 begin
   Result := TchCrc32Algorithm.BASE91D;
 end;
 
 { TchCrc32MPEG2Tests }
 
-function TchCrc32MPEG2Tests.CreateAlgorithm: TchCrc32Algorithm;
+function TchCrc32MPEG2Tests.CreateAlgorithm: TAlgorithm;
 begin
   Result := TchCrc32Algorithm.MPEG2;
 end;
 
 { TchCrc32CKSUMTests }
 
-function TchCrc32CKSUMTests.CreateAlgorithm: TchCrc32Algorithm;
+function TchCrc32CKSUMTests.CreateAlgorithm: TAlgorithm;
 begin
   Result := TchCrc32Algorithm.CKSUM;
 end;
 
 { TchCrc32AIXMTests }
 
-function TchCrc32AIXMTests.CreateAlgorithm: TchCrc32Algorithm;
+function TchCrc32AIXMTests.CreateAlgorithm: TAlgorithm;
 begin
   Result := TchCrc32Algorithm.AIXM;
 end;
 
 { TchCrc32JAMCRCTests }
 
-function TchCrc32JAMCRCTests.CreateAlgorithm: TchCrc32Algorithm;
+function TchCrc32JAMCRCTests.CreateAlgorithm: TAlgorithm;
 begin
   Result := TchCrc32Algorithm.JAMCRC;
 end;
 
 { TchCrc32XFERTests }
 
-function TchCrc32XFERTests.CreateAlgorithm: TchCrc32Algorithm;
+function TchCrc32XFERTests.CreateAlgorithm: TAlgorithm;
 begin
   Result := TchCrc32Algorithm.XFER;
 end;
 
 { TchCrc32AUTOSARTests }
 
-function TchCrc32AUTOSARTests.CreateAlgorithm: TchCrc32Algorithm;
+function TchCrc32AUTOSARTests.CreateAlgorithm: TAlgorithm;
 begin
   Result := TchCrc32Algorithm.AUTOSAR;
 end;

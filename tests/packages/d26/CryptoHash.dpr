@@ -15,7 +15,7 @@ program CryptoHash;
 
 {$IFDEF CONSOLE_TESTRUNNER}
 {$APPTYPE CONSOLE}
-{$ENDIF ~CONSOLE_TESTRUNNER}
+{$ENDIF ~ CONSOLE_TESTRUNNER}
 
 uses
   DUnitTestRunner,
@@ -24,9 +24,12 @@ uses
 {$ENDIF ~ NOT USE_JEDI_CORE_LIBRARY}
   chHash.Core.Bits,
   chHash,
-  chHash.Utils,
   chHash.CRC,
   chHash.CRC.CRC32,
+  chHash.Impl,
+  chHash.Utils,
+  chHash.CRC.Impl,
+  chHash.CRC.CRC32.Impl,
   chHash.Core.Bits.Tests,
   chHash.Core.Byte.Tests,
   chHash.Core.ShortInt.Tests,
@@ -50,5 +53,5 @@ begin
 {$IFDEF CONSOLE_TESTRUNNER}
   Write('Для завершения нажмите "ENTER"');
   Readln;
-{$ENDIF ~CONSOLE_TESTRUNNER}
+{$ENDIF ~ CONSOLE_TESTRUNNER}
 end.

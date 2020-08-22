@@ -17,14 +17,20 @@ interface
 
 uses
   System.SysUtils,
-  chHash, chHash.Utils,
+{$IF DEFINED(SUPPORTS_INTERFACES)}
+  chHash,
+{$ELSE ~ NOT SUPPORTS_INTERFACES}
+  chHash.Impl,
+{$ENDIF ~ SUPPORTS_INTERFACES}
+  chHash.Utils,
   TestFramework;
 
 type
 
 { TchAlgorithmTests<C, R, HA> }
 
-  TchAlgorithmTests<C; R; HA: TchAlgorithm<C, R>> = class abstract(TTestCase)
+  TchAlgorithmTests<C; R; HA: {$IF DEFINED(SUPPORTS_INTERFACES)}IchAlgorithm<C, R>{$ELSE}TchAlgorithm<C, R>{$ENDIF}> =
+    class abstract(TTestCase)
   strict protected const
     FTestString: AnsiString = '123456789';
   strict protected
@@ -114,7 +120,9 @@ end;
 
 destructor TchAlgorithmTests<C, R, HA>.Destroy;
 begin
+{$IF NOT DEFINED(SUPPORTS_INTERFACES)}
   FreeAndNil(FAlgorithm);
+{$ENDIF ~ NOT SUPPORTS_INTERFACES}
   inherited Destroy;
 end;
 
