@@ -25,12 +25,12 @@ uses
 
 type
 
-{ TchCrcAlgorithmTests<Bits, HA> }
+{ TchCrcTests<Bits, HA> }
 
-  TchCrcAlgorithmTests<Bits; HA: {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrcAlgorithm<Bits>{$ELSE}TchCrcAlgorithm<Bits>{$ENDIF}> =
+  TchCrcTests<Bits; HA: {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc<Bits>{$ELSE}TchCrc<Bits>{$ENDIF}> =
     class abstract(TchAlgorithmTests<Bits, Bits, HA>)
   strict protected
-    FCrcTable: TchCrcAlgorithm<Bits>.TOneLevelCrcTable;
+    FCrcTable: TchCrc<Bits>.TOneLevelCrcTable;
     function GetCheckValueForEmpty: Bits; override;
     function GetCheckMessage(const Expected, Actual: Bits): string; override;
     function BitsToHex(const Value: Bits): string; virtual; abstract;
@@ -49,9 +49,9 @@ implementation
 uses
   System.Diagnostics;
 
-{ TchCrcAlgorithmTests<Bits, HA> }
+{ TchCrcTests<Bits, HA> }
 
-procedure TchCrcAlgorithmTests<Bits, HA>.CheckTest;
+procedure TchCrcTests<Bits, HA>.CheckTest;
 begin
   var Expected := FAlgorithm.Init;
   ControlCalculate(Expected, FTestString[1], Length(FTestString));
@@ -80,7 +80,7 @@ begin
   CheckResult(FinalControlCalculate(Expected), FAlgorithm.Final(Actual));
 end;
 
-procedure TchCrcAlgorithmTests<Bits, HA>.CombineTest;
+procedure TchCrcTests<Bits, HA>.CombineTest;
 begin
   Randomize;
   const RightLength = Random(10);
@@ -98,7 +98,7 @@ begin
   CheckResult(FAlgorithm.Check, Actual);
 end;
 
-procedure TchCrcAlgorithmTests<Bits, HA>.ControllStressTest(const Data: TBytes);
+procedure TchCrcTests<Bits, HA>.ControllStressTest(const Data: TBytes);
 begin
   var Actual := FAlgorithm.Init;
   const Stopwatch = TStopwatch.StartNew;
@@ -112,20 +112,20 @@ begin
   else Status(Format('%s: Control Speed = %.3fs, %.3f MB/s', [FAlgorithm.ToString, S, (GetMaxLength/(1024 * 1024)/S) * GetCount]));
 end;
 
-function TchCrcAlgorithmTests<Bits, HA>.GetCheckMessage(const Expected, Actual: Bits): string;
+function TchCrcTests<Bits, HA>.GetCheckMessage(const Expected, Actual: Bits): string;
 begin
   Result := Format('%s: Expected = $%s, Actual = $%s', [FAlgorithm.ToString, BitsToHex(Expected), BitsToHex(Actual)]);
 end;
 
-function TchCrcAlgorithmTests<Bits, HA>.GetCheckValueForEmpty: Bits;
+function TchCrcTests<Bits, HA>.GetCheckValueForEmpty: Bits;
 begin
   Result := FAlgorithm.Final(FAlgorithm.Init);
 end;
 
-procedure TchCrcAlgorithmTests<Bits, HA>.SetUp;
+procedure TchCrcTests<Bits, HA>.SetUp;
 begin
   inherited SetUp;
-  FCrcTable := TchCrcAlgorithm<Bits>(FAlgorithm).CrcTable;
+  FCrcTable := TchCrc<Bits>(FAlgorithm).CrcTable;
 end;
 
 end.

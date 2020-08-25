@@ -29,21 +29,10 @@ uses
 
 type
 
-{ TchCrc32Algorithm }
+{ TchCrc32 }
 
-  TchCrc32Algorithm =
-    class sealed(TchCrcAlgorithm<Cardinal>{$IF DEFINED(SUPPORTS_INTERFACES)}, IchCrc32Algorithm{$ENDIF})
+  TchCrc32 = class(TchCrc<Cardinal>{$IF DEFINED(SUPPORTS_INTERFACES)}, IchCrc32{$ENDIF})
   strict private
-    class function CreateCRC32: TchCrc32Algorithm; static;{$IF DEFINED(USE_INLINE)}inline;{$ENDIF}
-    class function CreateBZIP2: TchCrc32Algorithm; static;{$IF DEFINED(USE_INLINE)}inline;{$ENDIF}
-    class function CreateISCSI: TchCrc32Algorithm; static;{$IF DEFINED(USE_INLINE)}inline;{$ENDIF}
-    class function CreateBASE91D: TchCrc32Algorithm; static;{$IF DEFINED(USE_INLINE)}inline;{$ENDIF}
-    class function CreateMPEG2: TchCrc32Algorithm; static;{$IF DEFINED(USE_INLINE)}inline;{$ENDIF}
-    class function CreateCKSUM: TchCrc32Algorithm; static;{$IF DEFINED(USE_INLINE)}inline;{$ENDIF}
-    class function CreateAIXM: TchCrc32Algorithm; static;{$IF DEFINED(USE_INLINE)}inline;{$ENDIF}
-    class function CreateJAMCRC: TchCrc32Algorithm; static;{$IF DEFINED(USE_INLINE)}inline;{$ENDIF}
-    class function CreateXFER: TchCrc32Algorithm; static;{$IF DEFINED(USE_INLINE)}inline;{$ENDIF}
-    class function CreateAUTOSAR: TchCrc32Algorithm; static;{$IF DEFINED(USE_INLINE)}inline;{$ENDIF}
   strict protected
     function ByteToBits(const Value: Byte): Cardinal; override;
     function BitsToByte(const Value: Cardinal): Byte; override;
@@ -53,18 +42,8 @@ type
     function IsZero(const Value: Cardinal): Boolean; override;
   public
     class function Custom(const Polynomial, Init, XorOut, Check: Cardinal;
-      const RefIn, RefOut: Boolean): TchCrc32Algorithm; static;{$IF DEFINED(USE_INLINE)}inline;{$ENDIF}
+      const RefIn, RefOut: Boolean): TchCrc32; static;{$IF DEFINED(USE_INLINE)}inline;{$ENDIF}
     procedure Calculate(var Current: Cardinal; const Data: Pointer; const Length: Cardinal); override;
-    class property CRC32: TchCrc32Algorithm read CreateCRC32;
-    class property BZIP2: TchCrc32Algorithm read CreateBZIP2;
-    class property ISCSI: TchCrc32Algorithm read CreateISCSI;
-    class property BASE91D: TchCrc32Algorithm read CreateBASE91D;
-    class property MPEG2: TchCrc32Algorithm read CreateMPEG2;
-    class property CKSUM: TchCrc32Algorithm read CreateCKSUM;
-    class property AIXM: TchCrc32Algorithm read CreateAIXM;
-    class property JAMCRC: TchCrc32Algorithm read CreateJAMCRC;
-    class property XFER: TchCrc32Algorithm read CreateXFER;
-    class property AUTOSAR: TchCrc32Algorithm read CreateAUTOSAR;
   end;
 
 implementation
@@ -77,83 +56,15 @@ uses
   chHash.Core.Bits;
 {$ENDIF ~ USE_JEDI_CORE_LIBRARY}
 
-{ TchCrc32Algorithm }
+{ TchCrc32 }
 
-class function TchCrc32Algorithm.Custom(const Polynomial, Init, XorOut, Check: Cardinal;
-  const RefIn, RefOut: Boolean): TchCrc32Algorithm;
+class function TchCrc32.Custom(const Polynomial, Init, XorOut, Check: Cardinal;
+  const RefIn, RefOut: Boolean): TchCrc32;
 begin
-  Result := TchCrc32Algorithm.Create('Custom', Polynomial, Init, XorOut, Check, RefIn, RefOut);
+  Result := TchCrc32.Create('Custom', Polynomial, Init, XorOut, Check, RefIn, RefOut);
 end;
 
-class function TchCrc32Algorithm.CreateBASE91D: TchCrc32Algorithm;
-begin
-  Result := TchCrc32Algorithm.Create('CRC-32/BASE91-D', $A833982B, CardinalMask, CardinalMask, $87315576, True, True);
-  Result.FAliases.Add('CRC-32D');
-end;
-
-class function TchCrc32Algorithm.CreateBZIP2: TchCrc32Algorithm;
-begin
-  Result := TchCrc32Algorithm.Create('CRC-32/BZIP2', $04C11DB7, CardinalMask, CardinalMask, $FC891918, False, False);
-  Result.FAliases.Add('CRC-32/AAL5');
-  Result.FAliases.Add('CRC-32/DECT-B');
-  Result.FAliases.Add('B-CRC-32');
-end;
-
-class function TchCrc32Algorithm.CreateCKSUM: TchCrc32Algorithm;
-begin
-  Result := TchCrc32Algorithm.Create('CRC-32/CKSUM', $04C11DB7, $00000000, CardinalMask, $765E7680, False, False);
-  Result.FAliases.Add('CKSUM');
-  Result.FAliases.Add('CRC-32/POSIX');
-end;
-
-class function TchCrc32Algorithm.CreateCRC32: TchCrc32Algorithm;
-begin
-  Result := TchCrc32Algorithm.Create('CRC-32', $04C11DB7, CardinalMask, CardinalMask, $CBF43926, True, True);
-  Result.FAliases.Add('CRC-32/ISO-HDLC');
-  Result.FAliases.Add('CRC-32/ADCCP');
-  Result.FAliases.Add('CRC-32/V-42');
-  Result.FAliases.Add('CRC-32/XZ');
-  Result.FAliases.Add('PKZIP');
-end;
-
-class function TchCrc32Algorithm.CreateISCSI: TchCrc32Algorithm;
-begin
-  Result := TchCrc32Algorithm.Create('CRC-32/ISCSI', $1EDC6F41, CardinalMask, CardinalMask, $E3069283, True, True);
-  Result.FAliases.Add('CRC-32/BASE91-C');
-  Result.FAliases.Add('CRC-32/CASTAGNOLI');
-  Result.FAliases.Add('CRC-32/INTERLAKEN');
-  Result.FAliases.Add('CRC-32C');
-end;
-
-class function TchCrc32Algorithm.CreateJAMCRC: TchCrc32Algorithm;
-begin
-  Result := TchCrc32Algorithm.Create('CRC-32/JAMCRC', $04C11DB7, CardinalMask, $00000000, $340BC6D9, True, True);
-  Result.FAliases.Add('JAMCRC');
-end;
-
-class function TchCrc32Algorithm.CreateMPEG2: TchCrc32Algorithm;
-begin
-  Result := TchCrc32Algorithm.Create('CRC-32/MPEG-2', $04C11DB7, CardinalMask, $00000000, $0376E6E7, False, False);
-end;
-
-class function TchCrc32Algorithm.CreateAIXM: TchCrc32Algorithm;
-begin
-  Result := TchCrc32Algorithm.Create('CRC-32/AIXM', $814141AB, $00000000, $00000000, $3010BF7F, False, False);
-  Result.FAliases.Add('CRC-32Q');
-end;
-
-class function TchCrc32Algorithm.CreateAUTOSAR: TchCrc32Algorithm;
-begin
-  Result := TchCrc32Algorithm.Create('CRC-32/AUTOSAR', $F4ACFB13, CardinalMask, CardinalMask, $1697D06A, True, True);
-end;
-
-class function TchCrc32Algorithm.CreateXFER: TchCrc32Algorithm;
-begin
-  Result := TchCrc32Algorithm.Create('CRC-32/XFER', $000000AF, $00000000, $00000000, $BD0BE338, False, False);
-  Result.FAliases.Add('XFER');
-end;
-
-function TchCrc32Algorithm.IsZero(const Value: Cardinal): Boolean;
+function TchCrc32.IsZero(const Value: Cardinal): Boolean;
 {$IF DEFINED(USE_ASSEMBLER)}
 asm
   // --> EDX   Value
@@ -167,7 +78,7 @@ begin
 end;
 {$ENDIF ~ USE_ASSEMBLER}
 
-function TchCrc32Algorithm.BitsToByte(const Value: Cardinal): Byte;
+function TchCrc32.BitsToByte(const Value: Cardinal): Byte;
 {$IF DEFINED(USE_ASSEMBLER)}
 asm
   // --> EDX   Value
@@ -180,7 +91,7 @@ begin
 end;
 {$ENDIF ~ USE_ASSEMBLER}
 
-function TchCrc32Algorithm.ByteToBits(const Value: Byte): Cardinal;
+function TchCrc32.ByteToBits(const Value: Byte): Cardinal;
 {$IF DEFINED(USE_ASSEMBLER)}
 asm
   // --> EDX   Value
@@ -193,7 +104,7 @@ begin
 end;
 {$ENDIF ~ USE_ASSEMBLER}
 
-function TchCrc32Algorithm.LeftShift(const Value: Cardinal; const Bits: Byte): Cardinal;
+function TchCrc32.LeftShift(const Value: Cardinal; const Bits: Byte): Cardinal;
 {$IF DEFINED(USE_ASSEMBLER)}
 asm
 {$IF DEFINED(X64)}
@@ -219,7 +130,7 @@ begin
 end;
 {$ENDIF ~ USE_ASSEMBLER}
 
-function TchCrc32Algorithm.RightShift(const Value: Cardinal; const Bits: Byte): Cardinal;
+function TchCrc32.RightShift(const Value: Cardinal; const Bits: Byte): Cardinal;
 {$IF DEFINED(USE_ASSEMBLER)}
 asm
 {$IF DEFINED(X64)}
@@ -245,7 +156,7 @@ begin
 end;
 {$ENDIF ~ USE_ASSEMBLER}
 
-function TchCrc32Algorithm.BitwiseXor(const Left, Right: Cardinal): Cardinal;
+function TchCrc32.BitwiseXor(const Left, Right: Cardinal): Cardinal;
 {$IF DEFINED(USE_ASSEMBLER)}
 asm
 {$IF DEFINED(X64)}
@@ -272,7 +183,7 @@ end;
 {$ENDIF ~ USE_ASSEMBLER}
 
 {$IF DEFINED(USE_ASSEMBLER)}
-procedure TchCrc32Algorithm.Calculate(var Current: Cardinal; const Data: Pointer; const Length: Cardinal);
+procedure TchCrc32.Calculate(var Current: Cardinal; const Data: Pointer; const Length: Cardinal);
 asm
 {$IF DEFINED(X64)}
   // Start
@@ -533,7 +444,7 @@ asm
   // Finish
 end;
 {$ELSE ~ USE_FORCE_DELPHI}
-procedure TchCrc32Algorithm.Calculate(var Current: Cardinal; const Data: Pointer; const Length: Cardinal);
+procedure TchCrc32.Calculate(var Current: Cardinal; const Data: Pointer; const Length: Cardinal);
 begin
   if (Data = nil) or (Length = 0) then Exit;
 

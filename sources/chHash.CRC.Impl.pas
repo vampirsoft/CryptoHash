@@ -31,10 +31,9 @@ uses
 
 type
 
-{ TchCrcAlgorithm<Bits> }
+{ TchCrc<Bits> }
 
-  TchCrcAlgorithm<Bits> =
-    class abstract(TchAlgorithm<Bits, Bits>{$IF DEFINED(SUPPORTS_INTERFACES)}, IchCrcAlgorithm<Bits>{$ENDIF})
+  TchCrc<Bits> = class abstract(TchAlgorithm<Bits, Bits>{$IF DEFINED(SUPPORTS_INTERFACES)}, IchCrc<Bits>{$ENDIF})
   strict private const
     TABLE_RESIDUE_SIZE = Byte(255);
     TABLE_FIRST_LEVEL  = Byte({$IF DEFINED(USE_ASSEMBLER)}0{$ELSE}1{$ENDIF});
@@ -91,9 +90,9 @@ type
 
 implementation
 
-{ TchCrcAlgorithm<Bits> }
+{ TchCrc<Bits> }
 
-constructor TchCrcAlgorithm<Bits>.Create(const Name: string; const Polynomial, Init, XorOut, Check: Bits;
+constructor TchCrc<Bits>.Create(const Name: string; const Polynomial, Init, XorOut, Check: Bits;
   const RefIn, RefOut: Boolean);
 const SizeOfBits = Byte(SizeOf(Bits));
 begin
@@ -107,19 +106,19 @@ begin
   GenerateTable;
 end;
 
-destructor TchCrcAlgorithm<Bits>.Destroy;
+destructor TchCrc<Bits>.Destroy;
 begin
   FreeAndNil(FAliases);
 end;
 
-function TchCrcAlgorithm<Bits>.Final(const Current: Bits): Bits;
+function TchCrc<Bits>.Final(const Current: Bits): Bits;
 const SizeOfBits = Byte(SizeOf(Bits));
 begin
   if not FRefOut then ReverseBytes(@Current, SizeOfBits);
   Result := BitwiseXor(Current, FXorOut);
 end;
 
-function TchCrcAlgorithm<Bits>.Combine(const LeftCrc, RightCrc: Bits; const RightLength: Cardinal): Bits;
+function TchCrc<Bits>.Combine(const LeftCrc, RightCrc: Bits; const RightLength: Cardinal): Bits;
 begin
   if IsZero(RightCrc) or (RightLength = 0) then Exit(LeftCrc);
 
@@ -156,7 +155,7 @@ begin
   Result := BitwiseXor(Result, RightCrc);
 end;
 
-procedure TchCrcAlgorithm<Bits>.Gf2MatrixSquare(Square: TArray<Bits>; const Mat: TArray<Bits>);
+procedure TchCrc<Bits>.Gf2MatrixSquare(Square: TArray<Bits>; const Mat: TArray<Bits>);
 begin
   for var I := 0 to FWidth - 1 do
   begin
@@ -164,7 +163,7 @@ begin
   end;
 end;
 
-function TchCrcAlgorithm<Bits>.Gf2MatrixTimes(const Mat: TArray<Bits>; Vec: Bits): Bits;
+function TchCrc<Bits>.Gf2MatrixTimes(const Mat: TArray<Bits>; Vec: Bits): Bits;
 begin
   Result := ByteToBits(0);
   var I := 0;
@@ -176,7 +175,7 @@ begin
   end;
 end;
 
-procedure TchCrcAlgorithm<Bits>.GenerateTable;
+procedure TchCrc<Bits>.GenerateTable;
 const SizeOfBits = Byte(SizeOf(Bits));
 begin
   for var I := 0 to TABLE_RESIDUE_SIZE do
@@ -204,45 +203,45 @@ begin
   end;
 end;
 
-function TchCrcAlgorithm<Bits>.Aliases: TList<string>;
+function TchCrc<Bits>.Aliases: TList<string>;
 begin
   Result := FAliases;
 end;
 
-function TchCrcAlgorithm<Bits>.Polynomial: Bits;
+function TchCrc<Bits>.Polynomial: Bits;
 const SizeOfBits = Byte(SizeOf(Bits));
 begin
   Result := FPolynomial;
   if FRefIn then ReverseBits(@Result, SizeOfBits);
 end;
 
-function TchCrcAlgorithm<Bits>.RefIn: Boolean;
+function TchCrc<Bits>.RefIn: Boolean;
 begin
   Result := FRefIn;
 end;
 
-function TchCrcAlgorithm<Bits>.RefOut: Boolean;
+function TchCrc<Bits>.RefOut: Boolean;
 begin
   Result := FRefOut;
 end;
 
-function TchCrcAlgorithm<Bits>.ToString: string;
+function TchCrc<Bits>.ToString: string;
 begin
   Result := Format('%s (%db)', [FName, FWidth]);
 end;
 
-function TchCrcAlgorithm<Bits>.Width: Byte;
+function TchCrc<Bits>.Width: Byte;
 begin
   Result := FWidth;
 end;
 
-function TchCrcAlgorithm<Bits>.XorOut: Bits;
+function TchCrc<Bits>.XorOut: Bits;
 begin
   Result := FXorOut;
 end;
 
 {$IF DEFINED(HASH_TESTS)}
-function TchCrcAlgorithm<Bits>.GetCrcTable: TOneLevelCrcTable;
+function TchCrc<Bits>.GetCrcTable: TOneLevelCrcTable;
 const SizeOfBits = Byte(SizeOf(Bits));
 begin
   Result := FCrcTable[TABLE_FIRST_LEVEL];

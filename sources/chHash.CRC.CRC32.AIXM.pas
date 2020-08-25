@@ -9,7 +9,7 @@
 //*****************************************************************************//
 /////////////////////////////////////////////////////////////////////////////////
 
-unit chHash.CRC;
+unit chHash.CRC.CRC32.AIXM;
 
 {$INCLUDE CryptoHash.inc}
 
@@ -17,29 +17,28 @@ interface
 
 uses
 {$IF DEFINED(SUPPORTS_INTERFACES)}
-  System.Generics.Collections,
-  chHash;
+  chHash.CRC.CRC32.Impl;
 {$ELSE ~ NOT SUPPORTS_INTERFACES}
-  chHash.CRC.Impl;
+  chHash.CRC.CRC32;
 {$ENDIF ~ SUPPORTS_INTERFACES}
 
 type
-{$IF DEFINED(SUPPORTS_INTERFACES)}
-  IchCrc<Bits> = interface(IchAlgorithm<Bits, Bits>)
-    ['{F6432F50-8DE2-42AD-B67B-858C9EC7A1FA}']
-    function Combine(const LeftCrc, RightCrc: Bits; const RightLength: Cardinal): Bits;
-    function Width: Byte;
-    function Polynomial: Bits;
-    function XorOut: Bits;
-    function RefIn: Boolean;
-    function RefOut: Boolean;
-    function Aliases: TList<string>;
+
+{ TchCrc32AIXM }
+
+  TchCrc32AIXM = class({$IF DEFINED(SUPPORTS_INTERFACES)}chHash.CRC.CRC32.Impl{$ELSE}chHash.CRC.CRC32{$ENDIF}.TchCrc32)
+  public
+    constructor Create; reintroduce;
   end;
-{$ELSE ~ NOT SUPPORTS_INTERFACES}
-  TchCrc<Bits> = class abstract(chHash.CRC.Impl.TchCrc<Bits>)
-  end;
-{$ENDIF ~ SUPPORTS_INTERFACES}
 
 implementation
+
+{ TchCrc32AIXM }
+
+constructor TchCrc32AIXM.Create;
+begin
+  inherited Create('CRC-32/AIXM', $814141AB, $00000000, $00000000, $3010BF7F, False, False);
+  Aliases.Add('CRC-32Q');
+end;
 
 end.

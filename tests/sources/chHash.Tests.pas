@@ -43,7 +43,6 @@ type
     procedure ControllStressTest(const Data: TBytes); virtual;
     procedure CheckResult(const Expected, Actual: R); virtual;
   public
-    destructor Destroy; override;
     procedure SetUp; override;
   published
     procedure EmptyDataTest;
@@ -116,14 +115,6 @@ end;
 
 procedure TchAlgorithmTests<C, R, HA>.ControllStressTest(const Data: TBytes);
 begin
-end;
-
-destructor TchAlgorithmTests<C, R, HA>.Destroy;
-begin
-{$IF NOT DEFINED(SUPPORTS_INTERFACES)}
-  FreeAndNil(FAlgorithm);
-{$ENDIF ~ NOT SUPPORTS_INTERFACES}
-  inherited Destroy;
 end;
 
 procedure TchAlgorithmTests<C, R, HA>.EmptyDataTest;
