@@ -9,7 +9,7 @@
 //*****************************************************************************//
 /////////////////////////////////////////////////////////////////////////////////
 
-unit chHash.CRC;
+unit chHash.CRC.CRC32.AUTOSAR.Factory;
 
 {$INCLUDE CryptoHash.inc}
 
@@ -17,29 +17,45 @@ interface
 
 uses
 {$IF DEFINED(SUPPORTS_INTERFACES)}
-  System.Generics.Collections,
-  chHash;
-{$ELSE ~ NOT SUPPORTS_INTERFACES}
-  chHash.CRC.Impl;
+  chHash.CRC.CRC32,
 {$ENDIF ~ SUPPORTS_INTERFACES}
+  chHash.CRC.CRC32.AUTOSAR;
 
 type
-{$IF DEFINED(SUPPORTS_INTERFACES)}
-  IchCrc<Bits> = interface(IchAlgorithm<Bits, Bits>)
-    ['{F6432F50-8DE2-42AD-B67B-858C9EC7A1FA}']
-    function Combine(const LeftCrc, RightCrc: Bits; const RightLength: Cardinal): Bits;
-    function Width: Byte;
-    function Polynomial: Bits;
-    function XorOut: Bits;
-    function RefIn: Boolean;
-    function RefOut: Boolean;
-    function Aliases: TList<string>;
+
+{ TchCrc32AUTOSAR }
+
+  TchCrc32AUTOSAR = class sealed(chHash.CRC.CRC32.AUTOSAR.TchCrc32AUTOSAR)
+  private type
+    TInstance = {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc32{$ELSE}chHash.CRC.CRC32.AUTOSAR.TchCrc32AUTOSAR{$ENDIF};
+  private
+    class var FInstance: TInstance;
+  private
+    constructor Create; reintroduce;
+  public
+    class property Instance: TInstance read FInstance;
   end;
-{$ELSE ~ NOT SUPPORTS_INTERFACES}
-  TchCrc<Bits> = class abstract(chHash.CRC.Impl.TchCrc<Bits>)
-  end;
-{$ENDIF ~ SUPPORTS_INTERFACES}
 
 implementation
+
+{$IF NOT DEFINED(SUPPORTS_INTERFACES)}
+uses
+  System.SysUtils;
+{$ENDIF ~ NOT SUPPORTS_INTERFACES}
+
+{ TchCrc32AUTOSAR }
+
+constructor TchCrc32AUTOSAR.Create;
+begin
+  inherited Create;
+end;
+
+initialization
+  TchCrc32AUTOSAR.FInstance := TchCrc32AUTOSAR.Create;
+
+{$IF NOT DEFINED(SUPPORTS_INTERFACES)}
+finalization
+  FreeAndNil(TchCrc32AUTOSAR.FInstance);
+{$ENDIF ~ NOT SUPPORTS_INTERFACES}
 
 end.

@@ -24,11 +24,11 @@ uses
 
 type
 {$IF DEFINED(SUPPORTS_INTERFACES)}
-  IchCrc32Algorithm = interface(IchCrcAlgorithm<Cardinal>)
+  IchCrc32 = interface(IchCrc<Cardinal>)
     ['{406A0BDF-4B39-48B4-B44E-6D60F2F36FE0}']
   end;
 {$ELSE ~ NOT SUPPORTS_INTERFACES}
-  TchCrc32Algorithm = chHash.CRC.CRC32.Impl.TchCrc32Algorithm;
+  TchCrc32 = chHash.CRC.CRC32.Impl.TchCrc32;
 {$ENDIF ~ SUPPORTS_INTERFACES}
 
 implementation
