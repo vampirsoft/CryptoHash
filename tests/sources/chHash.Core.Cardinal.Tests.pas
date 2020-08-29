@@ -11,159 +11,135 @@
 
 unit chHash.Core.Cardinal.Tests;
 
-{$INCLUDE CryptoHash.inc}
+{$INCLUDE CryptoHash.Tests.inc}
 
 interface
 
 uses
+  System.SysUtils,
   TestFramework,
   chHash.Core.Bits.Tests;
 
 type
 
+{ TAbstractCardinalTests }
+
+  TAbstractCardinalTests = class abstract(TBitsTests<Cardinal>)
+  strict protected
+    function GetValue: Cardinal; override;
+    function ByteToBits(const Value: Byte): Cardinal; override;
+    function BitsToHex(const Value: Cardinal): string; override;
+    function GetExpectedForReverseBits: Cardinal; override;
+    function GetExpectedForReverseBytes: Cardinal; override;
+    function GetExpectedForBytes: TBytes; override;
+  end;
+
 { TCardinalTests }
 
-  TCardinalTests = class(TBitsTests<Cardinal>)
-  public
-    procedure SetUp; override;
-  published
-    procedure ReverseBitsTest; override;
-    procedure ReverseBytesTest; override;
-    procedure TestBitTest; override;
-    procedure ToBytesTest; override;
-    procedure HelperReverseBitsTest; override;
-    procedure HelperReverseBytesTest; override;
-    procedure HelperTestBitTest; override;
-    procedure HelperToBytesTest; override;
+  TCardinalTests = class(TAbstractCardinalTests)
+  strict protected
+    function GetReverseBits: Cardinal; override;
+    function GetReverseBytes: Cardinal; override;
+    function GetTestBit: Boolean; override;
+    function GetBytes: TBytes; override;
+  end;
+
+{ TCardinalHelperTests }
+
+  TCardinalHelperTests = class(TAbstractCardinalTests)
+  strict protected
+    function GetReverseBits: Cardinal; override;
+    function GetReverseBytes: Cardinal; override;
+    function GetTestBit: Boolean; override;
+    function GetBytes: TBytes; override;
   end;
 
 implementation
 
 uses
-  System.SysUtils,
-  System.Generics.Defaults,
 {$IF DEFINED(USE_JEDI_CORE_LIBRARY)}
   JclLogic,
 {$ENDIF ~ USE_JEDI_CORE_LIBRARY}
   chHash.Core.Bits;
 
+{ TAbstractCardinalTests }
+
+function TAbstractCardinalTests.GetValue: Cardinal;
+begin
+  Result := $CBF43926;
+end;
+
+function TAbstractCardinalTests.ByteToBits(const Value: Byte): Cardinal;
+begin
+  Result := Value;
+end;
+
+function TAbstractCardinalTests.BitsToHex(const Value: Cardinal): string;
+begin
+  Result := IntToHex(Value);
+end;
+
+function TAbstractCardinalTests.GetExpectedForReverseBits: Cardinal;
+begin
+  Result := $649C2FD3;
+end;
+
+function TAbstractCardinalTests.GetExpectedForReverseBytes: Cardinal;
+begin
+  Result := $2639F4CB;
+end;
+
+function TAbstractCardinalTests.GetExpectedForBytes: TBytes;
+begin
+  Result := [$CB, $F4, $39, $26];
+end;
+
 { TCardinalTests }
 
-procedure TCardinalTests.SetUp;
+function TCardinalTests.GetReverseBits: Cardinal;
 begin
-  FValue := $CBF43926;
-  FBytePerConvert := SizeOf(FValue);
+  Result := ReverseBits(FValue);
 end;
 
-procedure TCardinalTests.ReverseBitsTest;
+function TCardinalTests.GetReverseBytes: Cardinal;
 begin
-  const Expected = $649C2FD3;
-  Test(
-    procedure(const ConvertCount: Cardinal)
-    begin
-      var Actual := $0;
-      for var I := 1 to ConvertCount do
-      begin
-        Actual := ReverseBits(FValue);
-      end;
-      CheckEquals(Expected, Actual, Format('Expected = $%s, Actual = $%s', [IntToHex(Expected), IntToHex(Actual)]));
-    end
-  );
+  Result := ReverseBytes(FValue);
 end;
 
-procedure TCardinalTests.ReverseBytesTest;
+function TCardinalTests.GetTestBit: Boolean;
 begin
-  const Expected = $2639F4CB;
-  Test(
-    procedure(const ConvertCount: Cardinal)
-    begin
-      var Actual := $0;
-      for var I := 1 to ConvertCount do
-      begin
-        Actual := ReverseBytes(FValue);
-      end;
-      CheckEquals(Expected, Actual, Format('Expected = $%s, Actual = $%s', [IntToHex(Expected), IntToHex(Actual)]));
-    end
-  );
+  Result := TestBit(FValue, 18);
 end;
 
-procedure TCardinalTests.TestBitTest;
+function TCardinalTests.GetBytes: TBytes;
 begin
-  const Expected = True;
-  Test(
-    procedure(const ConvertCount: Cardinal)
-    begin
-      var Actual := False;
-      for var I := 1 to ConvertCount do
-      begin
-        Actual := TestBit(FValue, 18);
-      end;
-      CheckEquals(Expected, Actual);
-    end
-  );
+  Result := ToBytes(FValue);
 end;
 
-procedure TCardinalTests.ToBytesTest;
+{ TCardinalHelperTests }
+
+function TCardinalHelperTests.GetReverseBits: Cardinal;
 begin
-  CheckTrue(TEqualityComparer<TBytes>.Default.Equals([$CB, $F4, $39, $26], ToBytes(FValue)));
+  Result := FValue.ReverseBits;
 end;
 
-procedure TCardinalTests.HelperReverseBitsTest;
+function TCardinalHelperTests.GetReverseBytes: Cardinal;
 begin
-  const Expected = $649C2FD3;
-  Test(
-    procedure(const ConvertCount: Cardinal)
-    begin
-      var Actual := $0;
-      for var I := 1 to ConvertCount do
-      begin
-        Actual := FValue.ReverseBits;
-      end;
-      CheckEquals(Expected, Actual, Format('Expected = $%s, Actual = $%s', [IntToHex(Expected), IntToHex(Actual)]));
-      CheckNotEquals(Expected, FValue, Format('Expected = $%s, Value = $%s', [IntToHex(Expected), IntToHex(FValue)]));
-    end
-  );
+  Result := FValue.ReverseBytes;
 end;
 
-procedure TCardinalTests.HelperReverseBytesTest;
+function TCardinalHelperTests.GetTestBit: Boolean;
 begin
-  const Expected = $2639F4CB;
-  Test(
-    procedure(const ConvertCount: Cardinal)
-    begin
-      var Actual := $0;
-      for var I := 1 to ConvertCount do
-      begin
-        Actual := FValue.ReverseBytes;
-      end;
-      CheckEquals(Expected, Actual, Format('Expected = $%s, Actual = $%s', [IntToHex(Expected), IntToHex(Actual)]));
-      CheckNotEquals(Expected, FValue, Format('Expected = $%s, Value = $%s', [IntToHex(Expected), IntToHex(FValue)]));
-    end
-  );
+  Result := FValue.TestBit(18);
 end;
 
-procedure TCardinalTests.HelperTestBitTest;
+function TCardinalHelperTests.GetBytes: TBytes;
 begin
-  const Expected = True;
-  Test(
-    procedure(const ConvertCount: Cardinal)
-    begin
-      var Actual := False;
-      for var I := 1 to ConvertCount do
-      begin
-        Actual := FValue.TestBit(18);
-      end;
-      CheckEquals(Expected, Actual);
-    end
-  );
-end;
-
-procedure TCardinalTests.HelperToBytesTest;
-begin
-  CheckTrue(TEqualityComparer<TBytes>.Default.Equals([$CB, $F4, $39, $26], FValue.ToBytes));
+  Result := FValue.ToBytes;
 end;
 
 initialization
   RegisterTest(TCardinalTests.Suite);
+  RegisterTest(TCardinalHelperTests.Suite);
 
 end.

@@ -6,10 +6,10 @@
         <Projects Include="CryptoHash.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="C:\rad\libraries\CryptoHash\tests\packages\d26\Bits.dproj">
+        <Projects Include="Bits.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="C:\rad\libraries\CryptoHash\tests\packages\d26\Crc32.dproj">
+        <Projects Include="Crc32.dproj">
             <Dependencies/>
         </Projects>
     </ItemGroup>
@@ -30,22 +30,22 @@
         <MSBuild Projects="CryptoHash.dproj" Targets="Make"/>
     </Target>
     <Target Name="Bits">
-        <MSBuild Projects="C:\rad\libraries\CryptoHash\tests\packages\d26\Bits.dproj"/>
+        <MSBuild Projects="Bits.dproj"/>
     </Target>
     <Target Name="Bits:Clean">
-        <MSBuild Projects="C:\rad\libraries\CryptoHash\tests\packages\d26\Bits.dproj" Targets="Clean"/>
+        <MSBuild Projects="Bits.dproj" Targets="Clean"/>
     </Target>
     <Target Name="Bits:Make">
-        <MSBuild Projects="C:\rad\libraries\CryptoHash\tests\packages\d26\Bits.dproj" Targets="Make"/>
+        <MSBuild Projects="Bits.dproj" Targets="Make"/>
     </Target>
     <Target Name="Crc32">
-        <MSBuild Projects="C:\rad\libraries\CryptoHash\tests\packages\d26\Crc32.dproj"/>
+        <MSBuild Projects="Crc32.dproj"/>
     </Target>
     <Target Name="Crc32:Clean">
-        <MSBuild Projects="C:\rad\libraries\CryptoHash\tests\packages\d26\Crc32.dproj" Targets="Clean"/>
+        <MSBuild Projects="Crc32.dproj" Targets="Clean"/>
     </Target>
     <Target Name="Crc32:Make">
-        <MSBuild Projects="C:\rad\libraries\CryptoHash\tests\packages\d26\Crc32.dproj" Targets="Make"/>
+        <MSBuild Projects="Crc32.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
         <CallTarget Targets="CryptoHash;Bits;Crc32"/>

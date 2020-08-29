@@ -11,159 +11,135 @@
 
 unit chHash.Core.Word.Tests;
 
-{$INCLUDE CryptoHash.inc}
+{$INCLUDE CryptoHash.Tests.inc}
 
 interface
 
 uses
+  System.SysUtils,
   TestFramework,
   chHash.Core.Bits.Tests;
 
 type
 
+{ TAbstractWordTests }
+
+  TAbstractWordTests = class abstract(TBitsTests<Word>)
+  strict protected
+    function GetValue: Word; override;
+    function ByteToBits(const Value: Byte): Word; override;
+    function BitsToHex(const Value: Word): string; override;
+    function GetExpectedForReverseBits: Word; override;
+    function GetExpectedForReverseBytes: Word; override;
+    function GetExpectedForBytes: TBytes; override;
+  end;
+
 { TWordTests }
 
-  TWordTests = class(TBitsTests<Word>)
-  public
-    procedure SetUp; override;
-  published
-    procedure ReverseBitsTest; override;
-    procedure ReverseBytesTest; override;
-    procedure TestBitTest; override;
-    procedure ToBytesTest; override;
-    procedure HelperReverseBitsTest; override;
-    procedure HelperReverseBytesTest; override;
-    procedure HelperTestBitTest; override;
-    procedure HelperToBytesTest; override;
+  TWordTests = class(TAbstractWordTests)
+  strict protected
+    function GetReverseBits: Word; override;
+    function GetReverseBytes: Word; override;
+    function GetTestBit: Boolean; override;
+    function GetBytes: TBytes; override;
+  end;
+
+{ TWordHelperTests }
+
+  TWordHelperTests = class(TAbstractWordTests)
+  strict protected
+    function GetReverseBits: Word; override;
+    function GetReverseBytes: Word; override;
+    function GetTestBit: Boolean; override;
+    function GetBytes: TBytes; override;
   end;
 
 implementation
 
 uses
-  System.SysUtils,
-  System.Generics.Defaults,
 {$IF DEFINED(USE_JEDI_CORE_LIBRARY)}
   JclLogic,
 {$ENDIF ~ USE_JEDI_CORE_LIBRARY}
   chHash.Core.Bits;
 
+{ TAbstractWordTests }
+
+function TAbstractWordTests.GetValue: Word;
+begin
+  Result := $29B1;
+end;
+
+function TAbstractWordTests.ByteToBits(const Value: Byte): Word;
+begin
+  Result := Value;
+end;
+
+function TAbstractWordTests.BitsToHex(const Value: Word): string;
+begin
+  Result := IntToHex(Value);
+end;
+
+function TAbstractWordTests.GetExpectedForReverseBits: Word;
+begin
+  Result := $8D94;
+end;
+
+function TAbstractWordTests.GetExpectedForReverseBytes: Word;
+begin
+  Result := $B129;
+end;
+
+function TAbstractWordTests.GetExpectedForBytes: TBytes;
+begin
+  Result := [$29, $B1];
+end;
+
 { TWordTests }
 
-procedure TWordTests.SetUp;
+function TWordTests.GetReverseBits: Word;
 begin
-  FValue := $29B1;
-  FBytePerConvert := SizeOf(FValue);
+  Result := ReverseBits(FValue);
 end;
 
-procedure TWordTests.ReverseBitsTest;
+function TWordTests.GetReverseBytes: Word;
 begin
-  const Expected = $8D94;
-  Test(
-    procedure(const ConvertCount: Cardinal)
-    begin
-      var Actual := $0;
-      for var I := 1 to ConvertCount do
-      begin
-        Actual := ReverseBits(FValue);
-      end;
-      CheckEquals(Expected, Actual, Format('Expected = $%s, Actual = $%s', [IntToHex(Expected), IntToHex(Actual)]));
-    end
-  );
+  Result := ReverseBytes(FValue);
 end;
 
-procedure TWordTests.ReverseBytesTest;
+function TWordTests.GetTestBit: Boolean;
 begin
-  const Expected = $B129;
-  Test(
-    procedure(const ConvertCount: Cardinal)
-    begin
-      var Actual := $0;
-      for var I := 1 to ConvertCount do
-      begin
-        Actual := ReverseBytes(FValue);
-      end;
-      CheckEquals(Expected, Actual, Format('Expected = $%s, Actual = $%s', [IntToHex(Expected), IntToHex(Actual)]));
-    end
-  );
+  Result := TestBit(FValue, 11);
 end;
 
-procedure TWordTests.TestBitTest;
+function TWordTests.GetBytes: TBytes;
 begin
-  const Expected = True;
-  Test(
-    procedure(const ConvertCount: Cardinal)
-    begin
-      var Actual := False;
-      for var I := 1 to ConvertCount do
-      begin
-        Actual := TestBit(FValue, 11);
-      end;
-      CheckEquals(Expected, Actual);
-    end
-  );
+  Result := ToBytes(FValue);
 end;
 
-procedure TWordTests.ToBytesTest;
+{ TWordHelperTests }
+
+function TWordHelperTests.GetReverseBits: Word;
 begin
-  CheckTrue(TEqualityComparer<TBytes>.Default.Equals([$29, $B1], ToBytes(FValue)));
+  Result := FValue.ReverseBits;
 end;
 
-procedure TWordTests.HelperReverseBitsTest;
+function TWordHelperTests.GetReverseBytes: Word;
 begin
-  const Expected = $8D94;
-  Test(
-    procedure(const ConvertCount: Cardinal)
-    begin
-      var Actual := $0;
-      for var I := 1 to ConvertCount do
-      begin
-        Actual := FValue.ReverseBits;
-      end;
-      CheckEquals(Expected, Actual, Format('Expected = $%s, Actual = $%s', [IntToHex(Expected), IntToHex(Actual)]));
-      CheckNotEquals(Expected, FValue, Format('Expected = $%s, Value = $%s', [IntToHex(Expected), IntToHex(FValue)]));
-    end
-  );
+  Result := FValue.ReverseBytes;
 end;
 
-procedure TWordTests.HelperReverseBytesTest;
+function TWordHelperTests.GetTestBit: Boolean;
 begin
-  const Expected = $B129;
-  Test(
-    procedure(const ConvertCount: Cardinal)
-    begin
-      var Actual := $0;
-      for var I := 1 to ConvertCount do
-      begin
-        Actual := FValue.ReverseBytes;
-      end;
-      CheckEquals(Expected, Actual, Format('Expected = $%s, Actual = $%s', [IntToHex(Expected), IntToHex(Actual)]));
-      CheckNotEquals(Expected, FValue, Format('Expected = $%s, Value = $%s', [IntToHex(Expected), IntToHex(FValue)]));
-    end
-  );
+  Result := FValue.TestBit(11);
 end;
 
-procedure TWordTests.HelperTestBitTest;
+function TWordHelperTests.GetBytes: TBytes;
 begin
-  const Expected = True;
-  Test(
-    procedure(const ConvertCount: Cardinal)
-    begin
-      var Actual := False;
-      for var I := 1 to ConvertCount do
-      begin
-        Actual := FValue.TestBit(11);
-      end;
-      CheckEquals(Expected, Actual);
-    end
-  );
-end;
-
-procedure TWordTests.HelperToBytesTest;
-begin
-  CheckTrue(TEqualityComparer<TBytes>.Default.Equals([$29, $B1], FValue.ToBytes));
+  Result := FValue.ToBytes;
 end;
 
 initialization
   RegisterTest(TWordTests.Suite);
+  RegisterTest(TWordHelperTests.Suite);
 
 end.

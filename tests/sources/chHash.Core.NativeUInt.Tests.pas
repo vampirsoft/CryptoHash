@@ -11,169 +11,135 @@
 
 unit chHash.Core.NativeUInt.Tests;
 
-{$INCLUDE CryptoHash.inc}
+{$INCLUDE CryptoHash.Tests.inc}
 
 interface
 
 uses
+  System.SysUtils,
   TestFramework,
   chHash.Core.Bits.Tests;
 
 type
 
+{ TAbstractNativeUIntTests }
+
+  TAbstractNativeUIntTests = class abstract(TBitsTests<NativeUInt>)
+  strict protected
+    function GetValue: NativeUInt; override;
+    function ByteToBits(const Value: Byte): NativeUInt; override;
+    function BitsToHex(const Value: NativeUInt): string; override;
+    function GetExpectedForReverseBits: NativeUInt; override;
+    function GetExpectedForReverseBytes: NativeUInt; override;
+    function GetExpectedForBytes: TBytes; override;
+  end;
+
 { TNativeUIntTests }
 
-  TNativeUIntTests = class(TBitsTests<NativeUInt>)
-  public
-    procedure SetUp; override;
-  published
-    procedure ReverseBitsTest; override;
-    procedure ReverseBytesTest; override;
-    procedure TestBitTest; override;
-    procedure ToBytesTest; override;
-    procedure HelperReverseBitsTest; override;
-    procedure HelperReverseBytesTest; override;
-    procedure HelperTestBitTest; override;
-    procedure HelperToBytesTest; override;
+  TNativeUIntTests = class(TAbstractNativeUIntTests)
+  strict protected
+    function GetReverseBits: NativeUInt; override;
+    function GetReverseBytes: NativeUInt; override;
+    function GetTestBit: Boolean; override;
+    function GetBytes: TBytes; override;
+  end;
+
+{ TNativeUIntHelperTests }
+
+  TNativeUIntHelperTests = class(TAbstractNativeUIntTests)
+  strict protected
+    function GetReverseBits: NativeUInt; override;
+    function GetReverseBytes: NativeUInt; override;
+    function GetTestBit: Boolean; override;
+    function GetBytes: TBytes; override;
   end;
 
 implementation
 
 uses
-  System.SysUtils,
-  System.Generics.Defaults,
 {$IF DEFINED(USE_JEDI_CORE_LIBRARY)}
   JclLogic,
 {$ENDIF ~ USE_JEDI_CORE_LIBRARY}
   chHash.Core.Bits;
 
+{ TAbstractNativeUIntTests }
+
+function TAbstractNativeUIntTests.GetValue: NativeUInt;
+begin
+  Result := {$IF DEFINED(X64)}$995DC9BBDF1939FA{$ELSE}$CBF43926{$ENDIF};
+end;
+
+function TAbstractNativeUIntTests.ByteToBits(const Value: Byte): NativeUInt;
+begin
+  Result := Value;
+end;
+
+function TAbstractNativeUIntTests.BitsToHex(const Value: NativeUInt): string;
+begin
+  Result := IntToHex(Value);
+end;
+
+function TAbstractNativeUIntTests.GetExpectedForReverseBits: NativeUInt;
+begin
+  Result := {$IF DEFINED(X64)}$5F9C98FBDD93BA99{$ELSE}$649C2FD3{$ENDIF};
+end;
+
+function TAbstractNativeUIntTests.GetExpectedForReverseBytes: NativeUInt;
+begin
+  Result := {$IF DEFINED(X64)}$FA3919DFBBC95D99{$ELSE}$2639F4CB{$ENDIF};
+end;
+
+function TAbstractNativeUIntTests.GetExpectedForBytes: TBytes;
+begin
+  Result := [{$IF DEFINED(X64)}$99, $5D, $C9, $BB, $DF, $19, $39, $FA{$ELSE}$CB, $F4, $39, $26{$ENDIF}];
+end;
+
 { TNativeUIntTests }
 
-procedure TNativeUIntTests.SetUp;
+function TNativeUIntTests.GetReverseBits: NativeUInt;
 begin
-  FValue := {$IF DEFINED(X64)}$995DC9BBDF1939FA{$ELSE}$CBF43926{$ENDIF};
-  FBytePerConvert := SizeOf(FValue);
+  Result := ReverseBits(FValue);
 end;
 
-procedure TNativeUIntTests.ReverseBitsTest;
+function TNativeUIntTests.GetReverseBytes: NativeUInt;
 begin
-  const Expected = NativeUInt({$IF DEFINED(X64)}$5F9C98FBDD93BA99{$ELSE}$649C2FD3{$ENDIF});
-  Test(
-    procedure(const ConvertCount: Cardinal)
-    begin
-      var Actual: NativeUInt := $0;
-      for var I := 1 to ConvertCount do
-      begin
-        Actual := ReverseBits(FValue);
-      end;
-      CheckEquals(Expected, Actual, Format('Expected = $%s, Actual = $%s', [IntToHex(Expected), IntToHex(Actual)]));
-    end
-  );
+  Result := ReverseBytes(FValue);
 end;
 
-procedure TNativeUIntTests.ReverseBytesTest;
+function TNativeUIntTests.GetTestBit: Boolean;
 begin
-  const Expected = NativeUInt({$IF DEFINED(X64)}$FA3919DFBBC95D99{$ELSE}$2639F4CB{$ENDIF});
-  Test(
-    procedure(const ConvertCount: Cardinal)
-    begin
-      var Actual: NativeUInt := $0;
-      for var I := 1 to ConvertCount do
-      begin
-        Actual := ReverseBytes(FValue);
-      end;
-      CheckEquals(Expected, Actual, Format('Expected = $%s, Actual = $%s', [IntToHex(Expected), IntToHex(Actual)]));
-    end
-  );
+  Result := TestBit(FValue, {$IF DEFINED(X64)}40{$ELSE}18{$ENDIF});
 end;
 
-procedure TNativeUIntTests.TestBitTest;
+function TNativeUIntTests.GetBytes: TBytes;
 begin
-  const Expected = True;
-  Test(
-    procedure(const ConvertCount: Cardinal)
-    begin
-      var Actual := False;
-      for var I := 1 to ConvertCount do
-      begin
-        Actual := TestBit(FValue, {$IF DEFINED(X64)}40{$ELSE}18{$ENDIF});
-      end;
-      CheckEquals(Expected, Actual);
-    end
-  );
+  Result := ToBytes(FValue);
 end;
 
-procedure TNativeUIntTests.ToBytesTest;
+{ TNativeUIntHelperTests }
+
+function TNativeUIntHelperTests.GetReverseBits: NativeUInt;
 begin
-  CheckTrue(
-    TEqualityComparer<TBytes>.Default.Equals(
-      {$IF DEFINED(X64)}[$99, $5D, $C9, $BB, $DF, $19, $39, $FA]{$ELSE}[$CB, $F4, $39, $26]{$ENDIF},
-      ToBytes(FValue)
-    )
-  );
+  Result := FValue.ReverseBits;
 end;
 
-procedure TNativeUIntTests.HelperReverseBitsTest;
+function TNativeUIntHelperTests.GetReverseBytes: NativeUInt;
 begin
-  const Expected = NativeUInt({$IF DEFINED(X64)}$5F9C98FBDD93BA99{$ELSE}$649C2FD3{$ENDIF});
-  Test(
-    procedure(const ConvertCount: Cardinal)
-    begin
-      var Actual: NativeUInt := $0;
-      for var I := 1 to ConvertCount do
-      begin
-        Actual := FValue.ReverseBits;
-      end;
-      CheckEquals(Expected, Actual, Format('Expected = $%s, Actual = $%s', [IntToHex(Expected), IntToHex(Actual)]));
-      CheckNotEquals(Expected, FValue, Format('Expected = $%s, Value = $%s', [IntToHex(Expected), IntToHex(FValue)]));
-    end
-  );
+  Result := FValue.ReverseBytes;
 end;
 
-procedure TNativeUIntTests.HelperReverseBytesTest;
+function TNativeUIntHelperTests.GetTestBit: Boolean;
 begin
-  const Expected = NativeUInt({$IF DEFINED(X64)}$FA3919DFBBC95D99{$ELSE}$2639F4CB{$ENDIF});
-  Test(
-    procedure(const ConvertCount: Cardinal)
-    begin
-      var Actual: NativeUInt := $0;
-      for var I := 1 to ConvertCount do
-      begin
-        Actual := FValue.ReverseBytes;
-      end;
-      CheckEquals(Expected, Actual, Format('Expected = $%s, Actual = $%s', [IntToHex(Expected), IntToHex(Actual)]));
-      CheckNotEquals(Expected, FValue, Format('Expected = $%s, Value = $%s', [IntToHex(Expected), IntToHex(FValue)]));
-    end
-  );
+  Result := FValue.TestBit({$IF DEFINED(X64)}40{$ELSE}18{$ENDIF});
 end;
 
-procedure TNativeUIntTests.HelperTestBitTest;
+function TNativeUIntHelperTests.GetBytes: TBytes;
 begin
-  const Expected = True;
-  Test(
-    procedure(const ConvertCount: Cardinal)
-    begin
-      var Actual := False;
-      for var I := 1 to ConvertCount do
-      begin
-        Actual := FValue.TestBit({$IF DEFINED(X64)}40{$ELSE}18{$ENDIF});
-      end;
-      CheckEquals(Expected, Actual);
-    end
-  );
-end;
-
-procedure TNativeUIntTests.HelperToBytesTest;
-begin
-  CheckTrue(
-    TEqualityComparer<TBytes>.Default.Equals(
-      {$IF DEFINED(X64)}[$99, $5D, $C9, $BB, $DF, $19, $39, $FA]{$ELSE}[$CB, $F4, $39, $26]{$ENDIF},
-      FValue.ToBytes
-    )
-  );
+  Result := FValue.ToBytes;
 end;
 
 initialization
   RegisterTest(TNativeUIntTests.Suite);
+  RegisterTest(TNativeUIntHelperTests.Suite);
 
 end.

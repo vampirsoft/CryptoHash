@@ -11,7 +11,7 @@
 
 unit chHash.CRC.CRC32.Tests;
 
-{$INCLUDE CryptoHash.inc}
+{$INCLUDE CryptoHash.Tests.inc}
 
 interface
 
