@@ -11,7 +11,7 @@
 
 program Bits;
 
-{$INCLUDE CryptoHash.inc}
+{$INCLUDE CryptoHash.Tests.inc}
 
 {$IFDEF CONSOLE_TESTRUNNER}
 {$APPTYPE CONSOLE}
@@ -19,9 +19,9 @@ program Bits;
 
 uses
   DUnitTestRunner,
-{$IF NOT DEFINED(USE_JEDI_CORE_LIBRARY)}
+  {$IF NOT DEFINED(USE_JEDI_CORE_LIBRARY)}
   chHash.Core,
-{$ENDIF ~ NOT USE_JEDI_CORE_LIBRARY}
+  {$ENDIF ~ NOT USE_JEDI_CORE_LIBRARY}
   chHash.Core.Bits,
   chHash.Core.Bits.Tests,
   chHash.Core.Byte.Tests,
@@ -39,6 +39,7 @@ uses
 {$R *.RES}
 
 begin
+  ReportMemoryLeaksOnShutdown := True;
   DUnitTestRunner.RunRegisteredTests;
 {$IFDEF CONSOLE_TESTRUNNER}
   Write('Для завершения нажмите "ENTER"');

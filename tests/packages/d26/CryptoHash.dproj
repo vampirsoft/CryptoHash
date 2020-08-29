@@ -76,8 +76,8 @@
         <DCC_F>false</DCC_F>
         <DCC_K>false</DCC_K>
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;$(DCC_Namespace)</DCC_Namespace>
-        <DCC_UnitSearchPath>$(BDS)\Source\DUnit\src;..\..\..\includes;..\..\..\sources;..\..\..\sources\factories;..\..\sources;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
-        <DCC_Define>CONSOLE_TESTRUNNER;HASH_TESTS;$(DCC_Define)</DCC_Define>
+        <DCC_UnitSearchPath>$(BDS)\Source\DUnit\src;..\..\..\includes;..\..\..\sources;..\..\..\sources\factories;..\..\includes;..\..\sources;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_Define>HASH_TESTS;$(DCC_Define)</DCC_Define>
         <VerInfo_Locale>1049</VerInfo_Locale>
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
         <SanitizedProjectName>CryptoHash</SanitizedProjectName>
@@ -165,9 +165,9 @@
                 </Excluded_Packages>
             </Delphi.Personality>
             <Deployment Version="3">
-                <DeployFile LocalName="..\..\..\target\Win64\Debug\CryptoHash.rsm" Configuration="Debug" Class="DebugSymbols">
-                    <Platform Name="Win64">
-                        <RemoteName>CryptoHash.rsm</RemoteName>
+                <DeployFile LocalName="..\..\..\target\Win32\Debug\CryptoHash.exe" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>CryptoHash.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -220,9 +220,9 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="..\..\..\target\Win32\Debug\CryptoHash.exe" Configuration="Debug" Class="ProjectOutput">
-                    <Platform Name="Win32">
-                        <RemoteName>CryptoHash.exe</RemoteName>
+                <DeployFile LocalName="..\..\..\target\Win64\Debug\CryptoHash.rsm" Configuration="Debug" Class="DebugSymbols">
+                    <Platform Name="Win64">
+                        <RemoteName>CryptoHash.rsm</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

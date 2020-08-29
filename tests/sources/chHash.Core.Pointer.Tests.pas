@@ -11,191 +11,174 @@
 
 unit chHash.Core.Pointer.Tests;
 
-{$INCLUDE CryptoHash.inc}
+{$INCLUDE CryptoHash.Tests.inc}
 
 interface
 
 uses
-  TestFramework,
   System.SysUtils,
+  TestFramework,
   chHash.Core.Bits.Tests;
 
 type
 
-{ TPointerTests }
+{ TAbstractPointerTests }
 
-  TPointerTests = class(TBitsTests<TBytes>)
-  strict private
+  TAbstractPointerTests = class abstract(TBitsTests<TBytes>)
+  strict protected
     FLength: Cardinal;
+    function GetValue: TBytes; override;
+    function ByteToBits(const Value: Byte): TBytes; override;
+    function BitsToHex(const Value: TBytes): string; override;
+    function GetExpectedForReverseBits: TBytes; override;
+    function GetExpectedForReverseBytes: TBytes; override;
+    function GetExpectedForTestBit: Boolean; override;
+    function GetExpectedForBytes: TBytes; override;
   public
     procedure SetUp; override;
-  published
-    procedure ReverseBitsTest; override;
-    procedure ReverseBytesTest; override;
-    procedure TestBitTest; override;
-    procedure ToBytesTest; override;
-    procedure HelperReverseBitsTest; override;
-    procedure HelperReverseBytesTest; override;
-    procedure HelperTestBitTest; override;
-    procedure HelperToBytesTest; override;
+  end;
+
+{ TPointerTests }
+
+  TPointerTests = class(TAbstractPointerTests)
+  strict protected
+    function GetReverseBits: TBytes; override;
+    function GetReverseBytes: TBytes; override;
+    function GetTestBit: Boolean; override;
+    function GetBytes: TBytes; override;
+  end;
+
+{ TPointerHelperTests }
+
+  TPointerHelperTests = class(TAbstractPointerTests)
+  strict protected
+    function GetReverseBits: TBytes; override;
+    function GetReverseBytes: TBytes; override;
+    function GetTestBit: Boolean; override;
+    function GetBytes: TBytes; override;
   end;
 
 implementation
 
 uses
-  System.Generics.Defaults,
 {$IF DEFINED(USE_JEDI_CORE_LIBRARY)}
   JclLogic,
 {$ENDIF ~ USE_JEDI_CORE_LIBRARY}
   chHash.Core.Bits;
 
-{ TPointerTests }
+{ TAbstractPointerTests }
 
-procedure TPointerTests.SetUp;
+function TAbstractPointerTests.GetValue: TBytes;
 begin
   FLength := 5;
   Randomize;
-  SetLength(FValue, FLength);
+  SetLength(Result, FLength);
   for var I: Byte := 0 to FLength - 1 do
   begin
-    FValue[I] := Random(256);
+    Result[I] := Random(256);
   end;
+end;
+
+function TAbstractPointerTests.ByteToBits(const Value: Byte): TBytes;
+begin
+  Result := ToBytes(Value);
+end;
+
+function TAbstractPointerTests.BitsToHex(const Value: TBytes): string;
+begin
+  Result := '';
+  for var I := 0 to Length(Value) - 1 do
+  begin
+    Result := Result + IntToHex(Value[I]);
+  end;
+end;
+
+function TAbstractPointerTests.GetExpectedForReverseBits: TBytes;
+begin
+  SetLength(Result, FLength);
+  for var I := 1 to FLength do
+  begin
+    Result[FLength - I] := ReverseBits(FValue[I - 1]);
+  end;
+end;
+
+function TAbstractPointerTests.GetExpectedForReverseBytes: TBytes;
+begin
+  SetLength(Result, FLength);
+  for var I := 1 to FLength do
+  begin
+    Result[FLength - I] := FValue[I - 1];
+  end;
+end;
+
+function TAbstractPointerTests.GetExpectedForTestBit: Boolean;
+begin
+  Result := TestBit(FValue[4], 4);
+end;
+
+function TAbstractPointerTests.GetExpectedForBytes: TBytes;
+begin
+  Result := FValue;
+end;
+
+procedure TAbstractPointerTests.SetUp;
+begin
+  inherited SetUp;
   FBytePerConvert := FLength;
 end;
 
-procedure TPointerTests.ReverseBitsTest;
-begin
-  var Expected: TBytes;
-  SetLength(Expected, FLength);
-  for var I := 1 to FLength do
-  begin
-    Expected[FLength - I] := ReverseBits(FValue[I - 1]);
-  end;
+{ TPointerTests }
 
-  Test(
-    procedure(const ConvertCount: Cardinal)
-    begin
-      const Actual: TBytes = FValue;
-      for var I := 1 to ConvertCount do
-      begin
-        ReverseBits(Actual, FLength);
-      end;
-      CheckTrue(TEqualityComparer<TBytes>.Default.Equals(Expected, Actual));
-    end
-  );
+function TPointerTests.GetReverseBits: TBytes;
+begin
+  Result := FValue;
+  ReverseBits(Result, FLength);
 end;
 
-procedure TPointerTests.ReverseBytesTest;
+function TPointerTests.GetReverseBytes: TBytes;
 begin
-  var Expected: TBytes;
-  SetLength(Expected, FLength);
-  for var I := 1 to FLength do
-  begin
-    Expected[FLength - I] := FValue[I - 1];
-  end;
-
-  Test(
-    procedure(const ConvertCount: Cardinal)
-    begin
-      const Actual: TBytes = FValue;
-      for var I := 1 to ConvertCount do
-      begin
-        ReverseBytes(Actual, FLength);
-      end;
-      CheckTrue(TEqualityComparer<TBytes>.Default.Equals(Expected, Actual));
-    end
-  );
+  Result := FValue;
+  ReverseBytes(Result, FLength);
 end;
 
-procedure TPointerTests.TestBitTest;
+function TPointerTests.GetTestBit: Boolean;
 begin
   const Bit = (FLength - 1) * BitsPerByte + 4;
-  const Expected = TestBit(FValue[4], 4);
-  Test(
-    procedure(const ConvertCount: Cardinal)
-    begin
-      var Actual := not Expected;
-      for var I := 1 to ConvertCount do
-      begin
-        Actual := TestBit(FValue, Bit);
-      end;
-      CheckEquals(Expected, Actual);
-    end
-  );
+  Result := TestBit(FValue, Bit);
 end;
 
-procedure TPointerTests.ToBytesTest;
+function TPointerTests.GetBytes: TBytes;
 begin
-  CheckTrue(TEqualityComparer<TBytes>.Default.Equals(FValue, ToBytes(@FValue[0], FLength)));
+  Result := ToBytes(@FValue[0], FLength);
 end;
 
-procedure TPointerTests.HelperReverseBitsTest;
-begin
-  var Expected: TBytes;
-  SetLength(Expected, FLength);
-  for var I := 1 to FLength do
-  begin
-    Expected[FLength - I] := ReverseBits(FValue[I - 1]);
-  end;
+{ TPointerHelperTests }
 
-  Test(
-    procedure(const ConvertCount: Cardinal)
-    begin
-      const Actual: TBytes = FValue;
-      for var I := 1 to ConvertCount do
-      begin
-        (@Actual[0]).ReverseBits(FLength);
-      end;
-      CheckTrue(TEqualityComparer<TBytes>.Default.Equals(Expected, Actual));
-    end
-  );
+function TPointerHelperTests.GetReverseBits: TBytes;
+begin
+  Result := FValue;
+  (@Result[0]).ReverseBits(FLength);
 end;
 
-procedure TPointerTests.HelperReverseBytesTest;
+function TPointerHelperTests.GetReverseBytes: TBytes;
 begin
-  var Expected: TBytes;
-  SetLength(Expected, FLength);
-  for var I := 1 to FLength do
-  begin
-    Expected[FLength - I] := FValue[I - 1];
-  end;
-
-  Test(
-    procedure(const ConvertCount: Cardinal)
-    begin
-      const Actual: TBytes = FValue;
-      for var I := 1 to ConvertCount do
-      begin
-        (@Actual[0]).ReverseBytes(FLength);
-      end;
-      CheckTrue(TEqualityComparer<TBytes>.Default.Equals(Expected, Actual));
-    end
-  );
+  Result := FValue;
+  (@Result[0]).ReverseBytes(FLength);
 end;
 
-procedure TPointerTests.HelperTestBitTest;
+function TPointerHelperTests.GetTestBit: Boolean;
 begin
-  const Bit = (FLength - 1) * Byte.Bits + 4;
-  const Expected = FValue[4].TestBit(4);
-  Test(
-    procedure(const ConvertCount: Cardinal)
-    begin
-      var Actual := not Expected;
-      for var I := 1 to ConvertCount do
-      begin
-        Actual := (@FValue[0]).TestBit(Bit);
-      end;
-      CheckEquals(Expected, Actual);
-    end
-  );
+  const Bit = (FLength - 1) * BitsPerByte + 4;
+  Result := (@FValue[0]).TestBit(Bit);
 end;
 
-procedure TPointerTests.HelperToBytesTest;
+function TPointerHelperTests.GetBytes: TBytes;
 begin
-  CheckTrue(TEqualityComparer<TBytes>.Default.Equals(FValue, (@FValue[0]).ToBytes(FLength)));
+  Result := (@FValue[0]).ToBytes(FLength);
 end;
 
 initialization
   RegisterTest(TPointerTests.Suite);
+  RegisterTest(TPointerHelperTests.Suite);
 
 end.

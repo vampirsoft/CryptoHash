@@ -11,159 +11,135 @@
 
 unit chHash.Core.Integer.Tests;
 
-{$INCLUDE CryptoHash.inc}
+{$INCLUDE CryptoHash.Tests.inc}
 
 interface
 
 uses
+  System.SysUtils,
   TestFramework,
   chHash.Core.Bits.Tests;
 
 type
 
+{ TAbstractIntegerTests }
+
+  TAbstractIntegerTests = class abstract(TBitsTests<Integer>)
+  strict protected
+    function GetValue: Integer; override;
+    function ByteToBits(const Value: Byte): Integer; override;
+    function BitsToHex(const Value: Integer): string; override;
+    function GetExpectedForReverseBits: Integer; override;
+    function GetExpectedForReverseBytes: Integer; override;
+    function GetExpectedForBytes: TBytes; override;
+  end;
+
 { TIntegerTests }
 
-  TIntegerTests = class(TBitsTests<Integer>)
-  public
-    procedure SetUp; override;
-  published
-    procedure ReverseBitsTest; override;
-    procedure ReverseBytesTest; override;
-    procedure TestBitTest; override;
-    procedure ToBytesTest; override;
-    procedure HelperReverseBitsTest; override;
-    procedure HelperReverseBytesTest; override;
-    procedure HelperTestBitTest; override;
-    procedure HelperToBytesTest; override;
+  TIntegerTests = class(TAbstractIntegerTests)
+  strict protected
+    function GetReverseBits: Integer; override;
+    function GetReverseBytes: Integer; override;
+    function GetTestBit: Boolean; override;
+    function GetBytes: TBytes; override;
+  end;
+
+{ TIntegerHelperTests }
+
+  TIntegerHelperTests = class(TAbstractIntegerTests)
+  strict protected
+    function GetReverseBits: Integer; override;
+    function GetReverseBytes: Integer; override;
+    function GetTestBit: Boolean; override;
+    function GetBytes: TBytes; override;
   end;
 
 implementation
 
 uses
-  System.SysUtils,
-  System.Generics.Defaults,
 {$IF DEFINED(USE_JEDI_CORE_LIBRARY)}
   JclLogic,
 {$ENDIF ~ USE_JEDI_CORE_LIBRARY}
   chHash.Core.Bits;
 
+{ TAbstractIntegerTests }
+
+function TAbstractIntegerTests.GetValue: Integer;
+begin
+  Result := $F4ACFB13;
+end;
+
+function TAbstractIntegerTests.ByteToBits(const Value: Byte): Integer;
+begin
+  Result := Value;
+end;
+
+function TAbstractIntegerTests.BitsToHex(const Value: Integer): string;
+begin
+  Result := IntToHex(Value);
+end;
+
+function TAbstractIntegerTests.GetExpectedForReverseBits: Integer;
+begin
+  Result := $C8DF352F;
+end;
+
+function TAbstractIntegerTests.GetExpectedForReverseBytes: Integer;
+begin
+  Result := $13FBACF4;
+end;
+
+function TAbstractIntegerTests.GetExpectedForBytes: TBytes;
+begin
+  Result := [$F4, $AC, $FB, $13];
+end;
+
 { TIntegerTests }
 
-procedure TIntegerTests.SetUp;
+function TIntegerTests.GetReverseBits: Integer;
 begin
-  FValue := Integer($F4ACFB13);
-  FBytePerConvert := SizeOf(FValue);
+  Result := ReverseBits(FValue);
 end;
 
-procedure TIntegerTests.ReverseBitsTest;
+function TIntegerTests.GetReverseBytes: Integer;
 begin
-  const Expected = Integer($C8DF352F);
-  Test(
-    procedure(const ConvertCount: Cardinal)
-    begin
-      var Actual := $0;
-      for var I := 1 to ConvertCount do
-      begin
-        Actual := ReverseBits(FValue);
-      end;
-      CheckEquals(Expected, Actual, Format('Expected = $%s, Actual = $%s', [IntToHex(Expected), IntToHex(Actual)]));
-    end
-  );
+  Result := ReverseBytes(FValue);
 end;
 
-procedure TIntegerTests.ReverseBytesTest;
+function TIntegerTests.GetTestBit: Boolean;
 begin
-  const Expected = Integer($13FBACF4);
-  Test(
-    procedure(const ConvertCount: Cardinal)
-    begin
-      var Actual := $0;
-      for var I := 1 to ConvertCount do
-      begin
-        Actual := ReverseBytes(FValue);
-      end;
-      CheckEquals(Expected, Actual, Format('Expected = $%s, Actual = $%s', [IntToHex(Expected), IntToHex(Actual)]));
-    end
-  );
+  Result := TestBit(FValue, 21);
 end;
 
-procedure TIntegerTests.TestBitTest;
+function TIntegerTests.GetBytes: TBytes;
 begin
-  const Expected = True;
-  Test(
-    procedure(const ConvertCount: Cardinal)
-    begin
-      var Actual := False;
-      for var I := 1 to ConvertCount do
-      begin
-        Actual := TestBit(FValue, 21);
-      end;
-      CheckEquals(Expected, Actual);
-    end
-  );
+  Result := ToBytes(FValue);
 end;
 
-procedure TIntegerTests.ToBytesTest;
+{ TIntegerHelperTests }
+
+function TIntegerHelperTests.GetReverseBits: Integer;
 begin
-  CheckTrue(TEqualityComparer<TBytes>.Default.Equals([$F4, $AC, $FB, $13], ToBytes(FValue)));
+  Result := FValue.ReverseBits;
 end;
 
-procedure TIntegerTests.HelperReverseBitsTest;
+function TIntegerHelperTests.GetReverseBytes: Integer;
 begin
-  const Expected = Integer($C8DF352F);
-  Test(
-    procedure(const ConvertCount: Cardinal)
-    begin
-      var Actual := $0;
-      for var I := 1 to ConvertCount do
-      begin
-        Actual := FValue.ReverseBits;
-      end;
-      CheckEquals(Expected, Actual, Format('Expected = $%s, Actual = $%s', [IntToHex(Expected), IntToHex(Actual)]));
-      CheckNotEquals(Expected, FValue, Format('Expected = $%s, Value = $%s', [IntToHex(Expected), IntToHex(FValue)]));
-    end
-  );
+  Result := FValue.ReverseBytes;
 end;
 
-procedure TIntegerTests.HelperReverseBytesTest;
+function TIntegerHelperTests.GetTestBit: Boolean;
 begin
-  const Expected = Integer($13FBACF4);
-  Test(
-    procedure(const ConvertCount: Cardinal)
-    begin
-      var Actual := $0;
-      for var I := 1 to ConvertCount do
-      begin
-        Actual := FValue.ReverseBytes;
-      end;
-      CheckEquals(Expected, Actual, Format('Expected = $%s, Actual = $%s', [IntToHex(Expected), IntToHex(Actual)]));
-      CheckNotEquals(Expected, FValue, Format('Expected = $%s, Value = $%s', [IntToHex(Expected), IntToHex(FValue)]));
-    end
-  );
+  Result := FValue.TestBit(21);
 end;
 
-procedure TIntegerTests.HelperTestBitTest;
+function TIntegerHelperTests.GetBytes: TBytes;
 begin
-  const Expected = True;
-  Test(
-    procedure(const ConvertCount: Cardinal)
-    begin
-      var Actual := False;
-      for var I := 1 to ConvertCount do
-      begin
-        Actual := FValue.TestBit(21);
-      end;
-      CheckEquals(Expected, Actual);
-    end
-  );
-end;
-
-procedure TIntegerTests.HelperToBytesTest;
-begin
-  CheckTrue(TEqualityComparer<TBytes>.Default.Equals([$F4, $AC, $FB, $13], FValue.ToBytes));
+  Result := FVAlue.ToBytes;
 end;
 
 initialization
   RegisterTest(TIntegerTests.Suite);
+  RegisterTest(TIntegerHelperTests.Suite);
 
 end.

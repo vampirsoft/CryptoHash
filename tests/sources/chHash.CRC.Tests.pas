@@ -11,7 +11,7 @@
 
 unit chHash.CRC.Tests;
 
-{$INCLUDE CryptoHash.inc}
+{$INCLUDE CryptoHash.Tests.inc}
 
 interface
 
@@ -35,8 +35,8 @@ type
     function GetCheckMessage(const Expected, Actual: Bits): string; override;
     function BitsToHex(const Value: Bits): string; virtual; abstract;
     function FinalControlCalculate(const Value: Bits): Bits; virtual; abstract;
-    procedure ControllStressTest(const Data: TBytes); override;
     procedure ControlCalculate(var Current: Bits; const Data; Length: Integer); virtual; abstract;
+    procedure DataStressTest(const Data: TBytes; const MaxLength, Count: Cardinal); override;
   public
     procedure SetUp; override;
   published
@@ -50,6 +50,38 @@ uses
   System.Diagnostics;
 
 { TchCrcTests<Bits, HA> }
+
+function TchCrcTests<Bits, HA>.GetCheckValueForEmpty: Bits;
+begin
+  Result := FAlgorithm.Final(FAlgorithm.Init);
+end;
+
+function TchCrcTests<Bits, HA>.GetCheckMessage(const Expected, Actual: Bits): string;
+begin
+  Result := Format('%s: Expected = $%s, Actual = $%s', [FAlgorithm.ToString, BitsToHex(Expected), BitsToHex(Actual)]);
+end;
+
+procedure TchCrcTests<Bits, HA>.DataStressTest(const Data: TBytes; const MaxLength, Count: Cardinal);
+begin
+  var Actual := FAlgorithm.Init;
+  const Stopwatch = TStopwatch.StartNew;
+  for var I := 1 to Count do
+  begin
+    ControlCalculate(Actual, Data[0], MaxLength);
+  end;
+  Stopwatch.Stop;
+  const S = Stopwatch.Elapsed.TotalSeconds;
+  if S = 0 then Status(Format('%s: Control Speed = 0s, %.3f MB/s', [FAlgorithm.ToString, GetMaxLength/1 * Count]))
+  else Status(Format('%s: Control Speed = %.3fs, %.3f MB/s', [FAlgorithm.ToString, S, (GetMaxLength/(1024 * 1024)/S) * Count]));
+
+  inherited DataStressTest(Data, MaxLength, Count);
+end;
+
+procedure TchCrcTests<Bits, HA>.SetUp;
+begin
+  inherited SetUp;
+  FCrcTable := TchCrc<Bits>(FAlgorithm).CrcTable;
+end;
 
 procedure TchCrcTests<Bits, HA>.CheckTest;
 begin
@@ -96,36 +128,6 @@ begin
 
   const Actual = FAlgorithm.Combine(LeftCrc, RightCrc, RightLength);
   CheckResult(FAlgorithm.Check, Actual);
-end;
-
-procedure TchCrcTests<Bits, HA>.ControllStressTest(const Data: TBytes);
-begin
-  var Actual := FAlgorithm.Init;
-  const Stopwatch = TStopwatch.StartNew;
-  for var I := 1 to GetCount do
-  begin
-    ControlCalculate(Actual, Data[0], GetMaxLength);
-  end;
-  Stopwatch.Stop;
-  const S = Stopwatch.Elapsed.TotalSeconds;
-  if S = 0 then Status(Format('%s: Control Speed = 0s, %.3f MB/s', [FAlgorithm.ToString, GetMaxLength/1 * GetCount]))
-  else Status(Format('%s: Control Speed = %.3fs, %.3f MB/s', [FAlgorithm.ToString, S, (GetMaxLength/(1024 * 1024)/S) * GetCount]));
-end;
-
-function TchCrcTests<Bits, HA>.GetCheckMessage(const Expected, Actual: Bits): string;
-begin
-  Result := Format('%s: Expected = $%s, Actual = $%s', [FAlgorithm.ToString, BitsToHex(Expected), BitsToHex(Actual)]);
-end;
-
-function TchCrcTests<Bits, HA>.GetCheckValueForEmpty: Bits;
-begin
-  Result := FAlgorithm.Final(FAlgorithm.Init);
-end;
-
-procedure TchCrcTests<Bits, HA>.SetUp;
-begin
-  inherited SetUp;
-  FCrcTable := TchCrc<Bits>(FAlgorithm).CrcTable;
 end;
 
 end.

@@ -11,159 +11,135 @@
 
 unit chHash.Core.UInt64.Tests;
 
-{$INCLUDE CryptoHash.inc}
+{$INCLUDE CryptoHash.Tests.inc}
 
 interface
 
 uses
+  System.SysUtils,
   TestFramework,
   chHash.Core.Bits.Tests;
 
 type
 
+{ TAbstractUInt64Tests }
+
+  TAbstractUInt64Tests = class abstract(TBitsTests<UInt64>)
+  strict protected
+    function GetValue: UInt64; override;
+    function ByteToBits(const Value: Byte): UInt64; override;
+    function BitsToHex(const Value: UInt64): string; override;
+    function GetExpectedForReverseBits: UInt64; override;
+    function GetExpectedForReverseBytes: UInt64; override;
+    function GetExpectedForBytes: TBytes; override;
+  end;
+
 { TUInt64Tests }
 
-  TUInt64Tests = class(TBitsTests<UInt64>)
-  public
-    procedure SetUp; override;
-  published
-    procedure ReverseBitsTest; override;
-    procedure ReverseBytesTest; override;
-    procedure TestBitTest; override;
-    procedure ToBytesTest; override;
-    procedure HelperReverseBitsTest; override;
-    procedure HelperReverseBytesTest; override;
-    procedure HelperTestBitTest; override;
-    procedure HelperToBytesTest; override;
+  TUInt64Tests = class(TAbstractUInt64Tests)
+  strict protected
+    function GetReverseBits: UInt64; override;
+    function GetReverseBytes: UInt64; override;
+    function GetTestBit: Boolean; override;
+    function GetBytes: TBytes; override;
+  end;
+
+{ TUInt64HelperTests }
+
+  TUInt64HelperTests = class(TAbstractUInt64Tests)
+  strict protected
+    function GetReverseBits: UInt64; override;
+    function GetReverseBytes: UInt64; override;
+    function GetTestBit: Boolean; override;
+    function GetBytes: TBytes; override;
   end;
 
 implementation
 
 uses
-  System.SysUtils,
-  System.Generics.Defaults,
 {$IF DEFINED(USE_JEDI_CORE_LIBRARY)}
   JclLogic,
 {$ENDIF ~ USE_JEDI_CORE_LIBRARY}
   chHash.Core.Bits;
 
+{ TAbstractUInt64Tests }
+
+function TAbstractUInt64Tests.GetValue: UInt64;
+begin
+  Result := $995DC9BBDF1939FA;
+end;
+
+function TAbstractUInt64Tests.ByteToBits(const Value: Byte): UInt64;
+begin
+  Result := Value;
+end;
+
+function TAbstractUInt64Tests.BitsToHex(const Value: UInt64): string;
+begin
+  Result := IntToHex(Value);
+end;
+
+function TAbstractUInt64Tests.GetExpectedForReverseBits: UInt64;
+begin
+  Result := $5F9C98FBDD93BA99;
+end;
+
+function TAbstractUInt64Tests.GetExpectedForReverseBytes: UInt64;
+begin
+  Result := $FA3919DFBBC95D99;
+end;
+
+function TAbstractUInt64Tests.GetExpectedForBytes: TBytes;
+begin
+  Result := [$99, $5D, $C9, $BB, $DF, $19, $39, $FA];
+end;
+
 { TUInt64Tests }
 
-procedure TUInt64Tests.SetUp;
+function TUInt64Tests.GetReverseBits: UInt64;
 begin
-  FValue := $995DC9BBDF1939FA;
-  FBytePerConvert := SizeOf(FValue);
+  Result := ReverseBits(FValue);
 end;
 
-procedure TUInt64Tests.ReverseBitsTest;
+function TUInt64Tests.GetReverseBytes: UInt64;
 begin
-  const Expected = UInt64($5F9C98FBDD93BA99);
-  Test(
-    procedure(const ConvertCount: Cardinal)
-    begin
-      var Actual: UInt64 := $0;
-      for var I := 1 to ConvertCount do
-      begin
-        Actual := ReverseBits(FValue);
-      end;
-      CheckEquals(Expected, Actual, Format('Expected = $%s, Actual = $%s', [IntToHex(Expected), IntToHex(Actual)]));
-    end
-  );
+  Result := ReverseBytes(FValue);
 end;
 
-procedure TUInt64Tests.ReverseBytesTest;
+function TUInt64Tests.GetTestBit: Boolean;
 begin
-  const Expected = UInt64($FA3919DFBBC95D99);
-  Test(
-    procedure(const ConvertCount: Cardinal)
-    begin
-      var Actual: UInt64 := $0;
-      for var I := 1 to ConvertCount do
-      begin
-        Actual := ReverseBytes(FValue);
-      end;
-      CheckEquals(Expected, Actual, Format('Expected = $%s, Actual = $%s', [IntToHex(Expected), IntToHex(Actual)]));
-    end
-  );
+  Result := TestBit(FValue, 40);
 end;
 
-procedure TUInt64Tests.TestBitTest;
+function TUInt64Tests.GetBytes: TBytes;
 begin
-  const Expected = True;
-  Test(
-    procedure(const ConvertCount: Cardinal)
-    begin
-      var Actual := False;
-      for var I := 1 to ConvertCount do
-      begin
-        Actual := TestBit(FValue, 40);
-      end;
-      CheckEquals(Expected, Actual);
-    end
-  );
+  Result := ToBytes(FValue);
 end;
 
-procedure TUInt64Tests.ToBytesTest;
+{ TUInt64HelperTests }
+
+function TUInt64HelperTests.GetReverseBits: UInt64;
 begin
-  CheckTrue(TEqualityComparer<TBytes>.Default.Equals([$99, $5D, $C9, $BB, $DF, $19, $39, $FA], ToBytes(FValue)));
+  Result := FValue.ReverseBits;
 end;
 
-procedure TUInt64Tests.HelperReverseBitsTest;
+function TUInt64HelperTests.GetReverseBytes: UInt64;
 begin
-  const Expected = UInt64($5F9C98FBDD93BA99);
-  Test(
-    procedure(const ConvertCount: Cardinal)
-    begin
-      var Actual: UInt64 := $0;
-      for var I := 1 to ConvertCount do
-      begin
-        Actual := FValue.ReverseBits;
-      end;
-      CheckEquals(Expected, Actual, Format('Expected = $%s, Actual = $%s', [IntToHex(Expected), IntToHex(Actual)]));
-      CheckNotEquals(Expected, FValue, Format('Expected = $%s, Value = $%s', [IntToHex(Expected), IntToHex(FValue)]));
-    end
-  );
+  Result := FValue.ReverseBytes;
 end;
 
-procedure TUInt64Tests.HelperReverseBytesTest;
+function TUInt64HelperTests.GetTestBit: Boolean;
 begin
-  const Expected = UInt64($FA3919DFBBC95D99);
-  Test(
-    procedure(const ConvertCount: Cardinal)
-    begin
-      var Actual: UInt64 := $0;
-      for var I := 1 to ConvertCount do
-      begin
-        Actual := FValue.ReverseBytes;
-      end;
-      CheckEquals(Expected, Actual, Format('Expected = $%s, Actual = $%s', [IntToHex(Expected), IntToHex(Actual)]));
-      CheckNotEquals(Expected, FValue, Format('Expected = $%s, Value = $%s', [IntToHex(Expected), IntToHex(FValue)]));
-    end
-  );
+  Result := FValue.TestBit(40);
 end;
 
-procedure TUInt64Tests.HelperTestBitTest;
+function TUInt64HelperTests.GetBytes: TBytes;
 begin
-  const Expected = True;
-  Test(
-    procedure(const ConvertCount: Cardinal)
-    begin
-      var Actual := False;
-      for var I := 1 to ConvertCount do
-      begin
-        Actual := FValue.TestBit(40);
-      end;
-      CheckEquals(Expected, Actual);
-    end
-  );
-end;
-
-procedure TUInt64Tests.HelperToBytesTest;
-begin
-  CheckTrue(TEqualityComparer<TBytes>.Default.Equals([$99, $5D, $C9, $BB, $DF, $19, $39, $FA], FValue.ToBytes));
+  Result := FValue.ToBytes;
 end;
 
 initialization
   RegisterTest(TUInt64Tests.Suite);
+  RegisterTest(TUInt64HelperTests.Suite);
 
 end.

@@ -10,159 +10,136 @@
 /////////////////////////////////////////////////////////////////////////////////
 
 unit chHash.Core.SmallInt.Tests;
-{$INCLUDE CryptoHash.inc}
+
+{$INCLUDE CryptoHash.Tests.inc}
 
 interface
 
 uses
+  System.SysUtils,
   TestFramework,
   chHash.Core.Bits.Tests;
 
 type
 
+{ TAbstractSmallIntTests }
+
+  TAbstractSmallIntTests = class abstract(TBitsTests<SmallInt>)
+  strict protected
+    function GetValue: SmallInt; override;
+    function ByteToBits(const Value: Byte): SmallInt; override;
+    function BitsToHex(const Value: SmallInt): string; override;
+    function GetExpectedForReverseBits: SmallInt; override;
+    function GetExpectedForReverseBytes: SmallInt; override;
+    function GetExpectedForBytes: TBytes; override;
+  end;
+
 { TSmallIntTests }
 
-  TSmallIntTests = class(TBitsTests<SmallInt>)
-  public
-    procedure SetUp; override;
-  published
-    procedure ReverseBitsTest; override;
-    procedure ReverseBytesTest; override;
-    procedure TestBitTest; override;
-    procedure ToBytesTest; override;
-    procedure HelperReverseBitsTest; override;
-    procedure HelperReverseBytesTest; override;
-    procedure HelperTestBitTest; override;
-    procedure HelperToBytesTest; override;
+  TSmallIntTests = class(TAbstractSmallIntTests)
+  strict protected
+    function GetReverseBits: SmallInt; override;
+    function GetReverseBytes: SmallInt; override;
+    function GetTestBit: Boolean; override;
+    function GetBytes: TBytes; override;
+  end;
+
+{ TSmallIntHelperTests }
+
+  TSmallIntHelperTests = class(TAbstractSmallIntTests)
+  strict protected
+    function GetReverseBits: SmallInt; override;
+    function GetReverseBytes: SmallInt; override;
+    function GetTestBit: Boolean; override;
+    function GetBytes: TBytes; override;
   end;
 
 implementation
 
 uses
-  System.SysUtils,
-  System.Generics.Defaults,
 {$IF DEFINED(USE_JEDI_CORE_LIBRARY)}
   JclLogic,
 {$ENDIF ~ USE_JEDI_CORE_LIBRARY}
   chHash.Core.Bits;
 
+{ TAbstractSmallIntTests }
+
+function TAbstractSmallIntTests.GetValue: SmallInt;
+begin
+  Result := SmallInt($FEE8);
+end;
+
+function TAbstractSmallIntTests.ByteToBits(const Value: Byte): SmallInt;
+begin
+  Result := Value;
+end;
+
+function TAbstractSmallIntTests.BitsToHex(const Value: SmallInt): string;
+begin
+  Result := IntToHex(Value);
+end;
+
+function TAbstractSmallIntTests.GetExpectedForReverseBits: SmallInt;
+begin
+  Result := $177F;
+end;
+
+function TAbstractSmallIntTests.GetExpectedForReverseBytes: SmallInt;
+begin
+  Result := SmallInt($E8FE);
+end;
+
+function TAbstractSmallIntTests.GetExpectedForBytes: TBytes;
+begin
+  Result := [$FE, $E8];
+end;
+
 { TSmallIntTests }
 
-procedure TSmallIntTests.SetUp;
+function TSmallIntTests.GetReverseBits: SmallInt;
 begin
-  FValue := SmallInt($FEE8);
-  FBytePerConvert := SizeOf(FValue);
+  Result := ReverseBits(FValue);
 end;
 
-procedure TSmallIntTests.ReverseBitsTest;
+function TSmallIntTests.GetReverseBytes: SmallInt;
 begin
-  const Expected = SmallInt($177F);
-  Test(
-    procedure(const ConvertCount: Cardinal)
-    begin
-      var Actual := $0;
-      for var I := 1 to ConvertCount do
-      begin
-        Actual := ReverseBits(FValue);
-      end;
-      CheckEquals(Expected, Actual, Format('Expected = $%s, Actual = $%s', [IntToHex(Expected), IntToHex(Actual)]));
-    end
-  );
+  Result := ReverseBytes(FValue);
 end;
 
-procedure TSmallIntTests.ReverseBytesTest;
+function TSmallIntTests.GetTestBit: Boolean;
 begin
-  const Expected = SmallInt($E8FE);
-  Test(
-    procedure(const ConvertCount: Cardinal)
-    begin
-      var Actual := $0;
-      for var I := 1 to ConvertCount do
-      begin
-        Actual := ReverseBytes(FValue);
-      end;
-      CheckEquals(Expected, Actual, Format('Expected = $%s, Actual = $%s', [IntToHex(Expected), IntToHex(Actual)]));
-    end
-  );
+  Result := TestBit(FValue, 9);
 end;
 
-procedure TSmallIntTests.TestBitTest;
+function TSmallIntTests.GetBytes: TBytes;
 begin
-  const Expected = True;
-  Test(
-    procedure(const ConvertCount: Cardinal)
-    begin
-      var Actual := False;
-      for var I := 1 to ConvertCount do
-      begin
-        Actual := TestBit(FValue, 9);
-      end;
-      CheckEquals(Expected, Actual);
-    end
-  );
+  Result := ToBytes(FValue);
 end;
 
-procedure TSmallIntTests.ToBytesTest;
+{ TSmallIntHelperTests }
+
+function TSmallIntHelperTests.GetReverseBits: SmallInt;
 begin
-  CheckTrue(TEqualityComparer<TBytes>.Default.Equals([$FE, $E8], ToBytes(FValue)));
+  Result := FValue.ReverseBits;
 end;
 
-procedure TSmallIntTests.HelperReverseBitsTest;
+function TSmallIntHelperTests.GetReverseBytes: SmallInt;
 begin
-  const Expected = SmallInt($177F);
-  Test(
-    procedure(const ConvertCount: Cardinal)
-    begin
-      var Actual := $0;
-      for var I := 1 to ConvertCount do
-      begin
-        Actual := FValue.ReverseBits;
-      end;
-      CheckEquals(Expected, Actual, Format('Expected = $%s, Actual = $%s', [IntToHex(Expected), IntToHex(Actual)]));
-      CheckNotEquals(Expected, FValue, Format('Expected = $%s, Value = $%s', [IntToHex(Expected), IntToHex(FValue)]));
-    end
-  );
+  Result := FValue.ReverseBytes;
 end;
 
-procedure TSmallIntTests.HelperReverseBytesTest;
+function TSmallIntHelperTests.GetTestBit: Boolean;
 begin
-  const Expected = SmallInt($E8FE);
-  Test(
-    procedure(const ConvertCount: Cardinal)
-    begin
-      var Actual := $0;
-      for var I := 1 to ConvertCount do
-      begin
-        Actual := FValue.ReverseBytes;
-      end;
-      CheckEquals(Expected, Actual, Format('Expected = $%s, Actual = $%s', [IntToHex(Expected), IntToHex(Actual)]));
-      CheckNotEquals(Expected, FValue, Format('Expected = $%s, Value = $%s', [IntToHex(Expected), IntToHex(FValue)]));
-    end
-  );
+  Result := FValue.TestBit(9);
 end;
 
-procedure TSmallIntTests.HelperTestBitTest;
+function TSmallIntHelperTests.GetBytes: TBytes;
 begin
-  const Expected = True;
-  Test(
-    procedure(const ConvertCount: Cardinal)
-    begin
-      var Actual := False;
-      for var I := 1 to ConvertCount do
-      begin
-        Actual := FValue.TestBit(9);
-      end;
-      CheckEquals(Expected, Actual);
-    end
-  );
-end;
-
-procedure TSmallIntTests.HelperToBytesTest;
-begin
-  CheckTrue(TEqualityComparer<TBytes>.Default.Equals([$FE, $E8], FValue.ToBytes));
+  Result := FValue.ToBytes;
 end;
 
 initialization
   RegisterTest(TSmallIntTests.Suite);
+  RegisterTest(TSmallIntHelperTests.Suite);
 
 end.

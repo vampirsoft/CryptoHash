@@ -11,7 +11,7 @@
 
 unit chHash.Tests;
 
-{$INCLUDE CryptoHash.inc}
+{$INCLUDE CryptoHash.Tests.inc}
 
 interface
 
@@ -40,7 +40,7 @@ type
     function GetCheckValueForEmpty: R; virtual; abstract;
     function CreateAlgorithm: HA; virtual; abstract;
     function GetCheckMessage(const Expected, Actual: R): string; virtual; abstract;
-    procedure ControllStressTest(const Data: TBytes); virtual;
+    procedure DataStressTest(const Data: TBytes; const MaxLength, Count: Cardinal); virtual;
     procedure CheckResult(const Expected, Actual: R); virtual;
   public
     procedure SetUp; override;
@@ -48,7 +48,9 @@ type
     procedure EmptyDataTest;
     procedure ShortCheckTest;
     procedure CheckTest; virtual;
+  {$IF DEFINED(BENCHMARK)}
     procedure StressTest; virtual;
+  {$ENDIF ~ BENCHMARK}
 //  Utils
     procedure CalculateTest;
   end;
@@ -64,41 +66,18 @@ uses
 
 { TchAlgorithmTests<C, R, HA> }
 
-procedure TchAlgorithmTests<C, R, HA>.CalculateTest;
+procedure TchAlgorithmTests<C, R, HA>.DataStressTest(const Data: TBytes; const MaxLength, Count: Cardinal);
 begin
-  Randomize;
-  const Tail = Random(MaxWord);
-  const DataSize = 64 * 1024 * 1023 + Tail;
-  var Data: TBytes;
-  SetLength(Data, DataSize);
-  for var I := 0 to DataSize - 1 do
-  begin
-    Data[I] := Random(256);
-  end;
-
-  var Expected := FAlgorithm.Init;
-  FAlgorithm.Calculate(Expected, Data, DataSize);
-
-  var DataStream := TMemoryStream.Create;
-  DataStream.Write(Data, DataSize);
-  SetLength(Data, 0);
-
-  const Count = 16;
-  var Actual: R;
+  var Actual := FAlgorithm.Init;
   var Stopwatch := TStopwatch.StartNew;
-  for var J := 1 to Count do
+  for var I := 1 to Count do
   begin
-    Actual := TchUtils.Calculate<C, R>(DataStream, FAlgorithm);
+    FAlgorithm.Calculate(Actual, Data[0], MaxLength);
   end;
   Stopwatch.Stop;
-  const TestSize = (DataSize/(1024 * 1024 * 1024)) * Count;
   const S = Stopwatch.Elapsed.TotalSeconds;
-  FreeAndNil(DataStream);
-  Status(Format('Test size = %.3f GB', [TestSize]));
-  if S = 0 then Status(Format('%s: Speed         = 0s, %.3f MB/s', [FAlgorithm.ToString, DataSize/1 * Count]))
-  else Status(Format('%s: Speed         = %.3fs, %.3f MB/s', [FAlgorithm.ToString, S, (DataSize/(1024 * 1024)/S) * Count]));
-
-  CheckResult(FAlgorithm.Final(Expected), Actual);
+  if S = 0 then Status(Format('%s: Speed         = 0s, %.3f MB/s', [FAlgorithm.ToString, MaxLength/1 * Count]))
+  else Status(Format('%s: Speed         = %.3fs, %.3f MB/s', [FAlgorithm.ToString, S, (MaxLength/(1024 * 1024)/S) * Count]));
 end;
 
 procedure TchAlgorithmTests<C, R, HA>.CheckResult(const Expected, Actual: R);
@@ -106,15 +85,9 @@ begin
   CheckTrue(TEqualityComparer<R>.Default.Equals(Expected, Actual), GetCheckMessage(Expected, Actual));
 end;
 
-procedure TchAlgorithmTests<C, R, HA>.CheckTest;
+procedure TchAlgorithmTests<C, R, HA>.SetUp;
 begin
-  var Actual := FAlgorithm.Init;
-  FAlgorithm.Calculate(Actual, FTestString[1], 9);
-  CheckResult(FAlgorithm.Check, FAlgorithm.Final(Actual));
-end;
-
-procedure TchAlgorithmTests<C, R, HA>.ControllStressTest(const Data: TBytes);
-begin
+  FAlgorithm := CreateAlgorithm;
 end;
 
 procedure TchAlgorithmTests<C, R, HA>.EmptyDataTest;
@@ -130,17 +103,20 @@ begin
   CheckResult(Expected, FAlgorithm.Final(Actual));
 end;
 
-procedure TchAlgorithmTests<C, R, HA>.SetUp;
-begin
-  FAlgorithm := CreateAlgorithm;
-end;
-
 procedure TchAlgorithmTests<C, R, HA>.ShortCheckTest;
 begin
   const TestBytes = ToBytes(FTestString[1], 9);
   CheckResult(FAlgorithm.Check, FAlgorithm.Calculate(TestBytes));
 end;
 
+procedure TchAlgorithmTests<C, R, HA>.CheckTest;
+begin
+  var Actual := FAlgorithm.Init;
+  FAlgorithm.Calculate(Actual, FTestString[1], 9);
+  CheckResult(FAlgorithm.Check, FAlgorithm.Final(Actual));
+end;
+
+{$IF DEFINED(BENCHMARK)}
 procedure TchAlgorithmTests<C, R, HA>.StressTest;
 begin
   const MaxLength = GetMaxLength;
@@ -156,20 +132,50 @@ begin
   const TestSize = (MaxLength/(1024 * 1024 * 1024)) * Count;
   Status(Format('Test size = %.3f GB', [TestSize]));
 
-  ControllStressTest(Data);
-
-  var Actual := FAlgorithm.Init;
-  var Stopwatch := TStopwatch.StartNew;
-  for var I := 1 to Count do
-  begin
-    FAlgorithm.Calculate(Actual, Data[0], MaxLength);
-  end;
-  Stopwatch.Stop;
-  const S = Stopwatch.Elapsed.TotalSeconds;
-  if S = 0 then Status(Format('%s: Speed         = 0s, %.3f MB/s', [FAlgorithm.ToString, MaxLength/1 * Count]))
-  else Status(Format('%s: Speed         = %.3fs, %.3f MB/s', [FAlgorithm.ToString, S, (MaxLength/(1024 * 1024)/S) * Count]));
+  DataStressTest(Data, MaxLength, Count);
 
   SetLength(Data, 0);
+end;
+{$ENDIF ~ BENCHMARK}
+
+procedure TchAlgorithmTests<C, R, HA>.CalculateTest;
+const
+  Count = {$IF DEFINED(BENCHMARK)}16{$ELSE}1{$ENDIF};
+  Koef = {$IF DEFINED(BENCHMARK)}1023{$ELSE}1{$ENDIF};
+begin
+  Randomize;
+  const Tail = Random(MaxWord);
+  const DataSize = 64 * 1024 * Koef + Tail;
+  var Data: TBytes;
+  SetLength(Data, DataSize);
+  for var I := 0 to DataSize - 1 do
+  begin
+    Data[I] := Random(256);
+  end;
+
+  var Expected := FAlgorithm.Init;
+  FAlgorithm.Calculate(Expected, Data, DataSize);
+
+  var DataStream := TMemoryStream.Create;
+  DataStream.Write(Data, DataSize);
+  SetLength(Data, 0);
+
+  var Actual: R;
+  var Stopwatch := TStopwatch.StartNew;
+  for var J := 1 to Count do
+  begin
+    Actual := TchUtils.Calculate<C, R>(DataStream, FAlgorithm);
+  end;
+  Stopwatch.Stop;
+{$IF DEFINED(BENCHMARK)}
+  const TestSize = (DataSize/(1024 * 1024 * 1024)) * Count;
+  const S = Stopwatch.Elapsed.TotalSeconds;
+  Status(Format('Test size = %.3f GB', [TestSize]));
+  if S = 0 then Status(Format('%s: Speed         = 0s, %.3f MB/s', [FAlgorithm.ToString, DataSize/1 * Count]))
+  else Status(Format('%s: Speed         = %.3fs, %.3f MB/s', [FAlgorithm.ToString, S, (DataSize/(1024 * 1024)/S) * Count]));
+{$ENDIF ~ BENCHMARK}
+  FreeAndNil(DataStream);
+  CheckResult(FAlgorithm.Final(Expected), Actual);
 end;
 
 end.
