@@ -32,7 +32,6 @@ type
 { TchCrc32 }
 
   TchCrc32 = class(TchCrc<Cardinal>{$IF DEFINED(SUPPORTS_INTERFACES)}, IchCrc32{$ENDIF})
-  strict private
   strict protected
     function ByteToBits(const Value: Byte): Cardinal; override;
     function BitsToByte(const Value: Cardinal): Byte; override;

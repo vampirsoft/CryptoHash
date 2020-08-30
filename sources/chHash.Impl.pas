@@ -29,13 +29,12 @@ type
   strict private
     FInit: C;
     FCheck: R;
-  strict protected
     FName: string;
+  strict protected
     constructor Create(const Name: string; const Init: C; const Check: R); reintroduce;
     class function IfThenElse<T>(const Condition: Boolean; const ThenValue, ElseValue: T): T; inline; static;
     class function InitArray<T>(const Length: Cardinal): TArray<T>; inline; static;
   public
-    function Init: C; inline;
     function Calculate(const Data: TBytes): R; overload; inline;
     function Calculate(const Data; const Length: Cardinal): R; overload; inline;
     function Calculate(const Data: Pointer; const Length: Cardinal): R; overload; inline;
@@ -44,14 +43,39 @@ type
     procedure Calculate(var Current: C; const Data; const Length: Cardinal); overload; inline;
     procedure Calculate(var Current: C; const Data: Pointer; const Length: Cardinal); overload; virtual; abstract;
     function Final(const Current: C): R; virtual; abstract;
+  {$IF DEFINED(SUPPORTS_INTERFACES)}
     function Name: string; inline;
+    function Init: C; inline;
     function Check: R; inline;
-    function ToString: string; override; abstract;
+  {$ELSE ~ NOT SUPPORTS_INTERFACES}
+    property Name: string read FName;
+    property Init: C read FInit;
+    property Check: R read FCheck;
+  {$ENDIF ~ SUPPORTS_INTERFACES}
+    function ToString: string; override;
   end;
 
 implementation
 
 { TchAlgorithm<C, R> }
+
+constructor TchAlgorithm<C, R>.Create(const Name: string; const Init: C; const Check: R);
+begin
+  FName := Name;
+  FInit := Init;
+  FCheck := Check;
+end;
+
+class function TchAlgorithm<C, R>.IfThenElse<T>(const Condition: Boolean; const ThenValue, ElseValue: T): T;
+begin
+  if Condition then Exit(ThenValue);
+  Result := ElseValue;
+end;
+
+class function TchAlgorithm<C, R>.InitArray<T>(const Length: Cardinal): TArray<T>;
+begin
+  SetLength(Result, Length);
+end;
 
 function TchAlgorithm<C, R>.Calculate(const Data: TBytes): R;
 begin
@@ -85,17 +109,10 @@ begin
   Calculate(Current, @Data, Length);
 end;
 
-constructor TchAlgorithm<C, R>.Create(const Name: string; const Init: C; const Check: R);
+{$IF DEFINED(SUPPORTS_INTERFACES)}
+function TchAlgorithm<C, R>.Name: string;
 begin
-  FName := Name;
-  FInit := Init;
-  FCheck := Check;
-end;
-
-class function TchAlgorithm<C, R>.IfThenElse<T>(const Condition: Boolean; const ThenValue, ElseValue: T): T;
-begin
-  if Condition then Exit(ThenValue);
-  Result := ElseValue;
+  Result := FName;
 end;
 
 function TchAlgorithm<C, R>.Init: C;
@@ -103,17 +120,13 @@ begin
   Result := FInit;
 end;
 
-class function TchAlgorithm<C, R>.InitArray<T>(const Length: Cardinal): TArray<T>;
-begin
-  SetLength(Result, Length);
-end;
-
 function TchAlgorithm<C, R>.Check: R;
 begin
   Result := FCheck;
 end;
+{$ENDIF ~ SUPPORTS_INTERFACES}
 
-function TchAlgorithm<C, R>.Name: string;
+function TchAlgorithm<C, R>.ToString: string;
 begin
   Result := FName;
 end;
