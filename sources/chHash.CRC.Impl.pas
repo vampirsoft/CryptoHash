@@ -76,12 +76,20 @@ type
     destructor Destroy; override;
     function Final(const Current: Bits): Bits; override;
     function Combine(const LeftCrc, RightCrc: Bits; const RightLength: Cardinal): Bits;
-    function Width: Byte; inline;
     function Polynomial: Bits;{$IF DEFINED(USE_INLINE)}inline;{$ENDIF}
+  {$IF DEFINED(SUPPORTS_INTERFACES)}
+    function Width: Byte; inline;
     function XorOut: Bits; inline;
     function RefIn: Boolean; inline;
     function RefOut: Boolean; inline;
     function Aliases: TList<string>; inline;
+  {$ELSE ~ NOT SUPPORTS_INTERFACES}
+    property Width: Byte read FWidth;
+    property XorOut: Bits read FXorOut;
+    property RefIn: Boolean read FRefIn;
+    property RefOut: Boolean read FRefOut;
+    property Aliases: TList<string> read FAliases;
+  {$ENDIF ~ SUPPORTS_INTERFACES}
     function ToString: string; override;
   {$IF DEFINED(HASH_TESTS)}
     property CrcTable: TOneLevelCrcTable read GetCrcTable;
@@ -175,6 +183,13 @@ begin
   end;
 end;
 
+function TchCrc<Bits>.Polynomial: Bits;
+const SizeOfBits = Byte(SizeOf(Bits));
+begin
+  Result := FPolynomial;
+  if FRefIn then ReverseBits(@Result, SizeOfBits);
+end;
+
 procedure TchCrc<Bits>.GenerateTable;
 const SizeOfBits = Byte(SizeOf(Bits));
 begin
@@ -203,16 +218,15 @@ begin
   end;
 end;
 
-function TchCrc<Bits>.Aliases: TList<string>;
+{$IF DEFINED(SUPPORTS_INTERFACES)}
+function TchCrc<Bits>.Width: Byte;
 begin
-  Result := FAliases;
+  Result := FWidth;
 end;
 
-function TchCrc<Bits>.Polynomial: Bits;
-const SizeOfBits = Byte(SizeOf(Bits));
+function TchCrc<Bits>.XorOut: Bits;
 begin
-  Result := FPolynomial;
-  if FRefIn then ReverseBits(@Result, SizeOfBits);
+  Result := FXorOut;
 end;
 
 function TchCrc<Bits>.RefIn: Boolean;
@@ -225,19 +239,15 @@ begin
   Result := FRefOut;
 end;
 
+function TchCrc<Bits>.Aliases: TList<string>;
+begin
+  Result := FAliases;
+end;
+{$ENDIF ~ SUPPORTS_INTERFACES}
+
 function TchCrc<Bits>.ToString: string;
 begin
-  Result := Format('%s (%db)', [FName, FWidth]);
-end;
-
-function TchCrc<Bits>.Width: Byte;
-begin
-  Result := FWidth;
-end;
-
-function TchCrc<Bits>.XorOut: Bits;
-begin
-  Result := FXorOut;
+  Result := Format('%s (%db)', [Name, FWidth]);
 end;
 
 {$IF DEFINED(HASH_TESTS)}
