@@ -1,0 +1,48 @@
+package CryptoHash;
+
+{$INCLUDE CryptoHash.inc}
+
+{$DESCRIPTION 'CryptoHash Library by Developer Dvornikov Sergey'}
+{$RUNONLY}
+{$ALIGN 8}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$REFERENCEINFO OFF}
+{$VARSTRINGCHECKS ON}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$IMPLICITBUILD OFF}
+
+{$R *.res}
+
+requires
+  rtl;
+
+contains
+{$IF NOT DEFINED(USE_JEDI_CORE_LIBRARY)}
+  chHash.Core,
+{$ENDIF ~ NOT USE_JEDI_CORE_LIBRARY}
+  chHash.Core.Bits,
+  chHash,
+  chHash.CRC,
+  chHash.CRC.CRC32,
+  chHash.Impl,
+  chHash.Utils,
+  chHash.CRC.Impl,
+  chHash.CRC.CRC32.Impl,
+  chHash.CRC.CRC32.PKZIP,
+  chHash.CRC.CRC32.BZIP2,
+  chHash.CRC.CRC32.ISCSI,
+  chHash.CRC.CRC32.BASE91D,
+  chHash.CRC.CRC32.MPEG2,
+  chHash.CRC.CRC32.CKSUM,
+  chHash.CRC.CRC32.AIXM,
+  chHash.CRC.CRC32.JAMCRC,
+  chHash.CRC.CRC32.XFER,
+  chHash.CRC.CRC32.AUTOSAR,
+  chHash.CRC.CRC32.CDROMEDC;
+
+end.

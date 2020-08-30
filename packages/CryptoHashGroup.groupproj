@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{E0FD62E8-8CAD-4C0C-8FCC-D58234B59157}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="CryptoHash.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="CryptoHashD.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="CryptoHash">
+        <MSBuild Projects="CryptoHash.dproj"/>
+    </Target>
+    <Target Name="CryptoHash:Clean">
+        <MSBuild Projects="CryptoHash.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="CryptoHash:Make">
+        <MSBuild Projects="CryptoHash.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="CryptoHashD">
+        <MSBuild Projects="CryptoHashD.dproj"/>
+    </Target>
+    <Target Name="CryptoHashD:Clean">
+        <MSBuild Projects="CryptoHashD.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="CryptoHashD:Make">
+        <MSBuild Projects="CryptoHashD.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="CryptoHash;CryptoHashD"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="CryptoHash:Clean;CryptoHashD:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="CryptoHash:Make;CryptoHashD:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
