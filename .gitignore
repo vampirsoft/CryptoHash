@@ -33,7 +33,7 @@
 __history/
 __recovery/
 *.~*
-library/
+libraries/
 target/
 win32/
 win64/

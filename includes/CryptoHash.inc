@@ -63,10 +63,26 @@
   {$DEFINE X64}
 {$ENDIF}
 
-{$WRITEABLECONST OFF}    // {$J-}
-{$OVERFLOWCHECKS OFF}    // {$Q-}
-{$RANGECHECKS OFF}       // {$R-}
-{$TYPEDADDRESS ON}       // {$T+}
+{$WRITEABLECONST OFF}     // {$J-}
+{$OVERFLOWCHECKS OFF}     // {$Q-}
+{$RANGECHECKS OFF}        // {$R-}
+{$TYPEDADDRESS ON}        // {$T+}
+{$BOOLEVAL OFF}           // {$B-}
+{$SAFEDIVIDE OFF}         // {$U-}
+
+{$IF DEFINED(DEBUG)}
+  {$DEBUGINFO ON}         // {$D+}
+  {$LOCALSYMBOLS ON}      // {$L+}
+  {$OPTIMIZATION OFF}     // {$O-}
+  {$ASSERTIONS ON}        // {$C+}
+  {$STACKFRAMES ON}       // {$W+}
+{$ELSE ~ NOT DEBUG}
+  {$DEBUGINFO OFF}        // {$D-}
+  {$LOCALSYMBOLS OFF}     // {$L-}
+  {$OPTIMIZATION ON}      // {$O+}
+  {$ASSERTIONS OFF}       // {$C-}
+  {$STACKFRAMES OFF}      // {$W-}
+{$ENDIF ~ DEBUG}
 
 {$IF DEFINED(SUPPORTS_INLINE) AND NOT DEFINED(DEBUG)}
   {$DEFINE USE_INLINE}
