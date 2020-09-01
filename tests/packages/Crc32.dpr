@@ -9,7 +9,7 @@
 //*****************************************************************************//
 /////////////////////////////////////////////////////////////////////////////////
 
-program Crc32;
+program crc32;
 
 {$INCLUDE CryptoHash.Tests.inc}
 
@@ -19,16 +19,15 @@ program Crc32;
 
 uses
   DUnitTestRunner,
-{$IF NOT DEFINED(USE_JEDI_CORE_LIBRARY)}
+  {$IF NOT DEFINED(USE_JEDI_CORE_LIBRARY)}
   chHash.Core,
-{$ENDIF ~ USE_JEDI_CORE_LIBRARY}
+  {$ENDIF ~ USE_JEDI_CORE_LIBRARY}
   chHash.Core.Bits,
   chHash,
-  chHash.CRC,
-  chHash.CRC.CRC32,
   chHash.Impl,
-  chHash.Utils,
+  chHash.CRC,
   chHash.CRC.Impl,
+  chHash.CRC.CRC32,
   chHash.CRC.CRC32.Impl,
   chHash.CRC.CRC32.PKZIP,
   chHash.CRC.CRC32.BZIP2,
@@ -52,6 +51,7 @@ uses
   chHash.CRC.CRC32.XFER.Factory,
   chHash.CRC.CRC32.AUTOSAR.Factory,
   chHash.CRC.CRC32.CDROMEDC.Factory,
+  chHash.Utils,
   chHash.Tests,
   chHash.CRC.Tests,
   chHash.CRC.CRC32.Tests;

@@ -40,14 +40,14 @@ type
 
   TchCrc32NormalTests = class abstract(TchCrc32Tests)
   strict protected
-    procedure ControlCalculate(var Current: Cardinal; const Data; Length: Integer); override;
+    procedure ControlCalculate(var Current: Cardinal; const Data; const Length: Cardinal); override;
   end;
 
 { TchCrc32ReverseTests }
 
   TchCrc32ReverseTests = class abstract(TchCrc32Tests)
   strict protected
-    procedure ControlCalculate(var Current: Cardinal; const Data; Length: Integer); override;
+    procedure ControlCalculate(var Current: Cardinal; const Data; const Length: Cardinal); override;
   end;
 
 { TchCrc32CRC32Tests }
@@ -177,31 +177,33 @@ end;
 
 { TchCrc32NormalTests }
 
-procedure TchCrc32NormalTests.ControlCalculate(var Current: Cardinal; const Data; Length: Integer);
+procedure TchCrc32NormalTests.ControlCalculate(var Current: Cardinal; const Data; const Length: Cardinal);
 begin
-  if Length <= 0 then Exit;
+  if Length = 0 then Exit;
 
+  var L := Length;
   var PData: PByte := @Data;
-  while Length > 0 do
+  while L > 0 do
   begin
-    Current := (Current shl BitsPerByte) xor FCrcTable[Byte(Ord(PData^) xor (Current shr (BitsPerByte * 3)))];
+    Current := (Current shl BitsPerByte) xor FCrcTable[Byte(PData^ xor (Current shr (BitsPerByte * 3)))];
     Inc(PData);
-    Dec(Length);
+    Dec(L);
   end;
 end;
 
 { TchCrc32ReverseTests }
 
-procedure TchCrc32ReverseTests.ControlCalculate(var Current: Cardinal; const Data; Length: Integer);
+procedure TchCrc32ReverseTests.ControlCalculate(var Current: Cardinal; const Data; const Length: Cardinal);
 begin
-  if Length <= 0 then Exit;
+  if Length = 0 then Exit;
 
+  var L := Length;
   var PData: PByte := @Data;
-  while Length > 0 do
+  while L > 0 do
   begin
     Current := (Current shr BitsPerByte) xor FCrcTable[Byte(PData^ xor Current)];
     Inc(PData);
-    Dec(Length);
+    Dec(L);
   end;
 end;
 

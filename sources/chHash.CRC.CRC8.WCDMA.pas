@@ -9,28 +9,35 @@
 //*****************************************************************************//
 /////////////////////////////////////////////////////////////////////////////////
 
-package CryptoHashD;
+unit chHash.CRC.CRC8.WCDMA;
 
 {$INCLUDE CryptoHash.inc}
 
-{$DESCRIPTION 'CryptoHash Library by Developer Dvornikov Sergey'}
-{$DESIGNONLY}
-{$ALIGN 8}
-{$EXTENDEDSYNTAX ON}
-{$IMPORTEDDATA ON}
-{$IOCHECKS ON}
-{$LONGSTRINGS ON}
-{$OPENSTRINGS ON}
-{$REFERENCEINFO OFF}
-{$VARSTRINGCHECKS ON}
-{$MINENUMSIZE 1}
-{$IMAGEBASE $400000}
-{$IMPLICITBUILD OFF}
+interface
 
-{$R *.res}
+uses
+{$IF DEFINED(SUPPORTS_INTERFACES)}
+  chHash.CRC.CRC8.Impl;
+{$ELSE ~ NOT SUPPORTS_INTERFACES}
+  chHash.CRC.CRC8;
+{$ENDIF ~ SUPPORTS_INTERFACES}
 
-requires
-  rtl,
-  CryptoHash;
+type
+
+{ TchCrc8WCDMA }
+
+  TchCrc8WCDMA = class({$IF DEFINED(SUPPORTS_INTERFACES)}chHash.CRC.CRC8.Impl{$ELSE}chHash.CRC.CRC8{$ENDIF}.TchCrc8)
+  public
+    constructor Create; reintroduce;
+  end;
+
+implementation
+
+{ TchCrc8WCDMA }
+
+constructor TchCrc8WCDMA.Create;
+begin
+  inherited Create('CRC-8/WCDMA', $9B, $00, $00, $25, True, True);
+end;
 
 end.

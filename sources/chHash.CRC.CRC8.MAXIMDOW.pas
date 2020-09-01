@@ -9,28 +9,37 @@
 //*****************************************************************************//
 /////////////////////////////////////////////////////////////////////////////////
 
-package CryptoHashD;
+unit chHash.CRC.CRC8.MAXIMDOW;
 
 {$INCLUDE CryptoHash.inc}
 
-{$DESCRIPTION 'CryptoHash Library by Developer Dvornikov Sergey'}
-{$DESIGNONLY}
-{$ALIGN 8}
-{$EXTENDEDSYNTAX ON}
-{$IMPORTEDDATA ON}
-{$IOCHECKS ON}
-{$LONGSTRINGS ON}
-{$OPENSTRINGS ON}
-{$REFERENCEINFO OFF}
-{$VARSTRINGCHECKS ON}
-{$MINENUMSIZE 1}
-{$IMAGEBASE $400000}
-{$IMPLICITBUILD OFF}
+interface
 
-{$R *.res}
+uses
+{$IF DEFINED(SUPPORTS_INTERFACES)}
+  chHash.CRC.CRC8.Impl;
+{$ELSE ~ NOT SUPPORTS_INTERFACES}
+  chHash.CRC.CRC8;
+{$ENDIF ~ SUPPORTS_INTERFACES}
 
-requires
-  rtl,
-  CryptoHash;
+type
+
+{ TchCrc8MAXIMDOW }
+
+  TchCrc8MAXIMDOW = class({$IF DEFINED(SUPPORTS_INTERFACES)}chHash.CRC.CRC8.Impl{$ELSE}chHash.CRC.CRC8{$ENDIF}.TchCrc8)
+  public
+    constructor Create; reintroduce;
+  end;
+
+implementation
+
+{ TchCrc8MAXIMDOW }
+
+constructor TchCrc8MAXIMDOW.Create;
+begin
+  inherited Create('CRC-8/MAXIM-DOW', $31, $00, $00, $A1, True, True);
+  Aliases.Add('CRC-8/MAXIM');
+  Aliases.Add('DOW-CRC');
+end;
 
 end.

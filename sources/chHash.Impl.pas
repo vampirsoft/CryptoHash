@@ -36,12 +36,12 @@ type
     class function InitArray<T>(const Length: Cardinal): TArray<T>; inline; static;
   public
     function Calculate(const Data: TBytes): R; overload; inline;
-    function Calculate(const Data; const Length: Cardinal): R; overload; inline;
     function Calculate(const Data: Pointer; const Length: Cardinal): R; overload; inline;
+    function Calculate(const Data; const Length: Cardinal): R; overload; inline;
     procedure Calculate(var Current: C; const Data: TBytes); overload; inline;
     procedure Calculate(var Current: C; const Data: TBytes; const Length: Cardinal); overload; inline;
-    procedure Calculate(var Current: C; const Data; const Length: Cardinal); overload; inline;
     procedure Calculate(var Current: C; const Data: Pointer; const Length: Cardinal); overload; virtual; abstract;
+    procedure Calculate(var Current: C; const Data; const Length: Cardinal); overload; inline;
     function Final(const Current: C): R; virtual; abstract;
   {$IF DEFINED(SUPPORTS_INTERFACES)}
     function Name: string; inline;

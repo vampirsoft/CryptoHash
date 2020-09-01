@@ -35,7 +35,7 @@ type
     function GetCheckMessage(const Expected, Actual: Bits): string; override;
     function BitsToHex(const Value: Bits): string; virtual; abstract;
     function FinalControlCalculate(const Value: Bits): Bits; virtual; abstract;
-    procedure ControlCalculate(var Current: Bits; const Data; Length: Integer); virtual; abstract;
+    procedure ControlCalculate(var Current: Bits; const Data; const Length: Cardinal); virtual; abstract;
     procedure DataStressTest(const Data: TBytes; const MaxLength, Count: Cardinal); override;
   public
     procedure SetUp; override;
@@ -80,7 +80,7 @@ end;
 procedure TchCrcTests<Bits, HA>.SetUp;
 begin
   inherited SetUp;
-  FCrcTable := TchCrc<Bits>(FAlgorithm).CrcTable;
+  FCrcTable := (FAlgorithm as TchCrc<Bits>).CrcTable;
 end;
 
 procedure TchCrcTests<Bits, HA>.CheckTest;
@@ -90,7 +90,7 @@ begin
   CheckResult(FAlgorithm.Check, FinalControlCalculate(Expected));
 
   Randomize;
-  const TestSize = Random(107) + 1;
+  const TestSize = Random((FAlgorithm as TchCrc<Bits>).TABLE_LEVEL_SIZE * 3 - 1) + 1;
   var Data: TBytes;
   SetLength(Data, TestSize);
   for var I := 0 to TestSize - 1 do
