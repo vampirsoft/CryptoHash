@@ -9,28 +9,28 @@
 //*****************************************************************************//
 /////////////////////////////////////////////////////////////////////////////////
 
-package CryptoHashD;
+unit chHash.CRC.CRC8;
 
 {$INCLUDE CryptoHash.inc}
 
-{$DESCRIPTION 'CryptoHash Library by Developer Dvornikov Sergey'}
-{$DESIGNONLY}
-{$ALIGN 8}
-{$EXTENDEDSYNTAX ON}
-{$IMPORTEDDATA ON}
-{$IOCHECKS ON}
-{$LONGSTRINGS ON}
-{$OPENSTRINGS ON}
-{$REFERENCEINFO OFF}
-{$VARSTRINGCHECKS ON}
-{$MINENUMSIZE 1}
-{$IMAGEBASE $400000}
-{$IMPLICITBUILD OFF}
+interface
 
-{$R *.res}
+uses
+{$IF DEFINED(SUPPORTS_INTERFACES)}
+  chHash.CRC;
+{$ELSE ~ NOT SUPPORTS_INTERFACES}
+  chHash.CRC.CRC8.Impl;
+{$ENDIF ~ SUPPORTS_INTERFACES}
 
-requires
-  rtl,
-  CryptoHash;
+type
+{$IF DEFINED(SUPPORTS_INTERFACES)}
+  IchCrc8 = interface(IchCrc<Byte>)
+    ['{406A0BDF-4B39-48B4-B44E-6D60F2F36FE0}']
+  end;
+{$ELSE ~ NOT SUPPORTS_INTERFACES}
+  TchCrc8 = chHash.CRC.CRC8.Impl.TchCrc8;
+{$ENDIF ~ SUPPORTS_INTERFACES}
+
+implementation
 
 end.

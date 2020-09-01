@@ -9,28 +9,36 @@
 //*****************************************************************************//
 /////////////////////////////////////////////////////////////////////////////////
 
-package CryptoHashD;
+unit chHash.CRC.CRC8.I4321;
 
 {$INCLUDE CryptoHash.inc}
 
-{$DESCRIPTION 'CryptoHash Library by Developer Dvornikov Sergey'}
-{$DESIGNONLY}
-{$ALIGN 8}
-{$EXTENDEDSYNTAX ON}
-{$IMPORTEDDATA ON}
-{$IOCHECKS ON}
-{$LONGSTRINGS ON}
-{$OPENSTRINGS ON}
-{$REFERENCEINFO OFF}
-{$VARSTRINGCHECKS ON}
-{$MINENUMSIZE 1}
-{$IMAGEBASE $400000}
-{$IMPLICITBUILD OFF}
+interface
 
-{$R *.res}
+uses
+{$IF DEFINED(SUPPORTS_INTERFACES)}
+  chHash.CRC.CRC8.Impl;
+{$ELSE ~ NOT SUPPORTS_INTERFACES}
+  chHash.CRC.CRC8;
+{$ENDIF ~ SUPPORTS_INTERFACES}
 
-requires
-  rtl,
-  CryptoHash;
+type
+
+{ TchCrc8I4321 }
+
+  TchCrc8I4321 = class({$IF DEFINED(SUPPORTS_INTERFACES)}chHash.CRC.CRC8.Impl{$ELSE}chHash.CRC.CRC8{$ENDIF}.TchCrc8)
+  public
+    constructor Create; reintroduce;
+  end;
+
+implementation
+
+{ TchCrc8I4321 }
+
+constructor TchCrc8I4321.Create;
+begin
+  inherited Create('CRC-8/I-432-1', $07, $00, $55, $A1, False, False);
+  Aliases.Add('CRC-8/ITU');
+end;
 
 end.

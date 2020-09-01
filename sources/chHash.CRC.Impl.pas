@@ -4,6 +4,11 @@
 //* Latest Source: https://github.com/vampirsoft/CryptoHash                   *//
 //* Unit Name    : CryptoHash.inc                                             *//
 //* Author       : Сергей (LordVampir) Дворников                              *//
+//* Based on     :                                                            *//
+//*              - http://guildalfa.ru/alsha/node/4                           *//
+//*              - https://create.stephan-brumme.com/crc32/                   *//
+//*              - https://github.com/meetanthony/crcjava                     *//
+//*              - https://stackoverflow.com/questions/29915764/generic-crc-8-16-32-64-combine-implementation
 //* Copyright 2019 LordVampir (https://github.com/vampirsoft)                 *//
 //* Licensed under the Apache License, Version 2.0                            *//
 //*****************************************************************************//
@@ -37,7 +42,11 @@ type
   strict private const
     TABLE_RESIDUE_SIZE = Byte(255);
     TABLE_FIRST_LEVEL  = Byte({$IF DEFINED(USE_ASSEMBLER)}0{$ELSE}1{$ENDIF});
+  {$IF DEFINED(HASH_TESTS)}
+  public const
+  {$ELSE}
   strict protected const
+  {$ENDIF ~ HASH_TESTS}
     TABLE_LEVEL_SIZE   = Byte({$IF DEFINED(USE_ASSEMBLER)}7{$ELSE}16{$ENDIF});
   {$IF DEFINED(HASH_TESTS)}
   public type

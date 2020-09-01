@@ -28,10 +28,6 @@
 // имеет смысл включить эту опцию
 //{$DEFINE USE_JEDI_CORE_LIBRARY}
 
-// Если используется OmniThreadLibrary (https://github.com/gabr42/OmniThreadLibrary),
-// то рекомендуется активировать эту опцию
-//{$DEFINE USE_OMNI_THREAD_LIBRARY}
-
 
 
 // ВНИМАНИЕ!!!
