@@ -9,22 +9,41 @@
 //*****************************************************************************//
 /////////////////////////////////////////////////////////////////////////////////
 
-{$IF NOT DEFINED(CRYPTO_HASH_TESTS_INC)}
-{$DEFINE CRYPTO_HASH_TESTS_INC}
+unit chHash.CRC.CRC16.XMODEM;
 
-// Теты в коносле
-{$DEFINE CONSOLE_TESTRUNNER}
-
-// Тесты на нагрузку
-//{$DEFINE BENCHMARK}
-
-// Отключение лишних сообщений при компиляции
-{$HINTS OFF}
-{$WARNINGS OFF}
-
-// ВНИМАНИЕ!!!
-// =============================================================================
-// НАСТРОЙКИ БИБЛИОТЕКИ
 {$INCLUDE CryptoHash.inc}
 
-{$ENDIF ~ CRYPTO_HASH_TESTS_INC}
+interface
+
+uses
+{$IF DEFINED(SUPPORTS_INTERFACES)}
+  chHash.CRC.CRC16.Impl;
+{$ELSE ~ NOT SUPPORTS_INTERFACES}
+  chHash.CRC.CRC16;
+{$ENDIF ~ SUPPORTS_INTERFACES}
+
+type
+
+{ TchCrc16XMODEM }
+
+  TchCrc16XMODEM =
+    class({$IF DEFINED(SUPPORTS_INTERFACES)}chHash.CRC.CRC16.Impl{$ELSE}chHash.CRC.CRC16{$ENDIF}.TchCrc16)
+  public
+    constructor Create; reintroduce;
+  end;
+
+implementation
+
+{ TchCrc16XMODEM }
+
+constructor TchCrc16XMODEM.Create;
+begin
+  inherited Create('CRC-16/XMODEM', $1021, $0000, $0000, $31C3, False, False);
+  Aliases.Add('CRC-16/ACORN');
+  Aliases.Add('CRC-16/LTE');
+  Aliases.Add('CRC-16/V-41-MSB');
+  Aliases.Add('XMODEM');
+  Aliases.Add('ZMODEM');
+end;
+
+end.

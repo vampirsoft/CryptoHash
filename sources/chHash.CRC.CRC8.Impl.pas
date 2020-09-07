@@ -185,7 +185,7 @@ asm
   //     RDX    address Current
   //      R8    addres Data
   //      R9    Length
-  // <-- EBX -> [RDX]
+  // <--  BL -> [RDX]
   TEST      R8,         R8
   JZ        @Ret
   NEG       R9
@@ -203,7 +203,7 @@ asm
 {$ENDIF ~ SUPPORTS_INTERFACES}
   MOV       RCX,        R9            // Length -> RCX
   PUSH      RBX
-  MOVZX     EBX,        [RDX]         // Current -> EBX
+  MOVZX     EBX,        [RDX]         // Current -> BL
   PUSH      RDX
   SUB       RSI,        RCX
 {$ELSE ~ X86}
@@ -212,7 +212,7 @@ asm
   //     EDX       address Current
   //     ECX       address Data
   //     on stack  Length
-  // <-- EBX    -> [EDX]
+  // <--  BL    -> [EDX]
   TEST      ECX,        ECX
   JZ        @Ret
   NEG       DWORD PTR [Length]
@@ -230,7 +230,7 @@ asm
   ADD       EBP,        $0C           // offset to Self.FTable -> EBP
 {$ENDIF ~ SUPPORTS_INTERFACES}
   PUSH      EBX
-  MOVZX     EBX,        [EDX]         // Current -> EBX
+  MOVZX     EBX,        [EDX]         // Current -> BL
   PUSH      EDX
   SUB       ESI,        ECX
 {$ENDIF ~ X64}
@@ -260,54 +260,54 @@ asm
 
   MOVZX     EDI,        AL
 {$IF DEFINED(X64)}
-  MOVZX     EBX,        [RBP + $0300 + RDI]         // (255 * 1) * 3
+  MOVZX     EBX,        [RBP + $0300 + RDI]         // (256 * 1) * 3
 {$ELSE ~ X86}
-  MOVZX     EBX,        [EBP + $0300 + EDI]         // (255 * 1) * 3
+  MOVZX     EBX,        [EBP + $0300 + EDI]         // (256 * 1) * 3
 {$ENDIF ~ X64}
   MOVZX     EDI,        AH
 {$IF DEFINED(X64)}
-  XOR       BL,         [RBP + $0200 + RDI]         // (255 * 1) * 2
+  XOR       BL,         [RBP + $0200 + RDI]         // (256 * 1) * 2
 {$ELSE ~ X86}
-  XOR       BL,         [EBP + $0200 + EDI]         // (255 * 1) * 2
+  XOR       BL,         [EBP + $0200 + EDI]         // (256 * 1) * 2
 {$ENDIF ~ X64}
   SHR       EAX,        16
   MOVZX     EDI,        AL
 {$IF DEFINED(X64)}
-  XOR       BL,         [RBP + $0100 + RDI]         // (255 * 1) * 1
+  XOR       BL,         [RBP + $0100 + RDI]         // (256 * 1) * 1
 {$ELSE ~ X86}
-  XOR       BL,         [EBP + $0100 + EDI]         // (255 * 1) * 1
+  XOR       BL,         [EBP + $0100 + EDI]         // (256 * 1) * 1
 {$ENDIF ~ X64}
   MOVZX     EDI,        AH
 {$IF DEFINED(X64)}
-  XOR       BL,         [RBP + RDI]                 // (255 * 1) * 0
+  XOR       BL,         [RBP + RDI]                 // (256 * 1) * 0
 {$ELSE ~ X86}
-  XOR       BL,         [EBP + EDI]                 // (255 * 1) * 0
+  XOR       BL,         [EBP + EDI]                 // (256 * 1) * 0
 {$ENDIF ~ X64}
 
   MOVZX     EDI,        DL
 {$IF DEFINED(X64)}
-  XOR       BL,         [RBP + $0700 + RDI]         // (255 * 1) * 7
+  XOR       BL,         [RBP + $0700 + RDI]         // (256 * 1) * 7
 {$ELSE ~ X86}
-  XOR       BL,         [EBP + $0700 + EDI]         // (255 * 1) * 7
+  XOR       BL,         [EBP + $0700 + EDI]         // (256 * 1) * 7
 {$ENDIF ~ X64}
   MOVZX     EDI,        DH
 {$IF DEFINED(X64)}
-  XOR       BL,         [RBP + $0600 + RDI]         // (255 * 1) * 6
+  XOR       BL,         [RBP + $0600 + RDI]         // (256 * 1) * 6
 {$ELSE ~ X86}
-  XOR       BL,         [EBP + $0600 + EDI]         // (255 * 1) * 6
+  XOR       BL,         [EBP + $0600 + EDI]         // (256 * 1) * 6
 {$ENDIF ~ X64}
   SHR       EDX,        16
   MOVZX     EDI,        DL
 {$IF DEFINED(X64)}
-  XOR       BL,         [RBP + $0500 + RDI]         // (255 * 1) * 5
+  XOR       BL,         [RBP + $0500 + RDI]         // (256 * 1) * 5
 {$ELSE ~ X86}
-  XOR       BL,         [EBP + $0500 + EDI]         // (255 * 1) * 5
+  XOR       BL,         [EBP + $0500 + EDI]         // (256 * 1) * 5
 {$ENDIF ~ X64}
   MOVZX     EDI,        DH
 {$IF DEFINED(X64)}
-  XOR       BL,         [RBP + $0400 + RDI]         // (255 * 4) * 4
+  XOR       BL,         [RBP + $0400 + RDI]         // (256 * 4) * 4
 {$ELSE ~ X86}
-  XOR       BL,         [EBP + $0400 + EDI]         // (255 * 1) * 4
+  XOR       BL,         [EBP + $0400 + EDI]         // (256 * 1) * 4
 {$ENDIF ~ X64}
 
 {$IF DEFINED(X64)}
@@ -327,54 +327,54 @@ asm
 
   MOVZX     EDI,        AL
 {$IF DEFINED(X64)}
-  MOVZX     EDX,        [RBP + $0300 + RDI]         // (255 * 1) * 3
+  MOVZX     EDX,        [RBP + $0300 + RDI]         // (256 * 1) * 3
 {$ELSE ~ X86}
-  MOVZX     EDX,        [EBP + $0300 + EDI]         // (255 * 1) * 3
+  MOVZX     EDX,        [EBP + $0300 + EDI]         // (256 * 1) * 3
 {$ENDIF ~ X64}
   MOVZX     EDI,        AH
 {$IF DEFINED(X64)}
-  XOR       DL,         [RBP + $0200 + RDI]         // (255 * 1) * 2
+  XOR       DL,         [RBP + $0200 + RDI]         // (256 * 1) * 2
 {$ELSE ~ X86}
-  XOR       DL,         [EBP + $0200 + EDI]         // (255 * 1) * 2
+  XOR       DL,         [EBP + $0200 + EDI]         // (256 * 1) * 2
 {$ENDIF ~ X64}
   SHR       EAX,        16
   MOVZX     EDI,        AL
 {$IF DEFINED(X64)}
-  XOR       DL,         [RBP + $0100 + RDI]         // (255 * 1) * 1
+  XOR       DL,         [RBP + $0100 + RDI]         // (256 * 1) * 1
 {$ELSE ~ X86}
-  XOR       DL,         [EBP + $0100 + EDI]         // (255 * 1) * 1
+  XOR       DL,         [EBP + $0100 + EDI]         // (256 * 1) * 1
 {$ENDIF ~ X64}
   MOVZX     EDI,        AH
 {$IF DEFINED(X64)}
-  XOR       DL,         [RBP + RDI]                 // (255 * 1) * 0
+  XOR       DL,         [RBP + RDI]                 // (256 * 1) * 0
 {$ELSE ~ X86}
-  XOR       DL,         [EBP + EDI]                 // (255 * 1) * 0
+  XOR       DL,         [EBP + EDI]                 // (256 * 1) * 0
 {$ENDIF ~ X64}
 
   MOVZX     EDI,        BL
 {$IF DEFINED(X64)}
-  XOR       DL,         [RBP + $0700 + RDI]         // (255 * 1) * 7
+  XOR       DL,         [RBP + $0700 + RDI]         // (256 * 1) * 7
 {$ELSE ~ X86}
-  XOR       DL,         [EBP + $0700 + EDI]         // (255 * 1) * 7
+  XOR       DL,         [EBP + $0700 + EDI]         // (256 * 1) * 7
 {$ENDIF ~ X64}
   MOVZX     EDI,        BH
 {$IF DEFINED(X64)}
-  XOR       DL,         [RBP + $0600 + RDI]         // (255 * 1) * 6
+  XOR       DL,         [RBP + $0600 + RDI]         // (256 * 1) * 6
 {$ELSE ~ X86}
-  XOR       DL,         [EBP + $0600 + EDI]         // (255 * 1) * 6
+  XOR       DL,         [EBP + $0600 + EDI]         // (256 * 1) * 6
 {$ENDIF ~ X64}
   SHR       EBX,        16
   MOVZX     EDI,        BL
 {$IF DEFINED(X64)}
-  XOR       DL,         [RBP + $0500 + RDI]         // (255 * 1) * 5
+  XOR       DL,         [RBP + $0500 + RDI]         // (256 * 1) * 5
 {$ELSE ~ X86}
-  XOR       DL,         [EBP + $0500 + EDI]         // (255 * 1) * 5
+  XOR       DL,         [EBP + $0500 + EDI]         // (256 * 1) * 5
 {$ENDIF ~ X64}
   MOVZX     EDI,        BH
 {$IF DEFINED(X64)}
-  XOR       DL,         [RBP + $0400 + RDI]         // (255 * 1) * 4
+  XOR       DL,         [RBP + $0400 + RDI]         // (256 * 1) * 4
 {$ELSE ~ X86}
-  XOR       DL,         [EBP + $0400 + EDI]         // (255 * 1) * 4
+  XOR       DL,         [EBP + $0400 + EDI]         // (256 * 1) * 4
 {$ENDIF ~ X64}
 
 {$IF DEFINED(X64)}

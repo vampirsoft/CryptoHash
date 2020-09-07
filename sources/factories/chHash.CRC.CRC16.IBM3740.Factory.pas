@@ -9,7 +9,7 @@
 //*****************************************************************************//
 /////////////////////////////////////////////////////////////////////////////////
 
-unit chHash.CRC.CRC8;
+unit chHash.CRC.CRC16.IBM3740.Factory;
 
 {$INCLUDE CryptoHash.inc}
 
@@ -17,20 +17,45 @@ interface
 
 uses
 {$IF DEFINED(SUPPORTS_INTERFACES)}
-  chHash.CRC;
-{$ELSE ~ NOT SUPPORTS_INTERFACES}
-  chHash.CRC.CRC8.Impl;
+  chHash.CRC.CRC16,
 {$ENDIF ~ SUPPORTS_INTERFACES}
+  chHash.CRC.CRC16.IBM3740;
 
 type
-{$IF DEFINED(SUPPORTS_INTERFACES)}
-  IchCrc8 = interface(IchCrc<Byte>)
-    ['{5CFBE9BC-2A8A-4746-9ABE-117BC9E846BA}']
+
+{ TchCrc16IBM3740 }
+
+  TchCrc16IBM3740 = class sealed(chHash.CRC.CRC16.IBM3740.TchCrc16IBM3740)
+  private type
+    TInstance = {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc16{$ELSE}chHash.CRC.CRC16.IBM3740.TchCrc16IBM3740{$ENDIF};
+  private
+    class var FInstance: TInstance;
+  private
+    constructor Create; reintroduce;
+  public
+    class property Instance: TInstance read FInstance;
   end;
-{$ELSE ~ NOT SUPPORTS_INTERFACES}
-  TchCrc8 = chHash.CRC.CRC8.Impl.TchCrc8;
-{$ENDIF ~ SUPPORTS_INTERFACES}
 
 implementation
+
+{$IF NOT DEFINED(SUPPORTS_INTERFACES)}
+uses
+  System.SysUtils;
+{$ENDIF ~ NOT SUPPORTS_INTERFACES}
+
+{ TchCrc16IBM3740 }
+
+constructor TchCrc16IBM3740.Create;
+begin
+  inherited Create;
+end;
+
+initialization
+  TchCrc16IBM3740.FInstance := TchCrc16IBM3740.Create;
+
+{$IF NOT DEFINED(SUPPORTS_INTERFACES)}
+finalization
+  FreeAndNil(TchCrc16IBM3740.FInstance);
+{$ENDIF ~ NOT SUPPORTS_INTERFACES}
 
 end.

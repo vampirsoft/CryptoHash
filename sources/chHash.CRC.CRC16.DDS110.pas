@@ -9,22 +9,31 @@
 //*****************************************************************************//
 /////////////////////////////////////////////////////////////////////////////////
 
-{$IF NOT DEFINED(CRYPTO_HASH_TESTS_INC)}
-{$DEFINE CRYPTO_HASH_TESTS_INC}
+unit chHash.CRC.CRC16.DDS110;
 
-// Теты в коносле
-{$DEFINE CONSOLE_TESTRUNNER}
-
-// Тесты на нагрузку
-//{$DEFINE BENCHMARK}
-
-// Отключение лишних сообщений при компиляции
-{$HINTS OFF}
-{$WARNINGS OFF}
-
-// ВНИМАНИЕ!!!
-// =============================================================================
-// НАСТРОЙКИ БИБЛИОТЕКИ
 {$INCLUDE CryptoHash.inc}
 
-{$ENDIF ~ CRYPTO_HASH_TESTS_INC}
+interface
+
+uses
+  chHash.CRC.CRC16.Reverse;
+
+type
+
+{ TchCrc16DDS110 }
+
+  TchCrc16DDS110 = class(TchReverseCrc16)
+  public
+    constructor Create; reintroduce;
+  end;
+
+implementation
+
+{ TchCrc16DDS110 }
+
+constructor TchCrc16DDS110.Create;
+begin
+  inherited Create('CRC-16/DDS-110', $8005, $800D, $0000, $9ECF, False, False);
+end;
+
+end.

@@ -10,6 +10,7 @@
 - Поддержка **Delphi 10.3.3 Rio Community Edition** (предыдущие версии официально не поддерживаются)
 - Официальная поддержка *Win32* и *Win64*, неофициальная поддержка остальных платформ доступных в текущей верии delphi
 - Быстрый (ускорение вплоть до 8.5-ми раз на asm и до 6.3-ти раз на delphi) подсчёт **crc-8**, как по прямому, так и по обратному алогоритмам
+- Быстрый (ускорение вплоть до 10-ти раз на asm и до 5.6-ми раз на delphi) подсчёт **crc-16**, как по прямому, так и по обратному алогоритмам
 - Быстрый (ускорение вплоть до 10-ти раз на asm и до 8-ми раз на delphi) подсчёт **crc-32**, как по прямому, так и по обратному алогоритмам
 
 ## Использование
@@ -27,5 +28,8 @@
 - [meetanthony / crcjava](https://github.com/meetanthony/crcjava)
 - [Generic CRC (8/16/32/64) combine implementation](https://stackoverflow.com/questions/29915764/generic-crc-8-16-32-64-combine-implementation)
 - [CRC calculations](https://www.miscel.dk/MiscEl/CRCcalculations.html)
+- [Начальное значение CCITT CRC 16 бит 0xffff](https://overcoder.net/q/911124/%D0%BD%D0%B0%D1%87%D0%B0%D0%BB%D1%8C%D0%BD%D0%BE%D0%B5-%D0%B7%D0%BD%D0%B0%D1%87%D0%B5%D0%BD%D0%B8%D0%B5-ccitt-crc-16-%D0%B1%D0%B8%D1%82-0xffff)
+- [CRC16-CCITT](http://srecord.sourceforge.net/crc16-ccitt.html)
+- [CRC Calculator (Javascript)](http://www.sunshine2k.de/coding/javascript/crc/crc_js.html)
 
 ## [История изменений](/CHANGELOG.md)

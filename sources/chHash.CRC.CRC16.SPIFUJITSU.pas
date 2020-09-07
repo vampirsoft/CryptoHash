@@ -9,22 +9,32 @@
 //*****************************************************************************//
 /////////////////////////////////////////////////////////////////////////////////
 
-{$IF NOT DEFINED(CRYPTO_HASH_TESTS_INC)}
-{$DEFINE CRYPTO_HASH_TESTS_INC}
+unit chHash.CRC.CRC16.SPIFUJITSU;
 
-// Теты в коносле
-{$DEFINE CONSOLE_TESTRUNNER}
-
-// Тесты на нагрузку
-//{$DEFINE BENCHMARK}
-
-// Отключение лишних сообщений при компиляции
-{$HINTS OFF}
-{$WARNINGS OFF}
-
-// ВНИМАНИЕ!!!
-// =============================================================================
-// НАСТРОЙКИ БИБЛИОТЕКИ
 {$INCLUDE CryptoHash.inc}
 
-{$ENDIF ~ CRYPTO_HASH_TESTS_INC}
+interface
+
+uses
+  chHash.CRC.CRC16.Reverse;
+
+type
+
+{ TchCrc16SPIFUJITSU }
+
+  TchCrc16SPIFUJITSU = class(TchReverseCrc16)
+  public
+    constructor Create; reintroduce;
+  end;
+
+implementation
+
+{ TchCrc16SPIFUJITSU }
+
+constructor TchCrc16SPIFUJITSU.Create;
+begin
+  inherited Create('CRC-16/SPI-FUJITSU', $1021, $1D0F, $0000, $E5CC, False, False);
+  Aliases.Add('CRC-16/AUG-CCITT');
+end;
+
+end.

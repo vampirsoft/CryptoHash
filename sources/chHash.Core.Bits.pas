@@ -26,9 +26,11 @@ interface
 uses
   System.SysUtils,
 {$IF DEFINED(USE_JEDI_CORE_LIBRARY)}
-  JclLogic,
-{$ENDIF ~ USE_JEDI_CORE_LIBRARY}
+  JclBase,
+  JclLogic;
+{$ELSE ~ NOTUSE_JEDI_CORE_LIBRARY}
   chHash.Core;
+{$ENDIF ~ USE_JEDI_CORE_LIBRARY}
 
 const
 {$IF NOT DEFINED(USE_JEDI_CORE_LIBRARY)}
@@ -329,6 +331,10 @@ const
 {$ENDREGION 'Primitive helpers'}
 
 implementation
+
+type
+  TULargeInteger = {$IF DEFINED(USE_JEDI_CORE_LIBRARY)}TJclULargeInteger{$ELSE}chHash.Core.TULargeInteger{$ENDIF};
+  TLargeInteger = {$IF DEFINED(USE_JEDI_CORE_LIBRARY)}TJclULargeInteger{$ELSE}chHash.Core.TLargeInteger{$ENDIF};
 
 {$REGION 'ReverseBits'}
 {$REGION 'Not use JEDI Core Library'}

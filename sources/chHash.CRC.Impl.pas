@@ -78,13 +78,13 @@ type
     function RightShift(const Value: Bits; const Bits: Byte): Bits; virtual; abstract;
     function BitwiseXor(const Left, Right: Bits): Bits; virtual; abstract;
     function IsZero(const Value: Bits): Boolean; virtual; abstract;
-  protected
+  strict protected
     constructor Create(const Name: string; const Polynomial, Init, XorOut, Check: Bits;
       const RefIn, RefOut: Boolean); reintroduce;
   public
     destructor Destroy; override;
     function Final(const Current: Bits): Bits; override;
-    function Combine(const LeftCrc, RightCrc: Bits; const RightLength: Cardinal): Bits;
+    function Combine(const LeftCrc, RightCrc: Bits; const RightLength: Cardinal): Bits; inline;
     function Polynomial: Bits;{$IF DEFINED(USE_INLINE)}inline;{$ENDIF}
   {$IF DEFINED(SUPPORTS_INTERFACES)}
     function Width: Byte; inline;
@@ -113,6 +113,7 @@ constructor TchCrc<Bits>.Create(const Name: string; const Polynomial, Init, XorO
   const RefIn, RefOut: Boolean);
 const SizeOfBits = Byte(SizeOf(Bits));
 begin
+  if RefIn then ReverseBits(@Init, SizeOfBits);
   inherited Create(Name, Init, Check);
   FAliases := TList<string>.Create;
   FPolynomial := Polynomial;

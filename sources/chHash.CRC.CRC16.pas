@@ -9,22 +9,28 @@
 //*****************************************************************************//
 /////////////////////////////////////////////////////////////////////////////////
 
-{$IF NOT DEFINED(CRYPTO_HASH_TESTS_INC)}
-{$DEFINE CRYPTO_HASH_TESTS_INC}
+unit chHash.CRC.CRC16;
 
-// Теты в коносле
-{$DEFINE CONSOLE_TESTRUNNER}
-
-// Тесты на нагрузку
-//{$DEFINE BENCHMARK}
-
-// Отключение лишних сообщений при компиляции
-{$HINTS OFF}
-{$WARNINGS OFF}
-
-// ВНИМАНИЕ!!!
-// =============================================================================
-// НАСТРОЙКИ БИБЛИОТЕКИ
 {$INCLUDE CryptoHash.inc}
 
-{$ENDIF ~ CRYPTO_HASH_TESTS_INC}
+interface
+
+uses
+{$IF DEFINED(SUPPORTS_INTERFACES)}
+  chHash.CRC;
+{$ELSE ~ NOT SUPPORTS_INTERFACES}
+  chHash.CRC.CRC16.Impl;
+{$ENDIF ~ SUPPORTS_INTERFACES}
+
+type
+{$IF DEFINED(SUPPORTS_INTERFACES)}
+  IchCrc16 = interface(IchCrc<Word>)
+    ['{B4AD7F3A-C836-475A-81EB-19B7410C7292}']
+  end;
+{$ELSE ~ NOT SUPPORTS_INTERFACES}
+  TchCrc16 = chHash.CRC.CRC16.Impl.TchCrc16;
+{$ENDIF ~ SUPPORTS_INTERFACES}
+
+implementation
+
+end.

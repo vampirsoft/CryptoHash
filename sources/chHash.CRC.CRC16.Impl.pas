@@ -4,15 +4,12 @@
 //* Latest Source: https://github.com/vampirsoft/CryptoHash                   *//
 //* Unit Name    : CryptoHash.inc                                             *//
 //* Author       : Сергей (LordVampir) Дворников                              *//
-//* Based on     :                                                            *//
-//*              - asm   : http://guildalfa.ru/alsha/node/2                   *//
-//*              - delphi: https://create.stephan-brumme.com/crc32/           *//
 //* Copyright 2019 LordVampir (https://github.com/vampirsoft)                 *//
 //* Licensed under the Apache License, Version 2.0                            *//
 //*****************************************************************************//
 /////////////////////////////////////////////////////////////////////////////////
 
-unit chHash.CRC.CRC32.Impl;
+unit chHash.CRC.CRC16.Impl;
 
 {$INCLUDE CryptoHash.inc}
 
@@ -21,7 +18,7 @@ interface
 uses
   chHash.Impl,
 {$IF DEFINED(SUPPORTS_INTERFACES)}
-  chHash.CRC.CRC32,
+  chHash.CRC.CRC16,
   chHash.CRC.Impl;
 {$ELSE ~ NOT SUPPORTS_INTERFACES}
   chHash.CRC;
@@ -29,20 +26,20 @@ uses
 
 type
 
-{ TchCrc32 }
+{ TchCrc16 }
 
-  TchCrc32 = class(TchCrc<Cardinal>{$IF DEFINED(SUPPORTS_INTERFACES)}, IchCrc32{$ENDIF})
+  TchCrc16 = class(TchCrc<Word>{$IF DEFINED(SUPPORTS_INTERFACES)}, IchCrc16{$ENDIF})
   strict protected
-    function ByteToBits(const Value: Byte): Cardinal; override;
-    function BitsToByte(const Value: Cardinal): Byte; override;
-    function LeftShift(const Value: Cardinal; const Bits: Byte): Cardinal; override;
-    function RightShift(const Value: Cardinal; const Bits: Byte): Cardinal; override;
-    function BitwiseXor(const Left, Right: Cardinal): Cardinal; override;
-    function IsZero(const Value: Cardinal): Boolean; override;
+    function ByteToBits(const Value: Byte): Word; override;
+    function BitsToByte(const Value: Word): Byte; override;
+    function LeftShift(const Value: Word; const Bits: Byte): Word; override;
+    function RightShift(const Value: Word; const Bits: Byte): Word; override;
+    function BitwiseXor(const Left, Right: Word): Word; override;
+    function IsZero(const Value: Word): Boolean; override;
   public
-    class function Custom(const Polynomial, Init, XorOut, Check: Cardinal;
-      const RefIn, RefOut: Boolean): TchCrc32; static;{$IF DEFINED(USE_INLINE)}inline;{$ENDIF}
-    procedure Calculate(var Current: Cardinal; const Data: Pointer; const Length: Cardinal); override;
+    class function Custom(const Polynomial, Init, XorOut, Check: Word;
+      const RefIn, RefOut: Boolean): TchCrc16; static;{$IF DEFINED(USE_INLINE)}inline;{$ENDIF}
+    procedure Calculate(var Current: Word; const Data: Pointer; const Length: Cardinal); override;
   end;
 
 implementation
@@ -54,20 +51,19 @@ uses
   chHash.Core.Bits;
 {$ENDIF ~ USE_JEDI_CORE_LIBRARY}
 
-{ TchCrc32 }
+{ TchCrc16 }
 
-class function TchCrc32.Custom(const Polynomial, Init, XorOut, Check: Cardinal;
-  const RefIn, RefOut: Boolean): TchCrc32;
+class function TchCrc16.Custom(const Polynomial, Init, XorOut, Check: Word; const RefIn, RefOut: Boolean): TchCrc16;
 begin
-  Result := TchCrc32.Create('Custom', Polynomial, Init, XorOut, Check, RefIn, RefOut);
+  Result := TchCrc16.Create('Custom', Polynomial, Init, XorOut, Check, RefIn, RefOut);
 end;
 
-function TchCrc32.ByteToBits(const Value: Byte): Cardinal;
+function TchCrc16.ByteToBits(const Value: Byte): Word;
 {$IF DEFINED(USE_ASSEMBLER)}
 asm
-  // -->  DL   Value
-  // <-- EAX   Result
-  MOVZX     EAX,        DL
+  // --> DL   Value
+  // <-- AX   Result
+  MOVZX     AX,         DL
 end;
 {$ELSE ~ USE_FORCE_DELPHI}
 begin
@@ -75,11 +71,11 @@ begin
 end;
 {$ENDIF ~ USE_ASSEMBLER}
 
-function TchCrc32.BitsToByte(const Value: Cardinal): Byte;
+function TchCrc16.BitsToByte(const Value: Word): Byte;
 {$IF DEFINED(USE_ASSEMBLER)}
 asm
-  // --> EDX   Value
-  // <--  AL   Result
+  // --> DX   Value
+  // <-- AL   Result
   MOV       AL,         DL
 end;
 {$ELSE ~ USE_FORCE_DELPHI}
@@ -88,24 +84,24 @@ begin
 end;
 {$ENDIF ~ USE_ASSEMBLER}
 
-function TchCrc32.LeftShift(const Value: Cardinal; const Bits: Byte): Cardinal;
+function TchCrc16.LeftShift(const Value: Word; const Bits: Byte): Word;
 {$IF DEFINED(USE_ASSEMBLER)}
 asm
 {$IF DEFINED(X64)}
   // Start
-  // --> EDX   Value
+  // -->  DX   Value
   //     R8B   Bits
-  // <-- EAX   Result
+  // <--  AX   Result
   MOV       CL,         R8B
 {$ELSE ~ X86}
   // Start
-  // --> EDX   Value
+  // -->  DX   Value
   //      CL   Bits
-  // <-- EAX   Result
+  // <--  AX   Result
 {$ENDIF ~ X64}
   // Initialized
-  MOV       EAX,        EDX
-  SHL       EAX,        CL
+  MOV       AX,         DX
+  SHL       AX,         CL
   // Finish
 end;
 {$ELSE ~ USE_FORCE_DELPHI}
@@ -114,24 +110,24 @@ begin
 end;
 {$ENDIF ~ USE_ASSEMBLER}
 
-function TchCrc32.RightShift(const Value: Cardinal; const Bits: Byte): Cardinal;
+function TchCrc16.RightShift(const Value: Word; const Bits: Byte): Word;
 {$IF DEFINED(USE_ASSEMBLER)}
 asm
 {$IF DEFINED(X64)}
   // Start
-  // --> EDX   Value
+  // -->  DX   Value
   //     R8B   Bits
-  // <-- EAX   Result
+  // <--  AX   Result
   MOV       CL,         R8B
 {$ELSE ~ X86}
   // Start
-  // --> EDX   Value
+  // -->  DX   Value
   //      CL   Bits
-  // <-- EAX   Result
+  // <--  AX   Result
 {$ENDIF ~ X64}
   // Initialized
-  MOV       EAX,        EDX
-  SHR       EAX,        CL
+  MOV       AX,         DX
+  SHR       AX,         CL
   // Finish
 end;
 {$ELSE ~ USE_FORCE_DELPHI}
@@ -140,24 +136,24 @@ begin
 end;
 {$ENDIF ~ USE_ASSEMBLER}
 
-function TchCrc32.BitwiseXor(const Left, Right: Cardinal): Cardinal;
+function TchCrc16.BitwiseXor(const Left, Right: Word): Word;
 {$IF DEFINED(USE_ASSEMBLER)}
 asm
 {$IF DEFINED(X64)}
   // Start
-  // --> EDX   Left
-  //     R8D   Right
-  // <-- EAX   Result
-  MOV       EAX,        R8D
+  // -->  DX   Left
+  //     R8W   Right
+  // <--  AX   Result
+  MOV       AX,         R8W
 {$ELSE ~ X86}
   // Start
-  // --> EDX   Left
-  //     ECX   Right
-  // <-- EAX   Result
-  MOV       EAX,        ECX
+  // -->  DX   Left
+  //      CX   Right
+  // <--  AX   Result
+  MOV       AX,         CX
 {$ENDIF ~ X64}
   // Initialized
-  XOR       EAX,        EDX
+  XOR       AX,         DX
   // Finish
 end;
 {$ELSE ~ USE_FORCE_DELPHI}
@@ -166,12 +162,12 @@ begin
 end;
 {$ENDIF ~ USE_ASSEMBLER}
 
-function TchCrc32.IsZero(const Value: Cardinal): Boolean;
+function TchCrc16.IsZero(const Value: Word): Boolean;
 {$IF DEFINED(USE_ASSEMBLER)}
 asm
-  // --> EDX   Value
-  // <--  AL   Result
-  CMP       EDX,        $0
+  // --> DX   Value
+  // <-- AL   Result
+  CMP       DX,         $0
   SETZ      AL
 end;
 {$ELSE ~ USE_FORCE_DELPHI}
@@ -181,7 +177,7 @@ end;
 {$ENDIF ~ USE_ASSEMBLER}
 
 {$IF DEFINED(USE_ASSEMBLER)}
-procedure TchCrc32.Calculate(var Current: Cardinal; const Data: Pointer; const Length: Cardinal);
+procedure TchCrc16.Calculate(var Current: Word; const Data: Pointer; const Length: Cardinal);
 asm
 {$IF DEFINED(X64)}
   // Start
@@ -189,7 +185,7 @@ asm
   //     RDX    address Current
   //      R8    addres Data
   //      R9    Length
-  // <-- EBX -> [RDX]
+  // <--  BX -> [RDX]
   TEST      R8,         R8
   JZ        @Ret
   NEG       R9
@@ -207,7 +203,7 @@ asm
 {$ENDIF ~ SUPPORTS_INTERFACES}
   MOV       RCX,        R9            // Length -> RCX
   PUSH      RBX
-  MOV       EBX,        [RDX]         // Current -> EBX
+  MOVZX     EBX, WORD PTR [RDX]       // Current -> BX
   PUSH      RDX
   SUB       RSI,        RCX
 {$ELSE ~ X86}
@@ -216,7 +212,7 @@ asm
   //     EDX       address Current
   //     ECX       address Data
   //     on stack  Length
-  // <-- EBX    -> [EDX]
+  // <--  BX    -> [EDX]
   TEST      ECX,        ECX
   JZ        @Ret
   NEG       DWORD PTR [Length]
@@ -229,12 +225,12 @@ asm
   PUSH      EBP
   MOV       EBP,        EAX           // addresss Self -> EBP
 {$IF DEFINED(SUPPORTS_INTERFACES)}
-  ADD       EBP,        $1C           // offset to Self.FTable -> EBP
+  ADD       EBP,        $18           // offset to Self.FTable -> EBP
 {$ELSE ~ NOT SUPPORTS_INTERFACES}
-  ADD       EBP,        $10           // offset to Self.FTable -> EBP
+  ADD       EBP,        $0C           // offset to Self.FTable -> EBP
 {$ENDIF ~ SUPPORTS_INTERFACES}
   PUSH      EBX
-  MOV       EBX,        [EDX]         // Current -> EBX
+  MOVZX     EBX, WORD PTR [EDX]       // Current -> BX
   PUSH      EDX
   SUB       ESI,        ECX
 {$ENDIF ~ X64}
@@ -264,54 +260,54 @@ asm
 
   MOVZX     EDI,        AL
 {$IF DEFINED(X64)}
-  MOV       EBX,        [RBP + $0C00 + RDI * 4]     // (256 * 4) * 3
+  MOVZX     EBX, WORD PTR [RBP + $0600 + RDI * 2]   // (256 * 2) * 3
 {$ELSE ~ X86}
-  MOV       EBX,        [EBP + $0C00 + EDI * 4]     // (256 * 4) * 3
+  MOVZX     EBX, WORD PTR [EBP + $0600 + EDI * 2]   // (256 * 2) * 3
 {$ENDIF ~ X64}
   MOVZX     EDI,        AH
 {$IF DEFINED(X64)}
-  XOR       EBX,        [RBP + $0800 + RDI * 4]     // (256 * 4) * 2
+  XOR       BX,         [RBP + $0400 + RDI * 2]     // (256 * 2) * 2
 {$ELSE ~ X86}
-  XOR       EBX,        [EBP + $0800 + EDI * 4]     // (256 * 4) * 2
+  XOR       BX,         [EBP + $0400 + EDI * 2]     // (256 * 2) * 2
 {$ENDIF ~ X64}
   SHR       EAX,        16
   MOVZX     EDI,        AL
 {$IF DEFINED(X64)}
-  XOR       EBX,        [RBP + $0400 + RDI * 4]     // (256 * 4) * 1
+  XOR       BX,         [RBP + $0200 + RDI * 2]     // (256 * 2) * 1
 {$ELSE ~ X86}
-  XOR       EBX,        [EBP + $0400 + EDI * 4]     // (256 * 4) * 1
+  XOR       BX,         [EBP + $0200 + EDI * 2]     // (256 * 2) * 1
 {$ENDIF ~ X64}
   MOVZX     EDI,        AH
 {$IF DEFINED(X64)}
-  XOR       EBX,        [RBP + RDI * 4]             // (256 * 4) * 0
+  XOR       BX,         [RBP + RDI * 2]             // (256 * 2) * 0
 {$ELSE ~ X86}
-  XOR       EBX,        [EBP + EDI * 4]             // (256 * 4) * 0
+  XOR       BX,         [EBP + EDI * 2]             // (256 * 2) * 0
 {$ENDIF ~ X64}
 
   MOVZX     EDI,        DL
 {$IF DEFINED(X64)}
-  XOR       EBX,        [RBP + $1C00 + RDI * 4]     // (256 * 4) * 7
+  XOR       BX,         [RBP + $0E00 + RDI * 2]     // (256 * 2) * 7
 {$ELSE ~ X86}
-  XOR       EBX,        [EBP + $1C00 + EDI * 4]     // (256 * 4) * 7
+  XOR       BX,         [EBP + $0E00 + EDI * 2]     // (256 * 2) * 7
 {$ENDIF ~ X64}
   MOVZX     EDI,        DH
 {$IF DEFINED(X64)}
-  XOR       EBX,        [RBP + $1800 + RDI * 4]     // (256 * 4) * 6
+  XOR       BX,         [RBP + $0C00 + RDI * 2]     // (256 * 2) * 6
 {$ELSE ~ X86}
-  XOR       EBX,        [EBP + $1800 + EDI * 4]     // (256 * 4) * 6
+  XOR       BX,         [EBP + $0C00 + EDI * 2]     // (256 * 2) * 6
 {$ENDIF ~ X64}
   SHR       EDX,        16
   MOVZX     EDI,        DL
 {$IF DEFINED(X64)}
-  XOR       EBX,        [RBP + $1400 + RDI * 4]     // (256 * 4) * 5
+  XOR       BX,         [RBP + $0A00 + RDI * 2]     // (256 * 2) * 5
 {$ELSE ~ X86}
-  XOR       EBX,        [EBP + $1400 + EDI * 4]     // (256 * 4) * 5
+  XOR       BX,         [EBP + $0A00 + EDI * 2]     // (256 * 2) * 5
 {$ENDIF ~ X64}
   MOVZX     EDI,        DH
 {$IF DEFINED(X64)}
-  XOR       EBX,        [RBP + $1000 + RDI * 4]     // (256 * 4) * 4
+  XOR       BX,         [RBP + $0800 + RDI * 2]     // (256 * 2) * 4
 {$ELSE ~ X86}
-  XOR       EBX,        [EBP + $1000 + EDI * 4]     // (256 * 4) * 4
+  XOR       BX,         [EBP + $0800 + EDI * 2]     // (256 * 2) * 4
 {$ENDIF ~ X64}
 
 {$IF DEFINED(X64)}
@@ -331,54 +327,54 @@ asm
 
   MOVZX     EDI,        AL
 {$IF DEFINED(X64)}
-  MOV       EDX,        [RBP + $0C00 + RDI * 4]     // (256 * 4) * 3
+  MOV       DX,         [RBP + $0600 + RDI * 2]     // (256 * 2) * 3
 {$ELSE ~ X86}
-  MOV       EDX,        [EBP + $0C00 + EDI * 4]     // (256 * 4) * 3
+  MOV       DX,         [EBP + $0600 + EDI * 2]     // (256 * 2) * 3
 {$ENDIF ~ X64}
   MOVZX     EDI,        AH
 {$IF DEFINED(X64)}
-  XOR       EDX,        [RBP + $0800 + RDI * 4]     // (256 * 4) * 2
+  XOR       DX,         [RBP + $0400 + RDI * 2]     // (256 * 2) * 2
 {$ELSE ~ X86}
-  XOR       EDX,        [EBP + $0800 + EDI * 4]     // (256 * 4) * 2
+  XOR       DX,         [EBP + $0400 + EDI * 2]     // (256 * 2) * 2
 {$ENDIF ~ X64}
   SHR       EAX,        16
   MOVZX     EDI,        AL
 {$IF DEFINED(X64)}
-  XOR       EDX,        [RBP + $0400 + RDI * 4]     // (256 * 4) * 1
+  XOR       DX,         [RBP + $0200 + RDI * 2]     // (256 * 2) * 1
 {$ELSE ~ X86}
-  XOR       EDX,        [EBP + $0400 + EDI * 4]     // (256 * 4) * 1
+  XOR       DX,         [EBP + $0200 + EDI * 2]     // (256 * 2) * 1
 {$ENDIF ~ X64}
   MOVZX     EDI,        AH
 {$IF DEFINED(X64)}
-  XOR       EDX,        [RBP + RDI * 4]             // (256 * 4) * 0
+  XOR       DX,         [RBP + RDI * 2]             // (256 * 2) * 0
 {$ELSE ~ X86}
-  XOR       EDX,        [EBP + EDI * 4]             // (256 * 4) * 0
+  XOR       DX,         [EBP + EDI * 2]             // (256 * 2) * 0
 {$ENDIF ~ X64}
 
   MOVZX     EDI,        BL
 {$IF DEFINED(X64)}
-  XOR       EDX,        [RBP + $1C00 + RDI * 4]     // (256 * 4) * 7
+  XOR       DX,         [RBP + $0E00 + RDI * 2]     // (256 * 2) * 7
 {$ELSE ~ X86}
-  XOR       EDX,        [EBP + $1C00 + EDI * 4]     // (256 * 4) * 7
+  XOR       DX,         [EBP + $0E00 + EDI * 2]     // (256 * 2) * 7
 {$ENDIF ~ X64}
   MOVZX     EDI,        BH
 {$IF DEFINED(X64)}
-  XOR       EDX,        [RBP + $1800 + RDI * 4]     // (256 * 4) * 6
+  XOR       DX,         [RBP + $0C00 + RDI * 2]     // (256 * 2) * 6
 {$ELSE ~ X86}
-  XOR       EDX,        [EBP + $1800 + EDI * 4]     // (256 * 4) * 6
+  XOR       DX,         [EBP + $0C00 + EDI * 2]     // (256 * 2) * 6
 {$ENDIF ~ X64}
   SHR       EBX,        16
   MOVZX     EDI,        BL
 {$IF DEFINED(X64)}
-  XOR       EDX,        [RBP + $1400 + RDI * 4]     // (256 * 4) * 5
+  XOR       DX,         [RBP + $0A00 + RDI * 2]     // (256 * 2) * 5
 {$ELSE ~ X86}
-  XOR       EDX,        [EBP + $1400 + EDI * 4]     // (256 * 4) * 5
+  XOR       DX,         [EBP + $0A00 + EDI * 2]     // (256 * 2) * 5
 {$ENDIF ~ X64}
   MOVZX     EDI,        BH
 {$IF DEFINED(X64)}
-  XOR       EDX,        [RBP + $1000 + RDI * 4]     // (256 * 4) * 4
+  XOR       DX,         [RBP + $0800 + RDI * 2]     // (256 * 2) * 4
 {$ELSE ~ X86}
-  XOR       EDX,        [EBP + $1000 + EDI * 4]     // (256 * 4) * 4
+  XOR       DX,         [EBP + $0800 + EDI * 2]     // (256 * 2) * 4
 {$ENDIF ~ X64}
 
 {$IF DEFINED(X64)}
@@ -413,9 +409,9 @@ asm
   XOR       AL,         BL
   SHR       EBX,        8
 {$IF DEFINED(X64)}
-  XOR       EBX,        [RBP + RAX * 4]
+  XOR       BX,         [RBP + RAX * 2]
 {$ELSE ~ X86}
-  XOR       EBX,        [EBP + EAX * 4]
+  XOR       BX,         [EBP + EAX * 2]
 {$ENDIF ~ X64}
 {$IF DEFINED(X64)}
   INC       RCX
@@ -427,13 +423,13 @@ asm
 @Done:
 {$IF DEFINED(X64)}
   POP       RDX
-  MOV       [RDX],      EBX           // Result -> Current
+  MOV       [RDX],      BX            // Result -> Current
   POP       RBX
   POP       RBP
   POP       RSI
 {$ELSE ~ X86}
   POP       EDX
-  MOV       [EDX],      EBX           // Result -> Current
+  MOV       [EDX],      BX            // Result -> Current
   POP       EBX
   POP       EBP
   POP       ESI
@@ -442,7 +438,7 @@ asm
   // Finish
 end;
 {$ELSE ~ USE_FORCE_DELPHI}
-procedure TchCrc32.Calculate(var Current: Cardinal; const Data: Pointer; const Length: Cardinal);
+procedure TchCrc16.Calculate(var Current: Word; const Data: Pointer; const Length: Cardinal);
 begin
   if (Data = nil) or (Length = 0) then Exit;
 
