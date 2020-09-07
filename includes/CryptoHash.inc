@@ -24,7 +24,7 @@
 // Если необходима поддержка интерфейсов, активируйте эту опцию
 {$DEFINE SUPPORTS_INTERFACES}
 
-// Если используется Jedy Core Lybrary (https://github.com/project-jedi/jcl),
+// Если используется JEDI Core Lybrary (https://github.com/project-jedi/jcl),
 // имеет смысл включить эту опцию
 //{$DEFINE USE_JEDI_CORE_LIBRARY}
 
@@ -34,8 +34,6 @@
 // =============================================================================
 // КОД СЛЕДУЮЩИЙ НИЖЕ НЕ ПРЕДНАЗНАЧЕН ДЛЯ ИЗМЕНЕНИЯ ПРОГРАММИСТОМ И
 // СОДЕРЖИТ КРИТИЧЕСКИЕ НАСТРОЙКИ ДЛЯ БИБЛИОТЕКИ CryptoHash
-
-{$INCLUDE jedi\jedi.inc}
 
 {$IF DEFINED(MSWINDOWS)}
   {$IF NOT DEFINED(USE_FORCE_DELPHI)}
@@ -80,7 +78,7 @@
   {$STACKFRAMES OFF}      // {$W-}
 {$ENDIF ~ DEBUG}
 
-{$IF DEFINED(SUPPORTS_INLINE) AND NOT DEFINED(DEBUG)}
+{$IF NOT DEFINED(DEBUG)}
   {$DEFINE USE_INLINE}
 {$ENDIF}
 
