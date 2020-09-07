@@ -9,7 +9,7 @@
 //*****************************************************************************//
 /////////////////////////////////////////////////////////////////////////////////
 
-unit chHash.CRC.CRC8;
+unit chHash.CRC.CRC16.IBMSDLC;
 
 {$INCLUDE CryptoHash.inc}
 
@@ -17,20 +17,40 @@ interface
 
 uses
 {$IF DEFINED(SUPPORTS_INTERFACES)}
-  chHash.CRC;
+  chHash.CRC.CRC16.Impl;
 {$ELSE ~ NOT SUPPORTS_INTERFACES}
-  chHash.CRC.CRC8.Impl;
+  chHash.CRC.CRC16;
 {$ENDIF ~ SUPPORTS_INTERFACES}
 
 type
-{$IF DEFINED(SUPPORTS_INTERFACES)}
-  IchCrc8 = interface(IchCrc<Byte>)
-    ['{5CFBE9BC-2A8A-4746-9ABE-117BC9E846BA}']
+
+{ TchCrc16IBMSDLC }
+
+  TchCrc16IBMSDLC =
+    class({$IF DEFINED(SUPPORTS_INTERFACES)}chHash.CRC.CRC16.Impl{$ELSE}chHash.CRC.CRC16{$ENDIF}.TchCrc16)
+  public
+    constructor Create; reintroduce;
   end;
-{$ELSE ~ NOT SUPPORTS_INTERFACES}
-  TchCrc8 = chHash.CRC.CRC8.Impl.TchCrc8;
-{$ENDIF ~ SUPPORTS_INTERFACES}
 
 implementation
+
+uses
+{$IF DEFINED(USE_JEDI_CORE_LIBRARY)}
+  JclLogic;
+{$ELSE ~ NOT USE_JEDI_CORE_LIBRARY}
+  chHash.Core.Bits;
+{$ENDIF ~ USE_JEDI_CORE_LIBRARY}
+
+{ TchCrc16IBMSDLC }
+
+constructor TchCrc16IBMSDLC.Create;
+begin
+  inherited Create('CRC-16/IBM-SDLC', $1021, WordMask, WordMask, $906E, True, True);
+  Aliases.Add('CRC-16/ISO-HDLC');
+  Aliases.Add('CRC-16/ISO-IEC-14443-3-B');
+  Aliases.Add('CRC-16/X-25');
+  Aliases.Add('CRC-B');
+  Aliases.Add('X-25');
+end;
 
 end.

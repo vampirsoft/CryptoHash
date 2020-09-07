@@ -9,22 +9,36 @@
 //*****************************************************************************//
 /////////////////////////////////////////////////////////////////////////////////
 
-{$IF NOT DEFINED(CRYPTO_HASH_TESTS_INC)}
-{$DEFINE CRYPTO_HASH_TESTS_INC}
+unit chHash.CRC.CRC16.OPENSAFETYA;
 
-// Теты в коносле
-{$DEFINE CONSOLE_TESTRUNNER}
-
-// Тесты на нагрузку
-//{$DEFINE BENCHMARK}
-
-// Отключение лишних сообщений при компиляции
-{$HINTS OFF}
-{$WARNINGS OFF}
-
-// ВНИМАНИЕ!!!
-// =============================================================================
-// НАСТРОЙКИ БИБЛИОТЕКИ
 {$INCLUDE CryptoHash.inc}
 
-{$ENDIF ~ CRYPTO_HASH_TESTS_INC}
+interface
+
+uses
+{$IF DEFINED(SUPPORTS_INTERFACES)}
+  chHash.CRC.CRC16.Impl;
+{$ELSE ~ NOT SUPPORTS_INTERFACES}
+  chHash.CRC.CRC16;
+{$ENDIF ~ SUPPORTS_INTERFACES}
+
+type
+
+{ TchCrc16OPENSAFETYA }
+
+  TchCrc16OPENSAFETYA =
+    class({$IF DEFINED(SUPPORTS_INTERFACES)}chHash.CRC.CRC16.Impl{$ELSE}chHash.CRC.CRC16{$ENDIF}.TchCrc16)
+  public
+    constructor Create; reintroduce;
+  end;
+
+implementation
+
+{ TchCrc16OPENSAFETYA }
+
+constructor TchCrc16OPENSAFETYA.Create;
+begin
+  inherited Create('CRC-16/OPENSAFETY-A', $5935, $0000, $0000, $5D38, False, False);
+end;
+
+end.

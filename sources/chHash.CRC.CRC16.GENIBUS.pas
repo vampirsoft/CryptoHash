@@ -9,7 +9,7 @@
 //*****************************************************************************//
 /////////////////////////////////////////////////////////////////////////////////
 
-unit chHash.CRC.CRC8;
+unit chHash.CRC.CRC16.GENIBUS;
 
 {$INCLUDE CryptoHash.inc}
 
@@ -17,20 +17,39 @@ interface
 
 uses
 {$IF DEFINED(SUPPORTS_INTERFACES)}
-  chHash.CRC;
+  chHash.CRC.CRC16.Impl;
 {$ELSE ~ NOT SUPPORTS_INTERFACES}
-  chHash.CRC.CRC8.Impl;
+  chHash.CRC.CRC16;
 {$ENDIF ~ SUPPORTS_INTERFACES}
 
 type
-{$IF DEFINED(SUPPORTS_INTERFACES)}
-  IchCrc8 = interface(IchCrc<Byte>)
-    ['{5CFBE9BC-2A8A-4746-9ABE-117BC9E846BA}']
+
+{ TchCrc16GENIBUS }
+
+  TchCrc16GENIBUS =
+    class({$IF DEFINED(SUPPORTS_INTERFACES)}chHash.CRC.CRC16.Impl{$ELSE}chHash.CRC.CRC16{$ENDIF}.TchCrc16)
+  public
+    constructor Create; reintroduce;
   end;
-{$ELSE ~ NOT SUPPORTS_INTERFACES}
-  TchCrc8 = chHash.CRC.CRC8.Impl.TchCrc8;
-{$ENDIF ~ SUPPORTS_INTERFACES}
 
 implementation
+
+uses
+{$IF DEFINED(USE_JEDI_CORE_LIBRARY)}
+  JclLogic;
+{$ELSE ~ NOT USE_JEDI_CORE_LIBRARY}
+  chHash.Core.Bits;
+{$ENDIF ~ USE_JEDI_CORE_LIBRARY}
+
+{ TchCrc16GENIBUS }
+
+constructor TchCrc16GENIBUS.Create;
+begin
+  inherited Create('CRC-16/GENIBUS', $1021, WordMask, WordMask, $D64E, False, False);
+  Aliases.Add('CRC-16/DARC');
+  Aliases.Add('CRC-16/EPC');
+  Aliases.Add('CRC-16/EPC-C1G2');
+  Aliases.Add('CRC-16/I-CODE');
+end;
 
 end.

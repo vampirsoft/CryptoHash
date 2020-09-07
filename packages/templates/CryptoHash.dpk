@@ -30,13 +30,16 @@ package CryptoHash;
 {$R *.res}
 
 requires
+  {$IF DEFINED(USE_JEDI_CORE_LIBRARY)}
+  Jcl,
+  {$ENDIF ~ USE_JEDI_CORE_LIBRARY}
   rtl;
 
 contains
 // core units
-{$IF NOT DEFINED(USE_JEDI_CORE_LIBRARY)}
+  {$IF NOT DEFINED(USE_JEDI_CORE_LIBRARY)}
   chHash.Core,
-{$ENDIF ~ NOT USE_JEDI_CORE_LIBRARY}
+  {$ENDIF ~ NOT USE_JEDI_CORE_LIBRARY}
   chHash.Core.Bits,
 // base units
   chHash,
@@ -66,6 +69,40 @@ contains
   chHash.CRC.CRC8.SMBUS,
   chHash.CRC.CRC8.TECH3250,
   chHash.CRC.CRC8.WCDMA,
+// crc-16 units
+  chHash.CRC.CRC16,
+  chHash.CRC.CRC16.Impl,
+  chHash.CRC.CRC16.Reverse,
+  chHash.CRC.CRC16.ARC,
+  chHash.CRC.CRC16.CDMA2000,
+  chHash.CRC.CRC16.CMS,
+  chHash.CRC.CRC16.DDS110,
+  chHash.CRC.CRC16.DECTR,
+  chHash.CRC.CRC16.DECTX,
+  chHash.CRC.CRC16.DNP,
+  chHash.CRC.CRC16.EN13757,
+  chHash.CRC.CRC16.GENIBUS,
+  chHash.CRC.CRC16.GSM,
+  chHash.CRC.CRC16.IBM3740,
+  chHash.CRC.CRC16.IBMSDLC,
+  chHash.CRC.CRC16.ISOIEC144433A,
+  chHash.CRC.CRC16.KERMIT,
+  chHash.CRC.CRC16.LJ1200,
+  chHash.CRC.CRC16.MAXIMDOW,
+  chHash.CRC.CRC16.MCRF4XX,
+  chHash.CRC.CRC16.MODBUS,
+  chHash.CRC.CRC16.NRSC5,
+  chHash.CRC.CRC16.OPENSAFETYA,
+  chHash.CRC.CRC16.OPENSAFETYB,
+  chHash.CRC.CRC16.PROFIBUS,
+  chHash.CRC.CRC16.RIELLO,
+  chHash.CRC.CRC16.SPIFUJITSU,
+  chHash.CRC.CRC16.T10DIF,
+  chHash.CRC.CRC16.TELEDISK,
+  chHash.CRC.CRC16.TMS37157,
+  chHash.CRC.CRC16.UMTS,
+  chHash.CRC.CRC16.USB,
+  chHash.CRC.CRC16.XMODEM,
 // crc-32 units
   chHash.CRC.CRC32,
   chHash.CRC.CRC32.Impl,

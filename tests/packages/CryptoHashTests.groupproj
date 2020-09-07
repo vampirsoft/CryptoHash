@@ -6,13 +6,16 @@
         <Projects Include="CryptoHash.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="bits.dproj">
+        <Projects Include="Bits.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="C:\rad\libraries\CryptoHash\tests\packages\crc8.dproj">
+        <Projects Include="crc8.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="crc32.dproj">
+        <Projects Include="crc16.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Crc32.dproj">
             <Dependencies/>
         </Projects>
     </ItemGroup>
@@ -32,41 +35,50 @@
     <Target Name="CryptoHash:Make">
         <MSBuild Projects="CryptoHash.dproj" Targets="Make"/>
     </Target>
-    <Target Name="bits">
-        <MSBuild Projects="bits.dproj"/>
+    <Target Name="Bits">
+        <MSBuild Projects="Bits.dproj"/>
     </Target>
-    <Target Name="bits:Clean">
-        <MSBuild Projects="bits.dproj" Targets="Clean"/>
+    <Target Name="Bits:Clean">
+        <MSBuild Projects="Bits.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="bits:Make">
-        <MSBuild Projects="bits.dproj" Targets="Make"/>
+    <Target Name="Bits:Make">
+        <MSBuild Projects="Bits.dproj" Targets="Make"/>
     </Target>
     <Target Name="crc8">
-        <MSBuild Projects="C:\rad\libraries\CryptoHash\tests\packages\crc8.dproj"/>
+        <MSBuild Projects="crc8.dproj"/>
     </Target>
     <Target Name="crc8:Clean">
-        <MSBuild Projects="C:\rad\libraries\CryptoHash\tests\packages\crc8.dproj" Targets="Clean"/>
+        <MSBuild Projects="crc8.dproj" Targets="Clean"/>
     </Target>
     <Target Name="crc8:Make">
-        <MSBuild Projects="C:\rad\libraries\CryptoHash\tests\packages\crc8.dproj" Targets="Make"/>
+        <MSBuild Projects="crc8.dproj" Targets="Make"/>
     </Target>
-    <Target Name="crc32">
-        <MSBuild Projects="crc32.dproj"/>
+    <Target Name="crc16">
+        <MSBuild Projects="crc16.dproj"/>
     </Target>
-    <Target Name="crc32:Clean">
-        <MSBuild Projects="crc32.dproj" Targets="Clean"/>
+    <Target Name="crc16:Clean">
+        <MSBuild Projects="crc16.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="crc32:Make">
-        <MSBuild Projects="crc32.dproj" Targets="Make"/>
+    <Target Name="crc16:Make">
+        <MSBuild Projects="crc16.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Crc32">
+        <MSBuild Projects="Crc32.dproj"/>
+    </Target>
+    <Target Name="Crc32:Clean">
+        <MSBuild Projects="Crc32.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Crc32:Make">
+        <MSBuild Projects="Crc32.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
-        <CallTarget Targets="CryptoHash;bits;crc8;crc32"/>
+        <CallTarget Targets="CryptoHash;Bits;crc8;crc16;Crc32"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="CryptoHash:Clean;bits:Clean;crc8:Clean;crc32:Clean"/>
+        <CallTarget Targets="CryptoHash:Clean;Bits:Clean;crc8:Clean;crc16:Clean;Crc32:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="CryptoHash:Make;bits:Make;crc8:Make;crc32:Make"/>
+        <CallTarget Targets="CryptoHash:Make;Bits:Make;crc8:Make;crc16:Make;Crc32:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>
