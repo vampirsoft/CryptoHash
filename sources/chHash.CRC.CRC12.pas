@@ -9,7 +9,7 @@
 //*****************************************************************************//
 /////////////////////////////////////////////////////////////////////////////////
 
-unit chHash.CRC.CRC16.Reverse;
+unit chHash.CRC.CRC12;
 
 {$INCLUDE CryptoHash.inc}
 
@@ -17,50 +17,23 @@ interface
 
 uses
 {$IF DEFINED(SUPPORTS_INTERFACES)}
-  chHash.CRC.CRC16.Impl;
+  chHash.CRC;
 {$ELSE ~ NOT SUPPORTS_INTERFACES}
-  chHash.CRC.CRC16;
+  chHash.CRC.CRC12.Impl;
 {$ENDIF ~ SUPPORTS_INTERFACES}
 
 type
-
-{ TchReverseCrc16 }
-
-  TchReverseCrc16 = class(TchCrc16)
-  public
-    procedure Calculate(var Current: Word; const Data: Pointer; const Length: Cardinal); override;
-    function Final(const Current: Word): Word; override;
+{$IF DEFINED(SUPPORTS_INTERFACES)}
+  IchCrc12 = interface(IchCrc<Word>)
+    ['{22D7801F-51AE-4787-83C3-93D246D3F79B}']
   end;
+{$ELSE ~ NOT SUPPORTS_INTERFACES}
+  TchCrc12 = chHash.CRC.CRC12.Impl.TchCrc12;
+{$ENDIF ~ SUPPORTS_INTERFACES}
+
+const
+  Bits12Mask = Word($FFF);
 
 implementation
-
-uses
-{$IF DEFINED(USE_JEDI_CORE_LIBRARY)}
-  JclLogic;
-{$ELSE ~ NOT USE_JEDI_CORE_LIBRARY}
-  chHash.Core.Bits;
-{$ENDIF ~ USE_JEDI_CORE_LIBRARY}
-
-{ TchReverseCrc16 }
-
-procedure TchReverseCrc16.Calculate(var Current: Word; const Data: Pointer; const Length: Cardinal);
-const
-  SizeOfBits = Byte(SizeOf(Word));
-
-begin
-  ReverseBytes(@Current, SizeOfBits);
-  inherited Calculate(Current, Data, Length);
-  ReverseBytes(@Current, SizeOfBits);
-end;
-
-function TchReverseCrc16.Final(const Current: Word): Word;
-const
-  SizeOfBits = Byte(SizeOf(Word));
-
-begin
-  Result := Current;
-  ReverseBytes(@Result, SizeOfBits);
-  Result := inherited Final(Result);
-end;
 
 end.

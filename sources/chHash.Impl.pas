@@ -27,10 +27,10 @@ type
 
   TchAlgorithm<C, R> = class abstract{$IF DEFINED(SUPPORTS_INTERFACES)}(TInterfacedObject, IchAlgorithm<C,R>){$ENDIF}
   strict private
-    FInit: C;
     FCheck: R;
     FName: string;
   strict protected
+    FInit: C;
     constructor Create(const Name: string; const Init: C; const Check: R); reintroduce;
     class function IfThenElse<T>(const Condition: Boolean; const ThenValue, ElseValue: T): T; inline; static;
     class function InitArray<T>(const Length: Cardinal): TArray<T>; inline; static;

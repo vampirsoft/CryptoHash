@@ -9,7 +9,7 @@
 //*****************************************************************************//
 /////////////////////////////////////////////////////////////////////////////////
 
-unit chHash.CRC.CRC16.Reverse;
+unit chHash.CRC.CRC12.DECT;
 
 {$INCLUDE CryptoHash.inc}
 
@@ -17,50 +17,28 @@ interface
 
 uses
 {$IF DEFINED(SUPPORTS_INTERFACES)}
-  chHash.CRC.CRC16.Impl;
+  chHash.CRC.CRC12.Impl;
 {$ELSE ~ NOT SUPPORTS_INTERFACES}
-  chHash.CRC.CRC16;
+  chHash.CRC.CRC12;
 {$ENDIF ~ SUPPORTS_INTERFACES}
 
 type
 
-{ TchReverseCrc16 }
+{ TchCrc12DECT }
 
-  TchReverseCrc16 = class(TchCrc16)
+  TchCrc12DECT = class({$IF DEFINED(SUPPORTS_INTERFACES)}chHash.CRC.CRC12.Impl{$ELSE}chHash.CRC.CRC12{$ENDIF}.TchCrc12)
   public
-    procedure Calculate(var Current: Word; const Data: Pointer; const Length: Cardinal); override;
-    function Final(const Current: Word): Word; override;
+    constructor Create; reintroduce;
   end;
 
 implementation
 
-uses
-{$IF DEFINED(USE_JEDI_CORE_LIBRARY)}
-  JclLogic;
-{$ELSE ~ NOT USE_JEDI_CORE_LIBRARY}
-  chHash.Core.Bits;
-{$ENDIF ~ USE_JEDI_CORE_LIBRARY}
+{ TchCrc12DECT }
 
-{ TchReverseCrc16 }
-
-procedure TchReverseCrc16.Calculate(var Current: Word; const Data: Pointer; const Length: Cardinal);
-const
-  SizeOfBits = Byte(SizeOf(Word));
-
+constructor TchCrc12DECT.Create;
 begin
-  ReverseBytes(@Current, SizeOfBits);
-  inherited Calculate(Current, Data, Length);
-  ReverseBytes(@Current, SizeOfBits);
-end;
-
-function TchReverseCrc16.Final(const Current: Word): Word;
-const
-  SizeOfBits = Byte(SizeOf(Word));
-
-begin
-  Result := Current;
-  ReverseBytes(@Result, SizeOfBits);
-  Result := inherited Final(Result);
+  inherited Create('CRC-12/DECT', $80F, $000, $000, $F5B, False, False);
+  Aliases.Add('X-CRC-12');
 end;
 
 end.

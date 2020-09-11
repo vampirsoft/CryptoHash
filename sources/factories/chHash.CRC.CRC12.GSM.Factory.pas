@@ -9,7 +9,7 @@
 //*****************************************************************************//
 /////////////////////////////////////////////////////////////////////////////////
 
-unit chHash.CRC.CRC16.Reverse;
+unit chHash.CRC.CRC12.GSM.Factory;
 
 {$INCLUDE CryptoHash.inc}
 
@@ -17,50 +17,45 @@ interface
 
 uses
 {$IF DEFINED(SUPPORTS_INTERFACES)}
-  chHash.CRC.CRC16.Impl;
-{$ELSE ~ NOT SUPPORTS_INTERFACES}
-  chHash.CRC.CRC16;
+  chHash.CRC.CRC12,
 {$ENDIF ~ SUPPORTS_INTERFACES}
+  chHash.CRC.CRC12.GSM;
 
 type
 
-{ TchReverseCrc16 }
+{ TchCrc12GSM }
 
-  TchReverseCrc16 = class(TchCrc16)
+  TchCrc12GSM = class sealed(chHash.CRC.CRC12.GSM.TchCrc12GSM)
+  private type
+    TInstance = {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc12{$ELSE}chHash.CRC.CRC12.GSM.TchCrc12GSM{$ENDIF};
+  private
+    class var FInstance: TInstance;
+  private
+    constructor Create; reintroduce;
   public
-    procedure Calculate(var Current: Word; const Data: Pointer; const Length: Cardinal); override;
-    function Final(const Current: Word): Word; override;
+    class property Instance: TInstance read FInstance;
   end;
 
 implementation
 
+{$IF NOT DEFINED(SUPPORTS_INTERFACES)}
 uses
-{$IF DEFINED(USE_JEDI_CORE_LIBRARY)}
-  JclLogic;
-{$ELSE ~ NOT USE_JEDI_CORE_LIBRARY}
-  chHash.Core.Bits;
-{$ENDIF ~ USE_JEDI_CORE_LIBRARY}
+  System.SysUtils;
+{$ENDIF ~ NOT SUPPORTS_INTERFACES}
 
-{ TchReverseCrc16 }
+{ TchCrc12GSM }
 
-procedure TchReverseCrc16.Calculate(var Current: Word; const Data: Pointer; const Length: Cardinal);
-const
-  SizeOfBits = Byte(SizeOf(Word));
-
+constructor TchCrc12GSM.Create;
 begin
-  ReverseBytes(@Current, SizeOfBits);
-  inherited Calculate(Current, Data, Length);
-  ReverseBytes(@Current, SizeOfBits);
+  inherited Create;
 end;
 
-function TchReverseCrc16.Final(const Current: Word): Word;
-const
-  SizeOfBits = Byte(SizeOf(Word));
+initialization
+  TchCrc12GSM.FInstance := TchCrc12GSM.Create;
 
-begin
-  Result := Current;
-  ReverseBytes(@Result, SizeOfBits);
-  Result := inherited Final(Result);
-end;
+{$IF NOT DEFINED(SUPPORTS_INTERFACES)}
+finalization
+  FreeAndNil(TchCrc12GSM.FInstance);
+{$ENDIF ~ NOT SUPPORTS_INTERFACES}
 
 end.
