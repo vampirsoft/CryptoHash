@@ -30,15 +30,18 @@ type
 
   TchCrc8 = class(TchCrc<Byte>{$IF DEFINED(SUPPORTS_INTERFACES)}, IchCrc8{$ENDIF})
   strict protected
+    constructor Create(const Name: string; const Polynomial, Init, XorOut, Check: Byte;
+      const RefIn, RefOut: Boolean); reintroduce;
     function ByteToBits(const Value: Byte): Byte; override;
     function BitsToByte(const Value: Byte): Byte; override;
     function LeftShift(const Value: Byte; const Bits: Byte): Byte; override;
     function RightShift(const Value: Byte; const Bits: Byte): Byte; override;
+    function BitwiseAnd(const Left, Right: Byte): Byte; override;
+    function BitwiseOr(const Left, Right: Byte): Byte; override;
     function BitwiseXor(const Left, Right: Byte): Byte; override;
+    function Subtract(const Left, Right: Byte): Byte; override;
     function IsZero(const Value: Byte): Boolean; override;
   public
-    class function Custom(const Polynomial, Init, XorOut, Check: Byte;
-      const RefIn, RefOut: Boolean): TchCrc8; static;{$IF DEFINED(USE_INLINE)}inline;{$ENDIF}
     procedure Calculate(var Current: Byte; const Data: Pointer; const Length: Cardinal); override;
   end;
 
@@ -53,9 +56,10 @@ uses
 
 { TchCrc8 }
 
-class function TchCrc8.Custom(const Polynomial, Init, XorOut, Check: Byte; const RefIn, RefOut: Boolean): TchCrc8;
+constructor TchCrc8.Create(const Name: string; const Polynomial, Init, XorOut, Check: Byte;
+  const RefIn, RefOut: Boolean);
 begin
-  Result := TchCrc8.Create('Custom', Polynomial, Init, XorOut, Check, RefIn, RefOut);
+  inherited Create(Name, 8, Polynomial, Init, XorOut, Check, RefIn, RefOut);
 end;
 
 function TchCrc8.ByteToBits(const Value: Byte): Byte;
@@ -136,6 +140,58 @@ begin
 end;
 {$ENDIF ~ USE_ASSEMBLER}
 
+function TchCrc8.BitwiseAnd(const Left, Right: Byte): Byte;
+{$IF DEFINED(USE_ASSEMBLER)}
+asm
+{$IF DEFINED(X64)}
+  // Start
+  // -->  DL   Left
+  //     R8B   Right
+  // <--  AL   Result
+  MOV       AL,         R8B
+{$ELSE ~ X86}
+  // Start
+  // -->  DL   Left
+  //      CL   Right
+  // <--  AL   Result
+  MOV       AL,         CL
+{$ENDIF ~ X64}
+  // Initialized
+  AND       AL,         DL
+  // Finish
+end;
+{$ELSE ~ USE_FORCE_DELPHI}
+begin
+  Result := Left and Right;
+end;
+{$ENDIF ~ USE_ASSEMBLER}
+
+function TchCrc8.BitwiseOr(const Left, Right: Byte): Byte;
+{$IF DEFINED(USE_ASSEMBLER)}
+asm
+{$IF DEFINED(X64)}
+  // Start
+  // -->  DL   Left
+  //     R8B   Right
+  // <--  AL   Result
+  MOV       AL,         R8B
+{$ELSE ~ X86}
+  // Start
+  // -->  DL   Left
+  //      CL   Right
+  // <--  AL   Result
+  MOV       AL,         CL
+{$ENDIF ~ X64}
+  // Initialized
+  OR        AL,         DL
+  // Finish
+end;
+{$ELSE ~ USE_FORCE_DELPHI}
+begin
+  Result := Left or Right;
+end;
+{$ENDIF ~ USE_ASSEMBLER}
+
 function TchCrc8.BitwiseXor(const Left, Right: Byte): Byte;
 {$IF DEFINED(USE_ASSEMBLER)}
 asm
@@ -159,6 +215,35 @@ end;
 {$ELSE ~ USE_FORCE_DELPHI}
 begin
   Result := Left xor Right;
+end;
+{$ENDIF ~ USE_ASSEMBLER}
+
+function TchCrc8.Subtract(const Left, Right: Byte): Byte;
+{$IF DEFINED(USE_ASSEMBLER)}
+asm
+{$IF DEFINED(X64)}
+  // Start
+  // -->  DL   Left
+  //     R8B   Right
+  // <--  AL   Result
+{$ELSE ~ X86}
+  // Start
+  // -->  DL   Left
+  //      CL   Right
+  // <--  AL   Result
+{$ENDIF ~ X64}
+  MOV       AL,         DL
+  // Initialized
+{$IF DEFINED(X64)}
+  SUB       AL,         R8B
+{$ELSE ~ X86}
+  SUB       AL,         CL
+{$ENDIF ~ X64}
+  // Finish
+end;
+{$ELSE ~ USE_FORCE_DELPHI}
+begin
+  Result := Left - Right;
 end;
 {$ENDIF ~ USE_ASSEMBLER}
 
@@ -197,9 +282,9 @@ asm
   PUSH      RBP
   MOV       RBP,        RCX           // addresss Self -> RBP
 {$IF DEFINED(SUPPORTS_INTERFACES)}
-  ADD       RBP,        $30           // offset to Self.FTable -> EBP
+  ADD       RBP,        $38           // offset to Self.FTable -> EBP
 {$ELSE ~ NOT SUPPORTS_INTERFACES}
-  ADD       RBP,        $18           // offset to Self.FTable -> RBP
+  ADD       RBP,        $20           // offset to Self.FTable -> RBP
 {$ENDIF ~ SUPPORTS_INTERFACES}
   MOV       RCX,        R9            // Length -> RCX
   PUSH      RBX
@@ -225,9 +310,9 @@ asm
   PUSH      EBP
   MOV       EBP,        EAX           // addresss Self -> EBP
 {$IF DEFINED(SUPPORTS_INTERFACES)}
-  ADD       EBP,        $18           // offset to Self.FTable -> EBP
+  ADD       EBP,        $1C           // offset to Self.FTable -> EBP
 {$ELSE ~ NOT SUPPORTS_INTERFACES}
-  ADD       EBP,        $0C           // offset to Self.FTable -> EBP
+  ADD       EBP,        $10           // offset to Self.FTable -> EBP
 {$ENDIF ~ SUPPORTS_INTERFACES}
   PUSH      EBX
   MOVZX     EBX,        [EDX]         // Current -> BL

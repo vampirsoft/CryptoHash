@@ -30,6 +30,7 @@ uses
 // crc units
   chHash.CRC,
   chHash.CRC.Impl,
+  chHash.CRC.CRC16Bits,
 // crc-8 units
   chHash.CRC.CRC8,
   chHash.CRC.CRC8.Impl,
@@ -71,6 +72,17 @@ uses
   chHash.CRC.CRC8.SMBUS.Factory,
   chHash.CRC.CRC8.TECH3250.Factory,
   chHash.CRC.CRC8.WCDMA.Factory,
+// crc-12 units
+  chHash.CRC.CRC12,
+  chHash.CRC.CRC12.Impl,
+  chHash.CRC.CRC12.CDMA2000,
+  chHash.CRC.CRC12.DECT,
+  chHash.CRC.CRC12.GSM,
+  chHash.CRC.CRC12.UMTS,
+  chHash.CRC.CRC12.CDMA2000.Factory,
+  chHash.CRC.CRC12.DECT.Factory,
+  chHash.CRC.CRC12.GSM.Factory,
+  chHash.CRC.CRC12.UMTS.Factory,
 // crc-16 units
   chHash.CRC.CRC16,
   chHash.CRC.CRC16.Impl,
@@ -178,6 +190,7 @@ uses
   chHash.Tests,
   chHash.CRC.Tests,
   chHash.CRC.CRC8.Tests,
+  chHash.CRC.CRC12.Tests,
   chHash.CRC.CRC16.Tests,
   chHash.CRC.CRC32.Tests;
 

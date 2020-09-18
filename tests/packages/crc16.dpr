@@ -27,6 +27,7 @@ uses
   chHash.Impl,
   chHash.CRC,
   chHash.CRC.Impl,
+  chHash.CRC.CRC16Bits,
   chHash.CRC.CRC16,
   chHash.CRC.CRC16.Impl,
   chHash.CRC.CRC16.Reverse,
