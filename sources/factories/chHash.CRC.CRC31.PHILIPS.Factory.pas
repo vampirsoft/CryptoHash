@@ -9,7 +9,7 @@
 //*****************************************************************************//
 /////////////////////////////////////////////////////////////////////////////////
 
-unit chHash.CRC.CRC32.Impl;
+unit chHash.CRC.CRC31.PHILIPS.Factory;
 
 {$INCLUDE CryptoHash.inc}
 
@@ -17,30 +17,45 @@ interface
 
 uses
 {$IF DEFINED(SUPPORTS_INTERFACES)}
-  chHash.CRC.CRC32,
+  chHash.CRC.CRC31,
 {$ENDIF ~ SUPPORTS_INTERFACES}
-  chHash.CRC.CRC32Bits;
+  chHash.CRC.CRC31.PHILIPS;
 
 type
 
-{ TchCrc32 }
+{ TchCrc31PHILIPS }
 
-  TchCrc32 = class(TchCrc32Bits{$IF DEFINED(SUPPORTS_INTERFACES)}, IchCrc32{$ENDIF})
-  strict private const
-    Size = Byte(32);
-  strict protected
-    constructor Create(const Name: string; const Polynomial, Init, XorOut, Check: Cardinal;
-      const RefIn, RefOut: Boolean); reintroduce;
+  TchCrc31PHILIPS = class sealed(chHash.CRC.CRC31.PHILIPS.TchCrc31PHILIPS)
+  private type
+    TInstance = {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc31{$ELSE}chHash.CRC.CRC31.PHILIPS.TchCrc31PHILIPS{$ENDIF};
+  private
+    class var FInstance: TInstance;
+  private
+    constructor Create; reintroduce;
+  public
+    class property Instance: TInstance read FInstance;
   end;
 
 implementation
 
-{ TchCrc32 }
+{$IF NOT DEFINED(SUPPORTS_INTERFACES)}
+uses
+  System.SysUtils;
+{$ENDIF ~ NOT SUPPORTS_INTERFACES}
 
-constructor TchCrc32.Create(const Name: string; const Polynomial, Init, XorOut, Check: Cardinal;
-  const RefIn, RefOut: Boolean);
+{ TchCrc31PHILIPS }
+
+constructor TchCrc31PHILIPS.Create;
 begin
-  inherited Create(Name, TchCrc32.Size, Polynomial, Init, XorOut, Check, RefIn, RefOut);
+  inherited Create;
 end;
+
+initialization
+  TchCrc31PHILIPS.FInstance := TchCrc31PHILIPS.Create;
+
+{$IF NOT DEFINED(SUPPORTS_INTERFACES)}
+finalization
+  FreeAndNil(TchCrc31PHILIPS.FInstance);
+{$ENDIF ~ NOT SUPPORTS_INTERFACES}
 
 end.

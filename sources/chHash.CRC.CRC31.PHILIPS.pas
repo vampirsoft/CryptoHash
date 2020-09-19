@@ -9,7 +9,7 @@
 //*****************************************************************************//
 /////////////////////////////////////////////////////////////////////////////////
 
-unit chHash.CRC.CRC32.Impl;
+unit chHash.CRC.CRC31.PHILIPS;
 
 {$INCLUDE CryptoHash.inc}
 
@@ -17,30 +17,27 @@ interface
 
 uses
 {$IF DEFINED(SUPPORTS_INTERFACES)}
-  chHash.CRC.CRC32,
+  chHash.CRC.CRC31.Impl,
 {$ENDIF ~ SUPPORTS_INTERFACES}
-  chHash.CRC.CRC32Bits;
+  chHash.CRC.CRC31;
 
 type
 
-{ TchCrc32 }
+{ TchCrc31PHILIPS }
 
-  TchCrc32 = class(TchCrc32Bits{$IF DEFINED(SUPPORTS_INTERFACES)}, IchCrc32{$ENDIF})
-  strict private const
-    Size = Byte(32);
-  strict protected
-    constructor Create(const Name: string; const Polynomial, Init, XorOut, Check: Cardinal;
-      const RefIn, RefOut: Boolean); reintroduce;
+  TchCrc31PHILIPS =
+    class({$IF DEFINED(SUPPORTS_INTERFACES)}chHash.CRC.CRC31.Impl{$ELSE}chHash.CRC.CRC31{$ENDIF}.TchCrc31)
+  public
+    constructor Create; reintroduce;
   end;
 
 implementation
 
-{ TchCrc32 }
+{ TchCrc31PHILIPS }
 
-constructor TchCrc32.Create(const Name: string; const Polynomial, Init, XorOut, Check: Cardinal;
-  const RefIn, RefOut: Boolean);
+constructor TchCrc31PHILIPS.Create;
 begin
-  inherited Create(Name, TchCrc32.Size, Polynomial, Init, XorOut, Check, RefIn, RefOut);
+  inherited Create('CRC-31/PHILIPS', $04C11DB7, Bits31Mask, Bits31Mask, $0CE9E46C, False, False);
 end;
 
 end.
