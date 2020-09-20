@@ -31,6 +31,7 @@ uses
   chHash.CRC,
   chHash.CRC.Impl,
   chHash.CRC.CRC16Bits,
+  chHash.CRC.CRC32Bits,
 // crc-8 units
   chHash.CRC.CRC8,
   chHash.CRC.CRC8.Impl,
@@ -147,6 +148,11 @@ uses
   chHash.CRC.CRC16.UMTS.Factory,
   chHash.CRC.CRC16.USB.Factory,
   chHash.CRC.CRC16.XMODEM.Factory,
+// crc-31 units
+  chHash.CRC.CRC31,
+  chHash.CRC.CRC31.Impl,
+  chHash.CRC.CRC31.PHILIPS,
+  chHash.CRC.CRC31.PHILIPS.Factory,
 // crc-32 units
   chHash.CRC.CRC32,
   chHash.CRC.CRC32.Impl,
@@ -192,6 +198,7 @@ uses
   chHash.CRC.CRC8.Tests,
   chHash.CRC.CRC12.Tests,
   chHash.CRC.CRC16.Tests,
+  chHash.CRC.CRC31.Tests,
   chHash.CRC.CRC32.Tests;
 
 {$R *.RES}

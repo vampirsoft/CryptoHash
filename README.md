@@ -42,4 +42,4 @@
 - [CRC16-CCITT](http://srecord.sourceforge.net/crc16-ccitt.html)
 - [CRC Calculator (Javascript)](http://www.sunshine2k.de/coding/javascript/crc/crc_js.html)
 
-## [История изменений](/CHANGELOG.md)
+### [История изменений](/CHANGELOG.md)

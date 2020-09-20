@@ -9,7 +9,7 @@
 //*****************************************************************************//
 /////////////////////////////////////////////////////////////////////////////////
 
-program crc32;
+program crc31;
 
 {$INCLUDE CryptoHash.Tests.inc}
 
@@ -28,34 +28,14 @@ uses
   chHash.CRC,
   chHash.CRC.Impl,
   chHash.CRC.CRC32Bits,
-  chHash.CRC.CRC32,
-  chHash.CRC.CRC32.Impl,
-  chHash.CRC.CRC32.PKZIP,
-  chHash.CRC.CRC32.BZIP2,
-  chHash.CRC.CRC32.ISCSI,
-  chHash.CRC.CRC32.BASE91D,
-  chHash.CRC.CRC32.MPEG2,
-  chHash.CRC.CRC32.CKSUM,
-  chHash.CRC.CRC32.AIXM,
-  chHash.CRC.CRC32.JAMCRC,
-  chHash.CRC.CRC32.XFER,
-  chHash.CRC.CRC32.AUTOSAR,
-  chHash.CRC.CRC32.CDROMEDC,
-  chHash.CRC.CRC32.PKZIP.Factory,
-  chHash.CRC.CRC32.BZIP2.Factory,
-  chHash.CRC.CRC32.ISCSI.Factory,
-  chHash.CRC.CRC32.BASE91D.Factory,
-  chHash.CRC.CRC32.MPEG2.Factory,
-  chHash.CRC.CRC32.CKSUM.Factory,
-  chHash.CRC.CRC32.AIXM.Factory,
-  chHash.CRC.CRC32.JAMCRC.Factory,
-  chHash.CRC.CRC32.XFER.Factory,
-  chHash.CRC.CRC32.AUTOSAR.Factory,
-  chHash.CRC.CRC32.CDROMEDC.Factory,
+  chHash.CRC.CRC31,
+  chHash.CRC.CRC31.Impl,
+  chHash.CRC.CRC31.PHILIPS,
+  chHash.CRC.CRC31.PHILIPS.Factory,
   chHash.Utils,
   chHash.Tests,
   chHash.CRC.Tests,
-  chHash.CRC.CRC32.Tests;
+  chHash.CRC.CRC31.Tests;
 
 {$R *.RES}
 
