@@ -29,11 +29,6 @@ type
 { TchCrc32Tests }
 
   TchCrc32Tests = class abstract(TchCrcTests<Cardinal, TCrc32Algorithm>)
-  strict protected
-    function BitsToHex(const Value: Cardinal): string; override;
-    function FinalControlCalculate(const Value: Cardinal): Cardinal; override;
-    function GetCount: Cardinal; override;
-    function GetMaxLength: Cardinal; override;
   end;
 
 { TchCrc32NormalTests }
@@ -146,34 +141,7 @@ uses
   chHash.CRC.CRC32.XFER.Factory,
   chHash.CRC.CRC32.AUTOSAR.Factory,
   chHash.CRC.CRC32.CDROMEDC.Factory,
-  TestFramework,
-  System.SysUtils, System.Generics.Collections;
-
-{ TchCrc32Tests }
-
-function TchCrc32Tests.BitsToHex(const Value: Cardinal): string;
-begin
-  Result := IntToHex(Value);
-end;
-
-function TchCrc32Tests.FinalControlCalculate(const Value: Cardinal): Cardinal;
-begin
-  Result := Value xor FAlgorithm.XorOut;
-end;
-
-function TchCrc32Tests.GetCount: Cardinal;
-begin
-  Result := 1024 * 16;
-//  Result := 1 * 1;
-//  Result := 1024 * 1;
-end;
-
-function TchCrc32Tests.GetMaxLength: Cardinal;
-begin
-  Result := $FFFF;
-//  Result := $FFFFFFF;
-//  Result := $100000
-end;
+  TestFramework;
 
 { TchCrc32NormalTests }
 

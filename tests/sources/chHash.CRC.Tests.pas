@@ -29,12 +29,15 @@ type
 
   TchCrcTests<Bits; HA: {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc<Bits>{$ELSE}TchCrc<Bits>{$ENDIF}> =
     class abstract(TchAlgorithmTests<Bits, Bits, HA>)
+  strict private
+    function BitsToHex(const Value: Bits): string;{$IF DEFINED(USE_INLINE)}inline;{$ENDIF}
+    function FinalControlCalculate(const Value: Bits): Bits;{$IF DEFINED(USE_INLINE)}inline;{$ENDIF}
   strict protected
     FCrcTable: TchCrc<Bits>.TOneLevelCrcTable;
+    function GetCount: Cardinal; override;
+    function GetMaxLength: Cardinal; override;
     function GetCheckValueForEmpty: Bits; override;
     function GetCheckMessage(const Expected, Actual: Bits): string; override;
-    function BitsToHex(const Value: Bits): string; virtual; abstract;
-    function FinalControlCalculate(const Value: Bits): Bits; virtual; abstract;
     procedure ControlCalculate(var Current: Bits; const Data; const Length: Cardinal); virtual; abstract;
     procedure DataStressTest(const Data: TBytes; const MaxLength, Count: Cardinal); override;
   public
@@ -47,9 +50,57 @@ type
 implementation
 
 uses
+{$IF DEFINED(USE_JEDI_CORE_LIBRARY)}
+  JclLogic,
+{$ENDIF ~ USE_JEDI_CORE_LIBRARY}
+  chHash.Core.Bits,
   System.Diagnostics;
 
 { TchCrcTests<Bits, HA> }
+
+function TchCrcTests<Bits, HA>.GetCount: Cardinal;
+begin
+  Result := 1024 * 16;
+//  Result := 1 * 1;
+//  Result := 1024 * 1;
+end;
+
+function TchCrcTests<Bits, HA>.GetMaxLength: Cardinal;
+begin
+  Result := $FFFF;
+//  Result := $FFFFFFF;
+//  Result := $100000
+end;
+
+function TchCrcTests<Bits, HA>.BitsToHex(const Value: Bits): string;
+const
+  SizeOfBits  = Byte(SizeOf(Bits));
+
+begin
+  const Bytes = (@Value).ToBytes(SizeOfBits);
+  Result := '';
+  for var I := 0 to Length(Bytes) - 1 do
+  begin
+    Result := Result + IntToHex(Bytes[I]);
+  end;
+end;
+
+function TchCrcTests<Bits, HA>.FinalControlCalculate(const Value: Bits): Bits;
+const
+  SizeOfBits  = Byte(SizeOf(Bits));
+  BitsPerBits = Byte(SizeOfBits * BitsPerByte);
+
+begin
+  const Algorithm = FAlgorithm as TchCrc<Bits>;
+  Result := Value;
+  if Algorithm.RefIn xor Algorithm.RefOut then
+  begin
+    ReverseBits(@Result, SizeOfBits);
+    Result := Algorithm.RightShift(Result, BitsPerBits - Algorithm.Width);
+  end;
+  Result := Algorithm.BitwiseXor(Result, Algorithm.XorOut);
+  Result := Algorithm.BitwiseAnd(Result, Algorithm.Mask);
+end;
 
 function TchCrcTests<Bits, HA>.GetCheckValueForEmpty: Bits;
 begin

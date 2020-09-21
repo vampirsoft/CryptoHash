@@ -30,7 +30,11 @@ type
 { TchCrc32Bits }
 
   TchCrc32Bits = class abstract(TchCrc<Cardinal>)
+  {$IF DEFINED(HASH_TESTS)}
+  public
+  {$ELSE ~ NOT HASH_TESTS}
   strict protected
+  {$ENDIF ~ HASH_TESTS}
     function ByteToBits(const Value: Byte): Cardinal; override;
     function BitsToByte(const Value: Cardinal): Byte; override;
     function LeftShift(const Value: Cardinal; const Bits: Byte): Cardinal; override;

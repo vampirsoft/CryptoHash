@@ -28,11 +28,6 @@ type
 { TchCrc12Tests }
 
   TchCrc12Tests = class abstract(TchCrcTests<Word, TCrc12Algorithm>)
-  strict protected
-    function BitsToHex(const Value: Word): string; override;
-    function FinalControlCalculate(const Value: Word): Word; override;
-    function GetCount: Cardinal; override;
-    function GetMaxLength: Cardinal; override;
   end;
 
 { TchCrc12NormalTests }
@@ -89,43 +84,7 @@ uses
   chHash.CRC.CRC12.DECT.Factory,
   chHash.CRC.CRC12.GSM.Factory,
   chHash.CRC.CRC12.UMTS.Factory,
-  TestFramework,
-  System.SysUtils, System.Generics.Collections;
-
-{ TchCrc12Tests }
-
-function TchCrc12Tests.BitsToHex(const Value: Word): string;
-begin
-  Result := IntToHex(Value);
-end;
-
-function TchCrc12Tests.FinalControlCalculate(const Value: Word): Word;
-const SizeOfBits  = Byte(SizeOf(Word));
-const BitsPerBits = Byte(SizeOfBits * BitsPerByte);
-begin
-  Result := Value;
-  if FAlgorithm.RefOut then
-  begin
-    Result := ReverseBits(Result);
-    Result := Result shr (BitsPerBits - FAlgorithm.Width);
-  end;
-  Result := Result xor FAlgorithm.XorOut;
-  Result := Result and (FAlgorithm as TchCrc12).Mask;
-end;
-
-function TchCrc12Tests.GetCount: Cardinal;
-begin
-  Result := 1024 * 16;
-//  Result := 1 * 1;
-//  Result := 1024 * 1;
-end;
-
-function TchCrc12Tests.GetMaxLength: Cardinal;
-begin
-  Result := $FFFF;
-//  Result := $FFFFFFF;
-//  Result := $100000
-end;
+  TestFramework;
 
 { TchCrc12NormalTests }
 

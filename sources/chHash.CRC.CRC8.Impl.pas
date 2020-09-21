@@ -29,7 +29,11 @@ type
 { TchCrc8 }
 
   TchCrc8 = class(TchCrc<Byte>{$IF DEFINED(SUPPORTS_INTERFACES)}, IchCrc8{$ENDIF})
+  {$IF DEFINED(HASH_TESTS)}
+  public
+  {$ELSE ~ NOT HASH_TESTS}
   strict protected
+  {$ENDIF ~ HASH_TESTS}
     constructor Create(const Name: string; const Polynomial, Init, XorOut, Check: Byte;
       const RefIn, RefOut: Boolean); reintroduce;
     function ByteToBits(const Value: Byte): Byte; override;

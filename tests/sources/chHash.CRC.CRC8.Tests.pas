@@ -30,10 +30,6 @@ type
 
   TchCrc8Tests = class abstract(TchCrcTests<Byte, TCrc8Algorithm>)
   strict protected
-    function BitsToHex(const Value: Byte): string; override;
-    function FinalControlCalculate(const Value: Byte): Byte; override;
-    function GetCount: Cardinal; override;
-    function GetMaxLength: Cardinal; override;
     procedure ControlCalculate(var Current: Byte; const Data; const Length: Cardinal); override;
   end;
 
@@ -173,11 +169,6 @@ type
 implementation
 
 uses
-{$IF DEFINED(USE_JEDI_CORE_LIBRARY)}
-  JclLogic,
-{$ELSE ~ NOT USE_JEDI_CORE_LIBRARY}
-  chHash.Core.Bits,
-{$ENDIF ~ USE_JEDI_CORE_LIBRARY}
   chHash.CRC.CRC8.AUTOSAR.Factory,
   chHash.CRC.CRC8.BLUETOOTH.Factory,
   chHash.CRC.CRC8.CDMA2000.Factory,
@@ -197,34 +188,9 @@ uses
   chHash.CRC.CRC8.SMBUS.Factory,
   chHash.CRC.CRC8.TECH3250.Factory,
   chHash.CRC.CRC8.WCDMA.Factory,
-  TestFramework,
-  System.SysUtils, System.Generics.Collections;
+  TestFramework;
 
 { TchCrc8Tests }
-
-function TchCrc8Tests.BitsToHex(const Value: Byte): string;
-begin
-  Result := IntToHex(Value);
-end;
-
-function TchCrc8Tests.FinalControlCalculate(const Value: Byte): Byte;
-begin
-  Result := Value xor FAlgorithm.XorOut;
-end;
-
-function TchCrc8Tests.GetCount: Cardinal;
-begin
-  Result := 1024 * 16;
-//  Result := 1 * 1;
-//  Result := 1024 * 1;
-end;
-
-function TchCrc8Tests.GetMaxLength: Cardinal;
-begin
-  Result := $FFFF;
-//  Result := $FFFFFFF;
-//  Result := $100000
-end;
 
 procedure TchCrc8Tests.ControlCalculate(var Current: Byte; const Data; const Length: Cardinal);
 begin
