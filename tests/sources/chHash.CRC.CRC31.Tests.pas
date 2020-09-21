@@ -28,11 +28,6 @@ type
 { TchCrc31Tests }
 
   TchCrc31Tests = class abstract(TchCrcTests<Cardinal, TCrc31Algorithm>)
-  strict protected
-    function BitsToHex(const Value: Cardinal): string; override;
-    function FinalControlCalculate(const Value: Cardinal): Cardinal; override;
-    function GetCount: Cardinal; override;
-    function GetMaxLength: Cardinal; override;
   end;
 
 { TchCrc31NormalTests }
@@ -65,35 +60,7 @@ uses
   chHash.Core.Bits,
 {$ENDIF ~ USE_JEDI_CORE_LIBRARY}
   chHash.CRC.CRC31.PHILIPS.Factory,
-  TestFramework,
-  System.SysUtils, System.Generics.Collections;
-
-{ TchCrc31Tests }
-
-function TchCrc31Tests.BitsToHex(const Value: Cardinal): string;
-begin
-  Result := IntToHex(Value);
-end;
-
-function TchCrc31Tests.FinalControlCalculate(const Value: Cardinal): Cardinal;
-begin
-  Result := Value xor FAlgorithm.XorOut;
-  Result := Result and (FAlgorithm as TchCrc31).Mask;
-end;
-
-function TchCrc31Tests.GetCount: Cardinal;
-begin
-  Result := 1024 * 16;
-//  Result := 1 * 1;
-//  Result := 1024 * 1;
-end;
-
-function TchCrc31Tests.GetMaxLength: Cardinal;
-begin
-  Result := $FFFF;
-//  Result := $FFFFFFF;
-//  Result := $100000
-end;
+  TestFramework;
 
 { TchCrc31NormalTests }
 

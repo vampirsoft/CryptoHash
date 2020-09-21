@@ -73,6 +73,11 @@ type
     procedure GenerateTable;{$IF DEFINED(USE_INLINE)}inline;{$ENDIF}
   strict protected
     FMask: Bits;
+    constructor Create(const Name: string; const Width: Byte; const Polynomial, Init, XorOut, Check: Bits;
+      const RefIn, RefOut: Boolean); reintroduce;
+  {$IF DEFINED(HASH_TESTS)}
+  public
+  {$ENDIF ~ HASH_TESTS}
     function ByteToBits(const Value: Byte): Bits; virtual; abstract;
     function BitsToByte(const Value: Bits): Byte; virtual; abstract;
     function LeftShift(const Value: Bits; const Bits: Byte): Bits; virtual; abstract;
@@ -82,9 +87,6 @@ type
     function BitwiseXor(const Left, Right: Bits): Bits; virtual; abstract;
     function Subtract(const Left, Right: Bits): Bits; virtual; abstract;
     function IsZero(const Value: Bits): Boolean; virtual; abstract;
-  strict protected
-    constructor Create(const Name: string; const Width: Byte; const Polynomial, Init, XorOut, Check: Bits;
-      const RefIn, RefOut: Boolean); reintroduce;
   public
     destructor Destroy; override;
     function Final(const Current: Bits): Bits; override;

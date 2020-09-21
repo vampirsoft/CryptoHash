@@ -27,7 +27,11 @@ type
 { TchCrc16Bits }
 
   TchCrc16Bits = class abstract(TchCrc<Word>)
+  {$IF DEFINED(HASH_TESTS)}
+  public
+  {$ELSE ~ NOT HASH_TESTS}
   strict protected
+  {$ENDIF ~ HASH_TESTS}
     function ByteToBits(const Value: Byte): Word; override;
     function BitsToByte(const Value: Word): Byte; override;
     function LeftShift(const Value: Word; const Bits: Byte): Word; override;

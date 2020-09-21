@@ -29,11 +29,6 @@ type
 { TchCrc16Tests }
 
   TchCrc16Tests = class abstract(TchCrcTests<Word, TCrc16Algorithm>)
-  strict protected
-    function BitsToHex(const Value: Word): string; override;
-    function FinalControlCalculate(const Value: Word): Word; override;
-    function GetCount: Cardinal; override;
-    function GetMaxLength: Cardinal; override;
   end;
 
 { TchCrc16NormalTests }
@@ -298,34 +293,7 @@ uses
   chHash.CRC.CRC16.UMTS.Factory,
   chHash.CRC.CRC16.USB.Factory,
   chHash.CRC.CRC16.XMODEM.Factory,
-  TestFramework,
-  System.SysUtils, System.Generics.Collections;
-
-{ TchCrc16Tests }
-
-function TchCrc16Tests.BitsToHex(const Value: Word): string;
-begin
-  Result := IntToHex(Value);
-end;
-
-function TchCrc16Tests.FinalControlCalculate(const Value: Word): Word;
-begin
-  Result := Value xor FAlgorithm.XorOut;
-end;
-
-function TchCrc16Tests.GetCount: Cardinal;
-begin
-  Result := 1024 * 16;
-//  Result := 1 * 1;
-//  Result := 1024 * 1;
-end;
-
-function TchCrc16Tests.GetMaxLength: Cardinal;
-begin
-  Result := $FFFF;
-//  Result := $FFFFFFF;
-//  Result := $100000
-end;
+  TestFramework;
 
 { TchCrc16NormalTests }
 
