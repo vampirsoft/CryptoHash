@@ -57,7 +57,7 @@ procedure TchCrc12.Calculate(var Current: Word; const Data: Pointer; const Lengt
 const
   SizeOfBits  = Byte(SizeOf(Word));
   BitsPerBits = Byte(SizeOfBits * BitsPerByte);
-  ShiftToBits = BitsPerBits - TchCrc12.Size;
+  ShiftToBits = Byte(BitsPerBits - TchCrc12.Size);
 
 begin
   Current := Current shl ShiftToBits;
@@ -71,7 +71,7 @@ function TchCrc12.Final(const Current: Word): Word;
 const
   SizeOfBits  = Byte(SizeOf(Word));
   BitsPerBits = Byte(SizeOfBits * BitsPerByte);
-  ShiftToBits = BitsPerBits - TchCrc12.Size;
+  ShiftToBits = Byte(BitsPerBits - TchCrc12.Size);
 
 begin
   Result := Current shl ShiftToBits;

@@ -30,8 +30,17 @@ uses
 // crc units
   chHash.CRC,
   chHash.CRC.Impl,
+  chHash.CRC.CRC8Bits,
   chHash.CRC.CRC16Bits,
   chHash.CRC.CRC32Bits,
+// crc-4 units
+  chHash.CRC.CRC4,
+  chHash.CRC.CRC4.Impl,
+  chHash.CRC.CRC4.Reverse,
+  chHash.CRC.CRC4.G704,
+  chHash.CRC.CRC4.INTERLAKEN,
+  chHash.CRC.CRC4.G704.Factory,
+  chHash.CRC.CRC4.INTERLAKEN.Factory,
 // crc-8 units
   chHash.CRC.CRC8,
   chHash.CRC.CRC8.Impl,
@@ -195,6 +204,7 @@ uses
   chHash.Core.Pointer.Tests,
   chHash.Tests,
   chHash.CRC.Tests,
+  chHash.CRC.CRC4.Tests,
   chHash.CRC.CRC8.Tests,
   chHash.CRC.CRC12.Tests,
   chHash.CRC.CRC16.Tests,
