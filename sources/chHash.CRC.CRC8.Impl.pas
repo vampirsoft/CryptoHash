@@ -16,35 +16,21 @@ unit chHash.CRC.CRC8.Impl;
 interface
 
 uses
-  chHash.Impl,
 {$IF DEFINED(SUPPORTS_INTERFACES)}
   chHash.CRC.CRC8,
-  chHash.CRC.Impl;
-{$ELSE ~ NOT SUPPORTS_INTERFACES}
-  chHash.CRC;
 {$ENDIF ~ SUPPORTS_INTERFACES}
+  chHash.CRC.CRC8Bits;
 
 type
 
 { TchCrc8 }
 
-  TchCrc8 = class(TchCrc<Byte>{$IF DEFINED(SUPPORTS_INTERFACES)}, IchCrc8{$ENDIF})
-  {$IF DEFINED(HASH_TESTS)}
-  public
-  {$ELSE ~ NOT HASH_TESTS}
+  TchCrc8 = class(TchCrc8Bits{$IF DEFINED(SUPPORTS_INTERFACES)}, IchCrc8{$ENDIF})
+  strict private const
+    Size = Byte(8);
   strict protected
-  {$ENDIF ~ HASH_TESTS}
     constructor Create(const Name: string; const Polynomial, Init, XorOut, Check: Byte;
       const RefIn, RefOut: Boolean); reintroduce;
-    function ByteToBits(const Value: Byte): Byte; override;
-    function BitsToByte(const Value: Byte): Byte; override;
-    function LeftShift(const Value: Byte; const Bits: Byte): Byte; override;
-    function RightShift(const Value: Byte; const Bits: Byte): Byte; override;
-    function BitwiseAnd(const Left, Right: Byte): Byte; override;
-    function BitwiseOr(const Left, Right: Byte): Byte; override;
-    function BitwiseXor(const Left, Right: Byte): Byte; override;
-    function Subtract(const Left, Right: Byte): Byte; override;
-    function IsZero(const Value: Byte): Boolean; override;
   public
     procedure Calculate(var Current: Byte; const Data: Pointer; const Length: Cardinal); override;
   end;
@@ -63,207 +49,8 @@ uses
 constructor TchCrc8.Create(const Name: string; const Polynomial, Init, XorOut, Check: Byte;
   const RefIn, RefOut: Boolean);
 begin
-  inherited Create(Name, 8, Polynomial, Init, XorOut, Check, RefIn, RefOut);
+  inherited Create(Name, TchCrc8.Size, Polynomial, Init, XorOut, Check, RefIn, RefOut);
 end;
-
-function TchCrc8.ByteToBits(const Value: Byte): Byte;
-{$IF DEFINED(USE_ASSEMBLER)}
-asm
-  // --> DL   Value
-  // <-- AL   Result
-  MOV       AL,         DL
-end;
-{$ELSE ~ USE_FORCE_DELPHI}
-begin
-  Result := Value;
-end;
-{$ENDIF ~ USE_ASSEMBLER}
-
-function TchCrc8.BitsToByte(const Value: Byte): Byte;
-{$IF DEFINED(USE_ASSEMBLER)}
-asm
-  // --> DL   Value
-  // <-- AL   Result
-  MOV       AL,         DL
-end;
-{$ELSE ~ USE_FORCE_DELPHI}
-begin
-  Result := Value;
-end;
-{$ENDIF ~ USE_ASSEMBLER}
-
-function TchCrc8.LeftShift(const Value, Bits: Byte): Byte;
-{$IF DEFINED(USE_ASSEMBLER)}
-asm
-{$IF DEFINED(X64)}
-  // Start
-  // -->  DL   Value
-  //     R8B   Bits
-  // <--  AL   Result
-  MOV       CL,         R8B
-{$ELSE ~ X86}
-  // Start
-  // -->  DL   Value
-  //      CL   Bits
-  // <--  AL   Result
-{$ENDIF ~ X64}
-  // Initialized
-  MOV       AL,         DL
-  SHL       AL,         CL
-  // Finish
-end;
-{$ELSE ~ USE_FORCE_DELPHI}
-begin
-  Result := Value shl Bits;
-end;
-{$ENDIF ~ USE_ASSEMBLER}
-
-function TchCrc8.RightShift(const Value, Bits: Byte): Byte;
-{$IF DEFINED(USE_ASSEMBLER)}
-asm
-{$IF DEFINED(X64)}
-  // Start
-  // -->  DL   Value
-  //     R8B   Bits
-  // <--  AL   Result
-  MOV       CL,         R8B
-{$ELSE ~ X86}
-  // Start
-  // -->  DL   Value
-  //      CL   Bits
-  // <--  AL   Result
-{$ENDIF ~ X64}
-  // Initialized
-  MOV       AL,         DL
-  SHR       AL,         CL
-  // Finish
-end;
-{$ELSE ~ USE_FORCE_DELPHI}
-begin
-  Result := Value shr Bits;
-end;
-{$ENDIF ~ USE_ASSEMBLER}
-
-function TchCrc8.BitwiseAnd(const Left, Right: Byte): Byte;
-{$IF DEFINED(USE_ASSEMBLER)}
-asm
-{$IF DEFINED(X64)}
-  // Start
-  // -->  DL   Left
-  //     R8B   Right
-  // <--  AL   Result
-  MOV       AL,         R8B
-{$ELSE ~ X86}
-  // Start
-  // -->  DL   Left
-  //      CL   Right
-  // <--  AL   Result
-  MOV       AL,         CL
-{$ENDIF ~ X64}
-  // Initialized
-  AND       AL,         DL
-  // Finish
-end;
-{$ELSE ~ USE_FORCE_DELPHI}
-begin
-  Result := Left and Right;
-end;
-{$ENDIF ~ USE_ASSEMBLER}
-
-function TchCrc8.BitwiseOr(const Left, Right: Byte): Byte;
-{$IF DEFINED(USE_ASSEMBLER)}
-asm
-{$IF DEFINED(X64)}
-  // Start
-  // -->  DL   Left
-  //     R8B   Right
-  // <--  AL   Result
-  MOV       AL,         R8B
-{$ELSE ~ X86}
-  // Start
-  // -->  DL   Left
-  //      CL   Right
-  // <--  AL   Result
-  MOV       AL,         CL
-{$ENDIF ~ X64}
-  // Initialized
-  OR        AL,         DL
-  // Finish
-end;
-{$ELSE ~ USE_FORCE_DELPHI}
-begin
-  Result := Left or Right;
-end;
-{$ENDIF ~ USE_ASSEMBLER}
-
-function TchCrc8.BitwiseXor(const Left, Right: Byte): Byte;
-{$IF DEFINED(USE_ASSEMBLER)}
-asm
-{$IF DEFINED(X64)}
-  // Start
-  // -->  DL   Left
-  //     R8B   Right
-  // <--  AL   Result
-  MOV       AL,         R8B
-{$ELSE ~ X86}
-  // Start
-  // -->  DL   Left
-  //      CL   Right
-  // <--  AL   Result
-  MOV       AL,         CL
-{$ENDIF ~ X64}
-  // Initialized
-  XOR       AL,         DL
-  // Finish
-end;
-{$ELSE ~ USE_FORCE_DELPHI}
-begin
-  Result := Left xor Right;
-end;
-{$ENDIF ~ USE_ASSEMBLER}
-
-function TchCrc8.Subtract(const Left, Right: Byte): Byte;
-{$IF DEFINED(USE_ASSEMBLER)}
-asm
-{$IF DEFINED(X64)}
-  // Start
-  // -->  DL   Left
-  //     R8B   Right
-  // <--  AL   Result
-{$ELSE ~ X86}
-  // Start
-  // -->  DL   Left
-  //      CL   Right
-  // <--  AL   Result
-{$ENDIF ~ X64}
-  MOV       AL,         DL
-  // Initialized
-{$IF DEFINED(X64)}
-  SUB       AL,         R8B
-{$ELSE ~ X86}
-  SUB       AL,         CL
-{$ENDIF ~ X64}
-  // Finish
-end;
-{$ELSE ~ USE_FORCE_DELPHI}
-begin
-  Result := Left - Right;
-end;
-{$ENDIF ~ USE_ASSEMBLER}
-
-function TchCrc8.IsZero(const Value: Byte): Boolean;
-{$IF DEFINED(USE_ASSEMBLER)}
-asm
-  // --> DL   Value
-  // <-- AL   Result
-  CMP       DL,         $0
-  SETZ      AL
-end;
-{$ELSE ~ USE_FORCE_DELPHI}
-begin
-  Result := Value = 0;
-end;
-{$ENDIF ~ USE_ASSEMBLER}
 
 {$IF DEFINED(USE_ASSEMBLER)}
 procedure TchCrc8.Calculate(var Current: Byte; const Data: Pointer; const Length: Cardinal);
@@ -568,13 +355,7 @@ begin
     Dec(L, TABLE_LEVEL_SIZE);
   end;
 
-  var PByteData := PByte(PData);
-  while L > 0 do
-  begin
-    Current := FCrcTable[1, Byte((PByteData^ xor Current))];
-    Inc(PByteData);
-    Dec(L);
-  end;
+  inherited Calculate(Current, PData, L);
 end;
 {$ENDIF ~ USE_ASSEMBLER}
 

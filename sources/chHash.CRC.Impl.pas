@@ -152,12 +152,12 @@ const
 begin
   if IsZero(RightCrc) or (RightLength = 0) then Exit(LeftCrc);
 
-  const Reverse = FRefIn xor FRefOut;
+  const IsReverse = FRefIn xor FRefOut;
   const ShiftToBits  = BitsPerBits - FWidth;
 
   var LCrc := BitwiseXor(LeftCrc, FXorOut);     // LCrc := LCrc xor FXorOut
   var RCrc := BitwiseXor(RightCrc, FXorOut);    // RCrc := RCrc xor FXorOut
-  if Reverse then
+  if IsReverse then
   begin
     LCrc := LeftShift(LCrc, ShiftToBits);       // LCrc := LCrc shl ShiftToBits
     ReverseBits(@LCrc, SizeOfBits);
@@ -197,7 +197,7 @@ begin
   until Length = 0;
 
   Result := BitwiseXor(Result, RCrc);           // Result := Result xor RCrc
-  if Reverse then
+  if IsReverse then
   begin
     ReverseBits(@Result, SizeOfBits);
     Result := RightShift(Result, ShiftToBits);  // Result := Result shr ShiftToBits
@@ -232,31 +232,44 @@ const
   BitsPerBits = Byte(SizeOfBits * BitsPerByte);
 
 begin
-  const ShiftToWidth = FWidth - BitsPerByte;
-  const ShiftToBits  = BitsPerBits - FWidth;
+  const IsSmall = FWidth < BitsPerByte;
+  const IsShifted = (not FRefIn and IsSmall) or not IsSmall;
+
+  const HighBitMask = IfThenElse<Byte>(IsSmall, BitsPerByte, FWidth) - 1;
+  const ShiftToBits  = IfThenElse<Byte>(IsShifted, BitsPerBits, FWidth) - FWidth;
+  const ShiftToWidth = Abs(IfThenElse<Byte>(IsShifted, FWidth, BitsPerByte) - BitsPerByte);
+  var Poly := FPolynomial;
+  if IsSmall then
+  begin
+    Poly := LeftShift(Poly, BitsPerByte - FWidth);
+  end;
+
   for var I := 0 to TABLE_RESIDUE_SIZE do
   begin
     var Current := ByteToBits(I);
     if FRefIn then ReverseBits(@Current, SizeOfByte);
-    Current := LeftShift(Current, ShiftToWidth);                    // Current := Current shl ShiftToWidth
-    for var J := 1 to BitsPerByte do
+    if not IsSmall then Current := LeftShift(Current, ShiftToWidth);  // Current := Current shl ShiftToWidth
+
+    for var Bit := 1 to BitsPerByte do
     begin
-      const TestBit = TestBitBuffer(Current, FWidth - 1);
-      Current := LeftShift(Current, 1);                             // Current := Current shl 1
-      if TestBit then Current := BitwiseXor(Current, FPolynomial);  // Current := Current xor FPolynomial
+      const TestBit = TestBitBuffer(Current, HighBitMask);
+      Current := LeftShift(Current, 1);                               // Current := Current shl 1
+      if TestBit then Current := BitwiseXor(Current, Poly);           // Current := Current xor FPolynomial
     end;
+
     if FRefIn then
     begin
-      Current := LeftShift(Current, ShiftToBits);                   // Current := Current shl ShiftToBits
+      Current := LeftShift(Current, ShiftToBits);                     // Current := Current shl ShiftToBits
       ReverseBits(@Current, SizeOfBits);
     end;
-    FCrcTable[TABLE_FIRST_LEVEL, I] := BitwiseAnd(Current, FMask);  // FCrcTable[TABLE_FIRST_LEVEL, I] := Current and FMask
+    if IsSmall then Current := RightShift(Current, ShiftToWidth);     // Current := Current shr ShiftToWidth
+    Current := BitwiseAnd(Current, FMask);                            // Current := Current and FMask
     if not FRefIn then
     begin
-//      FCrcTable[TABLE_FIRST_LEVEL, I] := FCrcTable[TABLE_FIRST_LEVEL, I] shl ShiftToBits;
-      FCrcTable[TABLE_FIRST_LEVEL, I] := LeftShift(FCrcTable[TABLE_FIRST_LEVEL, I], ShiftToBits);
-      ReverseBytes(@FCrcTable[TABLE_FIRST_LEVEL, I], SizeOfBits);
+      Current := LeftShift(Current, ShiftToBits);                     // Current := Current shl ShiftToBits
+      ReverseBytes(@Current, SizeOfBits);
     end;
+    FCrcTable[TABLE_FIRST_LEVEL, I] := Current;
   end;
 
   for var I := 0 to TABLE_RESIDUE_SIZE do
@@ -278,16 +291,19 @@ const
 
 begin
   Result := Current;
+
   if not FRefIn then
   begin
     ReverseBytes(@Result, SizeOfBits);
     Result := RightShift(Result, BitsPerBits - FWidth);       // Result := Result shr (BitsPerBits - FWidth)
   end;
+
   if FRefIn xor FRefOut then
   begin
     Result := LeftShift(Result, BitsPerBits - FWidth);        // Result := Result shl (BitsPerBits - FWidth)
     ReverseBits(@Result, SizeOfBits);
   end;
+
   Result := BitwiseAnd(BitwiseXor(Result, FXorOut), FMask);   // Result := (Result xor FXorOut) and FMask
 end;
 
