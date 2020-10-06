@@ -122,8 +122,13 @@ const
   SizeOfBits = Byte(SizeOf(Bits));
 
 begin
-  if RefIn then ReverseBits(@Init, SizeOfBits);
-  inherited Create(Name, Init, Check);
+  var I := Init;
+  if RefIn then
+  begin
+    ReverseBits(@I, SizeOfBits);
+    if Width < BitsPerByte then I := RightShift(I, BitsPerByte - Width);
+  end;
+  inherited Create(Name, I, Check);
   FPolynomial := Polynomial;
   FXorOut := XorOut;
   FRefIn := RefIn;
@@ -133,7 +138,7 @@ begin
   const OneByte = ByteToBits(1);
 // HighBitMask = Bits(1) shl (Width - 1);
 // FMask := ((HighBitMask - 1) shl 1) or 1;
-  FMask := BitwiseOr(LeftShift(Subtract(LeftShift(OneByte, (Width - 1)), OneByte), 1), OneByte);
+  FMask := BitwiseOr(LeftShift(Subtract(LeftShift(OneByte, Width - 1), OneByte), 1), OneByte);
 
   FAliases := TList<string>.Create;
   GenerateTable;
@@ -155,8 +160,8 @@ begin
   const IsReverse = FRefIn xor FRefOut;
   const ShiftToBits  = BitsPerBits - FWidth;
 
-  var LCrc := BitwiseXor(LeftCrc, FXorOut);     // LCrc := LCrc xor FXorOut
-  var RCrc := BitwiseXor(RightCrc, FXorOut);    // RCrc := RCrc xor FXorOut
+  var LCrc := BitwiseXor(LeftCrc, FXorOut);     // LCrc := LeftCrc xor FXorOut
+  var RCrc := BitwiseXor(RightCrc, FXorOut);    // RCrc := RightCrc xor FXorOut
   if IsReverse then
   begin
     LCrc := LeftShift(LCrc, ShiftToBits);       // LCrc := LCrc shl ShiftToBits

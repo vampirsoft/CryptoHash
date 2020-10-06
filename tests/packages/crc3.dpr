@@ -9,7 +9,7 @@
 //*****************************************************************************//
 /////////////////////////////////////////////////////////////////////////////////
 
-program crc12;
+program crc3;
 
 {$INCLUDE CryptoHash.Tests.inc}
 
@@ -27,21 +27,18 @@ uses
   chHash.Impl,
   chHash.CRC,
   chHash.CRC.Impl,
-  chHash.CRC.CRC16Bits,
-  chHash.CRC.CRC12,
-  chHash.CRC.CRC12.Impl,
-  chHash.CRC.CRC12.CDMA2000,
-  chHash.CRC.CRC12.DECT,
-  chHash.CRC.CRC12.GSM,
-  chHash.CRC.CRC12.UMTS,
-  chHash.CRC.CRC12.CDMA2000.Factory,
-  chHash.CRC.CRC12.DECT.Factory,
-  chHash.CRC.CRC12.GSM.Factory,
-  chHash.CRC.CRC12.UMTS.Factory,
+  chHash.CRC.CRC8Bits,
+  chHash.CRC.CRC3,
+  chHash.CRC.CRC3.Impl,
+  chHash.CRC.CRC3.Reverse,
+  chHash.CRC.CRC3.GSM,
+  chHash.CRC.CRC3.ROHC,
+  chHash.CRC.CRC3.GSM.Factory,
+  chHash.CRC.CRC3.ROHC.Factory,
   chHash.Utils,
   chHash.Tests,
   chHash.CRC.Tests,
-  chHash.CRC.CRC12.Tests;
+  chHash.CRC.CRC3.Tests;
 
 {$R *.RES}
 

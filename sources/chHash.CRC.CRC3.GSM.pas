@@ -9,38 +9,34 @@
 //*****************************************************************************//
 /////////////////////////////////////////////////////////////////////////////////
 
-unit chHash.CRC.CRC4.Impl;
+unit chHash.CRC.CRC3.GSM;
 
 {$INCLUDE CryptoHash.inc}
 
 interface
 
 uses
-{$IF DEFINED(SUPPORTS_INTERFACES)}
-  chHash.CRC.CRC4,
-{$ENDIF ~ SUPPORTS_INTERFACES}
-  chHash.CRC.CRC8Bits;
+  chHash.CRC.CRC3.Reverse;
 
 type
 
-{ TchCrc4 }
+{ TchCrc3GSM }
 
-  TchCrc4 = class(TchCrc8Bits{$IF DEFINED(SUPPORTS_INTERFACES)}, IchCrc4{$ENDIF})
-  strict protected const
-    Size = Byte(4);
-  strict protected
-    constructor Create(const Name: string; const Polynomial, Init, XorOut, Check: Word;
-      const RefIn, RefOut: Boolean); reintroduce;
+  TchCrc3GSM = class(TchReverseCrc3)
+  public
+    constructor Create; reintroduce;
   end;
 
 implementation
 
-{ TchCrc4 }
+uses
+  chHash.CRC.CRC3;
 
-constructor TchCrc4.Create(const Name: string; const Polynomial, Init, XorOut, Check: Word;
-  const RefIn, RefOut: Boolean);
+{ TchCrc3GSM }
+
+constructor TchCrc3GSM.Create;
 begin
-  inherited Create(Name, TchCrc4.Size, Polynomial, Init, XorOut, Check, RefIn, RefOut);
+  inherited Create('CRC-3/GSM', $3, $0, Bits3Mask, $4, False, False);
 end;
 
 end.

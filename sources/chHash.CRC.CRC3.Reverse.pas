@@ -9,7 +9,7 @@
 //*****************************************************************************//
 /////////////////////////////////////////////////////////////////////////////////
 
-unit chHash.CRC.CRC4.Impl;
+unit chHash.CRC.CRC3.Reverse;
 
 {$INCLUDE CryptoHash.inc}
 
@@ -17,30 +17,48 @@ interface
 
 uses
 {$IF DEFINED(SUPPORTS_INTERFACES)}
-  chHash.CRC.CRC4,
+  chHash.CRC.CRC3.Impl;
+{$ELSE ~ NOT SUPPORTS_INTERFACES}
+  chHash.CRC.CRC3;
 {$ENDIF ~ SUPPORTS_INTERFACES}
-  chHash.CRC.CRC8Bits;
 
 type
 
-{ TchCrc4 }
+{ TchReverseCrc3 }
 
-  TchCrc4 = class(TchCrc8Bits{$IF DEFINED(SUPPORTS_INTERFACES)}, IchCrc4{$ENDIF})
-  strict protected const
-    Size = Byte(4);
-  strict protected
-    constructor Create(const Name: string; const Polynomial, Init, XorOut, Check: Word;
-      const RefIn, RefOut: Boolean); reintroduce;
+  TchReverseCrc3 = class(TchCrc3)
+  public
+    procedure Calculate(var Current: Byte; const Data: Pointer; const Length: Cardinal); override;
+    function Final(const Current: Byte): Byte; override;
   end;
 
 implementation
 
-{ TchCrc4 }
+uses
+{$IF DEFINED(USE_JEDI_CORE_LIBRARY)}
+  JclLogic;
+{$ELSE ~ NOT USE_JEDI_CORE_LIBRARY}
+  chHash.Core.Bits;
+{$ENDIF ~ USE_JEDI_CORE_LIBRARY}
 
-constructor TchCrc4.Create(const Name: string; const Polynomial, Init, XorOut, Check: Word;
-  const RefIn, RefOut: Boolean);
+{ TchReverseCrc3 }
+
+procedure TchReverseCrc3.Calculate(var Current: Byte; const Data: Pointer; const Length: Cardinal);
+const
+  ShiftToBits = Byte(BitsPerByte - TchCrc3.Size);
+
 begin
-  inherited Create(Name, TchCrc4.Size, Polynomial, Init, XorOut, Check, RefIn, RefOut);
+  Current := Current shl ShiftToBits;
+  inherited Calculate(Current, Data, Length);
+  Current := Current shr ShiftToBits;
+end;
+
+function TchReverseCrc3.Final(const Current: Byte): Byte;
+const
+  ShiftToBits = Byte(BitsPerByte - TchCrc3.Size);
+
+begin
+  Result := inherited Final(Current shl ShiftToBits);
 end;
 
 end.
