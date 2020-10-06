@@ -9,7 +9,7 @@
 //*****************************************************************************//
 /////////////////////////////////////////////////////////////////////////////////
 
-unit chHash.CRC.CRC4.Impl;
+unit chHash.CRC.CRC3.ROHC.Factory;
 
 {$INCLUDE CryptoHash.inc}
 
@@ -17,30 +17,45 @@ interface
 
 uses
 {$IF DEFINED(SUPPORTS_INTERFACES)}
-  chHash.CRC.CRC4,
+  chHash.CRC.CRC3,
 {$ENDIF ~ SUPPORTS_INTERFACES}
-  chHash.CRC.CRC8Bits;
+  chHash.CRC.CRC3.ROHC;
 
 type
 
-{ TchCrc4 }
+{ TchCrc3ROHC }
 
-  TchCrc4 = class(TchCrc8Bits{$IF DEFINED(SUPPORTS_INTERFACES)}, IchCrc4{$ENDIF})
-  strict protected const
-    Size = Byte(4);
-  strict protected
-    constructor Create(const Name: string; const Polynomial, Init, XorOut, Check: Word;
-      const RefIn, RefOut: Boolean); reintroduce;
+  TchCrc3ROHC = class sealed(chHash.CRC.CRC3.ROHC.TchCrc3ROHC)
+  private type
+    TInstance = {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc3{$ELSE}chHash.CRC.CRC3.ROHC.TchCrc3ROHC{$ENDIF};
+  private
+    class var FInstance: TInstance;
+  private
+    constructor Create; reintroduce;
+  public
+    class property Instance: TInstance read FInstance;
   end;
 
 implementation
 
-{ TchCrc4 }
+{$IF NOT DEFINED(SUPPORTS_INTERFACES)}
+uses
+  System.SysUtils;
+{$ENDIF ~ NOT SUPPORTS_INTERFACES}
 
-constructor TchCrc4.Create(const Name: string; const Polynomial, Init, XorOut, Check: Word;
-  const RefIn, RefOut: Boolean);
+{ TchCrc3ROHC }
+
+constructor TchCrc3ROHC.Create;
 begin
-  inherited Create(Name, TchCrc4.Size, Polynomial, Init, XorOut, Check, RefIn, RefOut);
+  inherited Create;
 end;
+
+initialization
+  TchCrc3ROHC.FInstance := TchCrc3ROHC.Create;
+
+{$IF NOT DEFINED(SUPPORTS_INTERFACES)}
+finalization
+  FreeAndNil(TchCrc3ROHC.FInstance);
+{$ENDIF ~ NOT SUPPORTS_INTERFACES}
 
 end.

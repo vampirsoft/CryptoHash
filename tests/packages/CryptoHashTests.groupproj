@@ -12,6 +12,9 @@
         <Projects Include="crc4.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="crc3.dproj">
+            <Dependencies/>
+        </Projects>
         <Projects Include="crc8.dproj">
             <Dependencies/>
         </Projects>
@@ -62,6 +65,15 @@
     <Target Name="crc4:Make">
         <MSBuild Projects="crc4.dproj" Targets="Make"/>
     </Target>
+    <Target Name="crc3">
+        <MSBuild Projects="crc3.dproj"/>
+    </Target>
+    <Target Name="crc3:Clean">
+        <MSBuild Projects="crc3.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="crc3:Make">
+        <MSBuild Projects="crc3.dproj" Targets="Make"/>
+    </Target>
     <Target Name="crc8">
         <MSBuild Projects="crc8.dproj"/>
     </Target>
@@ -108,13 +120,13 @@
         <MSBuild Projects="crc32.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
-        <CallTarget Targets="CryptoHash;bits;crc4;crc8;crc12;crc16;crc31;crc32"/>
+        <CallTarget Targets="CryptoHash;bits;crc3;crc4;crc8;crc12;crc16;crc31;crc32"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="CryptoHash:Clean;bits:Clean;crc4:Clean;crc8:Clean;crc12:Clean;crc16:Clean;crc31:Clean;crc32:Clean"/>
+        <CallTarget Targets="CryptoHash:Clean;bits:Clean;crc3:Clean;crc4:Clean;crc8:Clean;crc12:Clean;crc16:Clean;crc31:Clean;crc32:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="CryptoHash:Make;bits:Make;crc4:Make;crc8:Make;crc12:Make;crc16:Make;crc31:Make;crc32:Make"/>
+        <CallTarget Targets="CryptoHash:Make;bits:Make;crc3:Make;crc4:Make;crc8:Make;crc12:Make;crc16:Make;crc31:Make;crc32:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

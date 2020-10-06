@@ -9,7 +9,7 @@
 //*****************************************************************************//
 /////////////////////////////////////////////////////////////////////////////////
 
-unit chHash.CRC.CRC4.Impl;
+unit chHash.CRC.CRC3;
 
 {$INCLUDE CryptoHash.inc}
 
@@ -17,30 +17,23 @@ interface
 
 uses
 {$IF DEFINED(SUPPORTS_INTERFACES)}
-  chHash.CRC.CRC4,
+  chHash.CRC;
+{$ELSE ~ NOT SUPPORTS_INTERFACES}
+  chHash.CRC.CRC3.Impl;
 {$ENDIF ~ SUPPORTS_INTERFACES}
-  chHash.CRC.CRC8Bits;
 
 type
-
-{ TchCrc4 }
-
-  TchCrc4 = class(TchCrc8Bits{$IF DEFINED(SUPPORTS_INTERFACES)}, IchCrc4{$ENDIF})
-  strict protected const
-    Size = Byte(4);
-  strict protected
-    constructor Create(const Name: string; const Polynomial, Init, XorOut, Check: Word;
-      const RefIn, RefOut: Boolean); reintroduce;
+{$IF DEFINED(SUPPORTS_INTERFACES)}
+  IchCrc3 = interface(IchCrc<Byte>)
+    ['{590AA9C8-EF54-4445-94A5-58011649D081}']
   end;
+{$ELSE ~ NOT SUPPORTS_INTERFACES}
+  TchCrc3 = chHash.CRC.CRC3.Impl.TchCrc3;
+{$ENDIF ~ SUPPORTS_INTERFACES}
+
+const
+  Bits3Mask = Byte($7);
 
 implementation
-
-{ TchCrc4 }
-
-constructor TchCrc4.Create(const Name: string; const Polynomial, Init, XorOut, Check: Word;
-  const RefIn, RefOut: Boolean);
-begin
-  inherited Create(Name, TchCrc4.Size, Polynomial, Init, XorOut, Check, RefIn, RefOut);
-end;
 
 end.

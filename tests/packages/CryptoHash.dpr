@@ -33,6 +33,14 @@ uses
   chHash.CRC.CRC8Bits,
   chHash.CRC.CRC16Bits,
   chHash.CRC.CRC32Bits,
+// crc-3 units
+  chHash.CRC.CRC3,
+  chHash.CRC.CRC3.Impl,
+  chHash.CRC.CRC3.Reverse,
+  chHash.CRC.CRC3.GSM,
+  chHash.CRC.CRC3.ROHC,
+  chHash.CRC.CRC3.GSM.Factory,
+  chHash.CRC.CRC3.ROHC.Factory,
 // crc-4 units
   chHash.CRC.CRC4,
   chHash.CRC.CRC4.Impl,
@@ -204,6 +212,7 @@ uses
   chHash.Core.Pointer.Tests,
   chHash.Tests,
   chHash.CRC.Tests,
+  chHash.CRC.CRC3.Tests,
   chHash.CRC.CRC4.Tests,
   chHash.CRC.CRC8.Tests,
   chHash.CRC.CRC12.Tests,

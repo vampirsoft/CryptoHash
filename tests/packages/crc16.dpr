@@ -15,7 +15,7 @@ program crc16;
 
 {$IFDEF CONSOLE_TESTRUNNER}
 {$APPTYPE CONSOLE}
-{$ENDIF}
+{$ENDIF ~ CONSOLE_TESTRUNNER}
 
 uses
   DUnitTestRunner,
