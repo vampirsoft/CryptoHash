@@ -16,9 +16,7 @@ unit chHash.CRC.CRC4.G704.Factory;
 interface
 
 uses
-{$IF DEFINED(SUPPORTS_INTERFACES)}
   chHash.CRC.CRC4,
-{$ENDIF ~ SUPPORTS_INTERFACES}
   chHash.CRC.CRC4.G704;
 
 type
@@ -27,7 +25,7 @@ type
 
   TchCrc4G704 = class sealed(chHash.CRC.CRC4.G704.TchCrc4G704)
   private type
-    TInstance = {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc4{$ELSE}chHash.CRC.CRC4.G704.TchCrc4G704{$ENDIF};
+    TInstance = {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc4{$ELSE}TchCrc4{$ENDIF};
   private
     class var FInstance: TInstance;
   private

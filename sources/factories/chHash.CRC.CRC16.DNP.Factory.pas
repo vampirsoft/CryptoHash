@@ -16,9 +16,7 @@ unit chHash.CRC.CRC16.DNP.Factory;
 interface
 
 uses
-{$IF DEFINED(SUPPORTS_INTERFACES)}
   chHash.CRC.CRC16,
-{$ENDIF ~ SUPPORTS_INTERFACES}
   chHash.CRC.CRC16.DNP;
 
 type
@@ -27,7 +25,7 @@ type
 
   TchCrc16DNP = class sealed(chHash.CRC.CRC16.DNP.TchCrc16DNP)
   private type
-    TInstance = {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc16{$ELSE}chHash.CRC.CRC16.DNP.TchCrc16DNP{$ENDIF};
+    TInstance = {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc16{$ELSE}TchCrc16{$ENDIF};
   private
     class var FInstance: TInstance;
   private

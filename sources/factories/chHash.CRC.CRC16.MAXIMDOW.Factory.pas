@@ -16,9 +16,7 @@ unit chHash.CRC.CRC16.MAXIMDOW.Factory;
 interface
 
 uses
-{$IF DEFINED(SUPPORTS_INTERFACES)}
   chHash.CRC.CRC16,
-{$ENDIF ~ SUPPORTS_INTERFACES}
   chHash.CRC.CRC16.MAXIMDOW;
 
 type
@@ -27,7 +25,7 @@ type
 
   TchCrc16MAXIMDOW = class sealed(chHash.CRC.CRC16.MAXIMDOW.TchCrc16MAXIMDOW)
   private type
-    TInstance = {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc16{$ELSE}chHash.CRC.CRC16.MAXIMDOW.TchCrc16MAXIMDOW{$ENDIF};
+    TInstance = {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc16{$ELSE}TchCrc16{$ENDIF};
   private
     class var FInstance: TInstance;
   private

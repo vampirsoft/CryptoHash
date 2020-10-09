@@ -16,9 +16,7 @@ unit chHash.CRC.CRC32.JAMCRC.Factory;
 interface
 
 uses
-{$IF DEFINED(SUPPORTS_INTERFACES)}
   chHash.CRC.CRC32,
-{$ENDIF ~ SUPPORTS_INTERFACES}
   chHash.CRC.CRC32.JAMCRC;
 
 type
@@ -27,7 +25,7 @@ type
 
   TchCrc32JAMCRC = class sealed(chHash.CRC.CRC32.JAMCRC.TchCrc32JAMCRC)
   private type
-    TInstance = {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc32{$ELSE}chHash.CRC.CRC32.JAMCRC.TchCrc32JAMCRC{$ENDIF};
+    TInstance = {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc32{$ELSE}TchCrc32{$ENDIF};
   private
     class var FInstance: TInstance;
   private

@@ -16,9 +16,7 @@ unit chHash.CRC.CRC16.T10DIF.Factory;
 interface
 
 uses
-{$IF DEFINED(SUPPORTS_INTERFACES)}
   chHash.CRC.CRC16,
-{$ENDIF ~ SUPPORTS_INTERFACES}
   chHash.CRC.CRC16.T10DIF;
 
 type
@@ -27,7 +25,7 @@ type
 
   TchCrc16T10DIF = class sealed(chHash.CRC.CRC16.T10DIF.TchCrc16T10DIF)
   private type
-    TInstance = {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc16{$ELSE}chHash.CRC.CRC16.T10DIF.TchCrc16T10DIF{$ENDIF};
+    TInstance = {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc16{$ELSE}TchCrc16{$ENDIF};
   private
     class var FInstance: TInstance;
   private

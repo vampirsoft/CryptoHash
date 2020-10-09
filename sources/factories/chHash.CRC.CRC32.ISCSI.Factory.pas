@@ -16,9 +16,7 @@ unit chHash.CRC.CRC32.ISCSI.Factory;
 interface
 
 uses
-{$IF DEFINED(SUPPORTS_INTERFACES)}
   chHash.CRC.CRC32,
-{$ENDIF ~ SUPPORTS_INTERFACES}
   chHash.CRC.CRC32.ISCSI;
 
 type
@@ -27,7 +25,7 @@ type
 
   TchCrc32ISCSI = class sealed(chHash.CRC.CRC32.ISCSI.TchCrc32ISCSI)
   private type
-    TInstance = {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc32{$ELSE}chHash.CRC.CRC32.ISCSI.TchCrc32ISCSI{$ENDIF};
+    TInstance = {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc32{$ELSE}TchCrc32{$ENDIF};
   private
     class var FInstance: TInstance;
   private

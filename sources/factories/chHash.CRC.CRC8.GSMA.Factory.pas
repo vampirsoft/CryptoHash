@@ -16,9 +16,7 @@ unit chHash.CRC.CRC8.GSMA.Factory;
 interface
 
 uses
-{$IF DEFINED(SUPPORTS_INTERFACES)}
   chHash.CRC.CRC8,
-{$ENDIF ~ SUPPORTS_INTERFACES}
   chHash.CRC.CRC8.GSMA;
 
 type
@@ -27,7 +25,7 @@ type
 
   TchCrc8GSMA = class sealed(chHash.CRC.CRC8.GSMA.TchCrc8GSMA)
   private type
-    TInstance = {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc8{$ELSE}chHash.CRC.CRC8.GSMA.TchCrc8GSMA{$ENDIF};
+    TInstance = {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc8{$ELSE}TchCrc8{$ENDIF};
   private
     class var FInstance: TInstance;
   private

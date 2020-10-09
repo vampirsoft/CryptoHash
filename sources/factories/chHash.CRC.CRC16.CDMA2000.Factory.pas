@@ -16,9 +16,7 @@ unit chHash.CRC.CRC16.CDMA2000.Factory;
 interface
 
 uses
-{$IF DEFINED(SUPPORTS_INTERFACES)}
   chHash.CRC.CRC16,
-{$ENDIF ~ SUPPORTS_INTERFACES}
   chHash.CRC.CRC16.CDMA2000;
 
 type
@@ -27,7 +25,7 @@ type
 
   TchCrc16CDMA2000 = class sealed(chHash.CRC.CRC16.CDMA2000.TchCrc16CDMA2000)
   private type
-    TInstance = {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc16{$ELSE}chHash.CRC.CRC16.CDMA2000.TchCrc16CDMA2000{$ENDIF};
+    TInstance = {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc16{$ELSE}TchCrc16{$ENDIF};
   private
     class var FInstance: TInstance;
   private

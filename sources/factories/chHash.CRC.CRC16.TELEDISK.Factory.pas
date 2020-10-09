@@ -16,9 +16,7 @@ unit chHash.CRC.CRC16.TELEDISK.Factory;
 interface
 
 uses
-{$IF DEFINED(SUPPORTS_INTERFACES)}
   chHash.CRC.CRC16,
-{$ENDIF ~ SUPPORTS_INTERFACES}
   chHash.CRC.CRC16.TELEDISK;
 
 type
@@ -27,7 +25,7 @@ type
 
   TchCrc16TELEDISK = class sealed(chHash.CRC.CRC16.TELEDISK.TchCrc16TELEDISK)
   private type
-    TInstance = {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc16{$ELSE}chHash.CRC.CRC16.TELEDISK.TchCrc16TELEDISK{$ENDIF};
+    TInstance = {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc16{$ELSE}TchCrc16{$ENDIF};
   private
     class var FInstance: TInstance;
   private

@@ -16,9 +16,7 @@ unit chHash.CRC.CRC3.ROHC.Factory;
 interface
 
 uses
-{$IF DEFINED(SUPPORTS_INTERFACES)}
   chHash.CRC.CRC3,
-{$ENDIF ~ SUPPORTS_INTERFACES}
   chHash.CRC.CRC3.ROHC;
 
 type
@@ -27,7 +25,7 @@ type
 
   TchCrc3ROHC = class sealed(chHash.CRC.CRC3.ROHC.TchCrc3ROHC)
   private type
-    TInstance = {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc3{$ELSE}chHash.CRC.CRC3.ROHC.TchCrc3ROHC{$ENDIF};
+    TInstance = {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc3{$ELSE}TchCrc3{$ENDIF};
   private
     class var FInstance: TInstance;
   private
