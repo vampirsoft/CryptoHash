@@ -16,9 +16,7 @@ unit chHash.CRC.CRC16.OPENSAFETYB.Factory;
 interface
 
 uses
-{$IF DEFINED(SUPPORTS_INTERFACES)}
   chHash.CRC.CRC16,
-{$ENDIF ~ SUPPORTS_INTERFACES}
   chHash.CRC.CRC16.OPENSAFETYB;
 
 type
@@ -27,8 +25,7 @@ type
 
   TchCrc16OPENSAFETYB = class sealed(chHash.CRC.CRC16.OPENSAFETYB.TchCrc16OPENSAFETYB)
   private type
-    TInstance =
-      {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc16{$ELSE}chHash.CRC.CRC16.OPENSAFETYB.TchCrc16OPENSAFETYB{$ENDIF};
+    TInstance = {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc16{$ELSE}TchCrc16{$ENDIF};
   private
     class var FInstance: TInstance;
   private

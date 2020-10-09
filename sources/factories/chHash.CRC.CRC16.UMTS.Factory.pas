@@ -16,9 +16,7 @@ unit chHash.CRC.CRC16.UMTS.Factory;
 interface
 
 uses
-{$IF DEFINED(SUPPORTS_INTERFACES)}
   chHash.CRC.CRC16,
-{$ENDIF ~ SUPPORTS_INTERFACES}
   chHash.CRC.CRC16.UMTS;
 
 type
@@ -27,7 +25,7 @@ type
 
   TchCrc16UMTS = class sealed(chHash.CRC.CRC16.UMTS.TchCrc16UMTS)
   private type
-    TInstance = {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc16{$ELSE}chHash.CRC.CRC16.UMTS.TchCrc16UMTS{$ENDIF};
+    TInstance = {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc16{$ELSE}TchCrc16{$ENDIF};
   private
     class var FInstance: TInstance;
   private

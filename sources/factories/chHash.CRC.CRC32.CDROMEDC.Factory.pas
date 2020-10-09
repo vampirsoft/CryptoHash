@@ -16,9 +16,7 @@ unit chHash.CRC.CRC32.CDROMEDC.Factory;
 interface
 
 uses
-{$IF DEFINED(SUPPORTS_INTERFACES)}
   chHash.CRC.CRC32,
-{$ENDIF ~ SUPPORTS_INTERFACES}
   chHash.CRC.CRC32.CDROMEDC;
 
 type
@@ -27,7 +25,7 @@ type
 
   TchCrc32CDROMEDC = class sealed(chHash.CRC.CRC32.CDROMEDC.TchCrc32CDROMEDC)
   private type
-    TInstance = {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc32{$ELSE}chHash.CRC.CRC32.CDROMEDC.TchCrc32CDROMEDC{$ENDIF};
+    TInstance = {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc32{$ELSE}TchCrc32{$ENDIF};
   private
     class var FInstance: TInstance;
   private

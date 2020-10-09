@@ -16,9 +16,7 @@ unit chHash.CRC.CRC4.INTERLAKEN.Factory;
 interface
 
 uses
-{$IF DEFINED(SUPPORTS_INTERFACES)}
   chHash.CRC.CRC4,
-{$ENDIF ~ SUPPORTS_INTERFACES}
   chHash.CRC.CRC4.INTERLAKEN;
 
 type
@@ -27,7 +25,7 @@ type
 
   TchCrc4INTERLAKEN = class sealed(chHash.CRC.CRC4.INTERLAKEN.TchCrc4INTERLAKEN)
   private type
-    TInstance = {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc4{$ELSE}chHash.CRC.CRC4.INTERLAKEN.TchCrc4INTERLAKEN{$ENDIF};
+    TInstance = {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc4{$ELSE}TchCrc4{$ENDIF};
   private
     class var FInstance: TInstance;
   private

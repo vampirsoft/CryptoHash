@@ -16,9 +16,7 @@ unit chHash.CRC.CRC8.I4321.Factory;
 interface
 
 uses
-{$IF DEFINED(SUPPORTS_INTERFACES)}
   chHash.CRC.CRC8,
-{$ENDIF ~ SUPPORTS_INTERFACES}
   chHash.CRC.CRC8.I4321;
 
 type
@@ -27,7 +25,7 @@ type
 
   TchCrc8I4321 = class sealed(chHash.CRC.CRC8.I4321.TchCrc8I4321)
   private type
-    TInstance = {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc8{$ELSE}chHash.CRC.CRC8.I4321.TchCrc8I4321{$ENDIF};
+    TInstance = {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc8{$ELSE}TchCrc8{$ENDIF};
   private
     class var FInstance: TInstance;
   private

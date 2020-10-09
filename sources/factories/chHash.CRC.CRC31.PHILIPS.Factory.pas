@@ -16,9 +16,7 @@ unit chHash.CRC.CRC31.PHILIPS.Factory;
 interface
 
 uses
-{$IF DEFINED(SUPPORTS_INTERFACES)}
   chHash.CRC.CRC31,
-{$ENDIF ~ SUPPORTS_INTERFACES}
   chHash.CRC.CRC31.PHILIPS;
 
 type
@@ -27,7 +25,7 @@ type
 
   TchCrc31PHILIPS = class sealed(chHash.CRC.CRC31.PHILIPS.TchCrc31PHILIPS)
   private type
-    TInstance = {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc31{$ELSE}chHash.CRC.CRC31.PHILIPS.TchCrc31PHILIPS{$ENDIF};
+    TInstance = {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc31{$ELSE}TchCrc31{$ENDIF};
   private
     class var FInstance: TInstance;
   private

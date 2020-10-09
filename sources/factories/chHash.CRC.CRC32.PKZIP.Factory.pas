@@ -16,9 +16,7 @@ unit chHash.CRC.CRC32.PKZIP.Factory;
 interface
 
 uses
-{$IF DEFINED(SUPPORTS_INTERFACES)}
   chHash.CRC.CRC32,
-{$ENDIF ~ SUPPORTS_INTERFACES}
   chHash.CRC.CRC32.PKZIP;
 
 type
@@ -27,7 +25,7 @@ type
 
   TchCrc32 = class sealed(chHash.CRC.CRC32.PKZIP.TchCrc32)
   private type
-    TInstance = {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc32{$ELSE}chHash.CRC.CRC32.PKZIP.TchCrc32{$ENDIF};
+    TInstance = {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc32{$ELSE}TchCrc32{$ENDIF};
   private
     class var FInstance: TInstance;
   private

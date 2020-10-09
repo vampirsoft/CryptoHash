@@ -16,9 +16,7 @@ unit chHash.CRC.CRC32.XFER.Factory;
 interface
 
 uses
-{$IF DEFINED(SUPPORTS_INTERFACES)}
   chHash.CRC.CRC32,
-{$ENDIF ~ SUPPORTS_INTERFACES}
   chHash.CRC.CRC32.XFER;
 
 type
@@ -27,7 +25,7 @@ type
 
   TchCrc32XFER = class sealed(chHash.CRC.CRC32.XFER.TchCrc32XFER)
   private type
-    TInstance = {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc32{$ELSE}chHash.CRC.CRC32.XFER.TchCrc32XFER{$ENDIF};
+    TInstance = {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc32{$ELSE}TchCrc32{$ENDIF};
   private
     class var FInstance: TInstance;
   private

@@ -16,9 +16,7 @@ unit chHash.CRC.CRC8.BLUETOOTH.Factory;
 interface
 
 uses
-{$IF DEFINED(SUPPORTS_INTERFACES)}
   chHash.CRC.CRC8,
-{$ENDIF ~ SUPPORTS_INTERFACES}
   chHash.CRC.CRC8.BLUETOOTH;
 
 type
@@ -27,7 +25,7 @@ type
 
   TchCrc8BLUETOOTH = class sealed(chHash.CRC.CRC8.BLUETOOTH.TchCrc8BLUETOOTH)
   private type
-    TInstance = {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc8{$ELSE}chHash.CRC.CRC8.BLUETOOTH.TchCrc8BLUETOOTH{$ENDIF};
+    TInstance = {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc8{$ELSE}TchCrc8{$ENDIF};
   private
     class var FInstance: TInstance;
   private

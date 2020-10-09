@@ -16,9 +16,7 @@ unit chHash.CRC.CRC12.DECT.Factory;
 interface
 
 uses
-{$IF DEFINED(SUPPORTS_INTERFACES)}
   chHash.CRC.CRC12,
-{$ENDIF ~ SUPPORTS_INTERFACES}
   chHash.CRC.CRC12.DECT;
 
 type
@@ -27,7 +25,7 @@ type
 
   TchCrc12DECT = class sealed(chHash.CRC.CRC12.DECT.TchCrc12DECT)
   private type
-    TInstance = {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc12{$ELSE}chHash.CRC.CRC12.DECT.TchCrc12DECT{$ENDIF};
+    TInstance = {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc12{$ELSE}TchCrc12{$ENDIF};
   private
     class var FInstance: TInstance;
   private
