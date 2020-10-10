@@ -30,6 +30,11 @@ type
 { TchCrc32Bits }
 
   TchCrc32Bits = class abstract(TchCrc<Cardinal>)
+  strict private const
+    BLOCK_SIZE = Byte({$IF DEFINED(USE_ASSEMBLER)}$08{$ELSE}$10{$ENDIF});
+  strict protected
+    constructor Create(const Name: string; const Width: Byte; const Polynomial, Init, XorOut, Check: Cardinal;
+      const RefIn, RefOut: Boolean); reintroduce;
   {$IF DEFINED(HASH_TESTS)}
   public
   {$ELSE ~ NOT HASH_TESTS}
@@ -60,6 +65,12 @@ uses
 {$ENDIF ~ NOT USE_ASSEMBLER}
 
 { TchCrc32Bits }
+
+constructor TchCrc32Bits.Create(const Name: string; const Width: Byte; const Polynomial, Init, XorOut, Check: Cardinal;
+  const RefIn, RefOut: Boolean);
+begin
+  inherited Create(Name, Width, TchCrc32Bits.BLOCK_SIZE, Polynomial, Init, XorOut, Check, RefIn, RefOut);
+end;
 
 function TchCrc32Bits.ByteToBits(const Value: Byte): Cardinal;
 {$IF DEFINED(USE_ASSEMBLER)}
@@ -281,9 +292,9 @@ asm
   PUSH      RBP
   MOV       RBP,        RCX           // addresss Self -> RBP
 {$IF DEFINED(SUPPORTS_INTERFACES)}
-  ADD       RBP,        $38           // offset to Self.FTable -> EBP
+  MOV       RBP,        [RBP + $38]   // offset to Self.FTable -> RBP
 {$ELSE ~ NOT SUPPORTS_INTERFACES}
-  ADD       RBP,        $20           // offset to Self.FTable -> RBP
+  MOV       RBP,        [RBP + $20]   // offset to Self.FTable -> RBP
 {$ENDIF ~ SUPPORTS_INTERFACES}
   MOV       RCX,        R9            // Length -> RCX
   PUSH      RBX
@@ -309,9 +320,9 @@ asm
   PUSH      EBP
   MOV       EBP,        EAX           // addresss Self -> EBP
 {$IF DEFINED(SUPPORTS_INTERFACES)}
-  ADD       EBP,        $1C           // offset to Self.FTable -> EBP
+  MOV       EBP,        [EBP + $1C]   // offset to Self.FTable -> EBP
 {$ELSE ~ NOT SUPPORTS_INTERFACES}
-  ADD       EBP,        $10           // offset to Self.FTable -> EBP
+  MOV       EBP,        [EBP + $10]   // offset to Self.FTable -> EBP
 {$ENDIF ~ SUPPORTS_INTERFACES}
   PUSH      EBX
   MOV       EBX,        [EDX]         // Current -> EBX
@@ -321,9 +332,9 @@ asm
   // Initialized
 
 {$IF DEFINED(X64)}
-  ADD       RCX,        $08
+  ADD       RCX,        BLOCK_SIZE
 {$ELSE ~ X86}
-  ADD       ECX,        $08
+  ADD       ECX,        BLOCK_SIZE
 {$ENDIF ~ X64}
   JG        @NoBlock
 {$IF DEFINED(X64)}
@@ -395,9 +406,9 @@ asm
 {$ENDIF ~ X64}
 
 {$IF DEFINED(X64)}
-  ADD       RCX,        $08
+  ADD       RCX,        BLOCK_SIZE
 {$ELSE ~ X86}
-  ADD       ECX,        $08
+  ADD       ECX,        BLOCK_SIZE
 {$ENDIF ~ X64}
   JG        @BlockDone
 
@@ -462,9 +473,9 @@ asm
 {$ENDIF ~ X64}
 
 {$IF DEFINED(X64)}
-  ADD       RCX,        $08
+  ADD       RCX,        BLOCK_SIZE
 {$ELSE ~ X86}
-  ADD       ECX,        $08
+  ADD       ECX,        BLOCK_SIZE
 {$ENDIF ~ X64}
   JLE       @BlockNext
   MOV       EBX,        EDX
@@ -478,9 +489,9 @@ asm
 
 @NoBlock:
 {$IF DEFINED(X64)}
-  SUB       RCX,        $08
+  SUB       RCX,        BLOCK_SIZE
 {$ELSE ~ X86}
-  SUB       ECX,        $08
+  SUB       ECX,        BLOCK_SIZE
 {$ENDIF ~ X64}
   JGE       @Done
 
@@ -529,7 +540,7 @@ begin
   var L := Length;
 
   var PData: PCardinal := Data;
-  while L >= TABLE_LEVEL_SIZE do
+  while L >= TchCrc32Bits.BLOCK_SIZE do
   begin
     const Block01 = PData^ xor Current;
     Inc(PData);
@@ -541,36 +552,30 @@ begin
     Inc(PData);
 
     Current :=
-      FCrcTable[ 1, Byte(Block04 shr (BitsPerByte * 3))] xor
-      FCrcTable[ 2, Byte(Block04 shr (BitsPerByte * 2))] xor
-      FCrcTable[ 3, Byte(Block04 shr  BitsPerByte)]      xor
-      FCrcTable[ 4, Byte(Block04)]                       xor
+      FCrcTable[ 0, Byte(Block04 shr (BitsPerByte * 3))] xor
+      FCrcTable[ 1, Byte(Block04 shr (BitsPerByte * 2))] xor
+      FCrcTable[ 2, Byte(Block04 shr  BitsPerByte)]      xor
+      FCrcTable[ 3, Byte(Block04)]                       xor
 
-      FCrcTable[ 5, Byte(Block03 shr (BitsPerByte * 3))] xor
-      FCrcTable[ 6, Byte(Block03 shr (BitsPerByte * 2))] xor
-      FCrcTable[ 7, Byte(Block03 shr  BitsPerByte)]      xor
-      FCrcTable[ 8, Byte(Block03)]                       xor
+      FCrcTable[ 4, Byte(Block03 shr (BitsPerByte * 3))] xor
+      FCrcTable[ 5, Byte(Block03 shr (BitsPerByte * 2))] xor
+      FCrcTable[ 6, Byte(Block03 shr  BitsPerByte)]      xor
+      FCrcTable[ 7, Byte(Block03)]                       xor
 
-      FCrcTable[ 9, Byte(Block02 shr (BitsPerByte * 3))] xor
-      FCrcTable[10, Byte(Block02 shr (BitsPerByte * 2))] xor
-      FCrcTable[11, Byte(Block02 shr  BitsPerByte)]      xor
-      FCrcTable[12, Byte(Block02)]                       xor
+      FCrcTable[ 8, Byte(Block02 shr (BitsPerByte * 3))] xor
+      FCrcTable[ 9, Byte(Block02 shr (BitsPerByte * 2))] xor
+      FCrcTable[10, Byte(Block02 shr  BitsPerByte)]      xor
+      FCrcTable[11, Byte(Block02)]                       xor
 
-      FCrcTable[13, Byte(Block01 shr (BitsPerByte * 3))] xor
-      FCrcTable[14, Byte(Block01 shr (BitsPerByte * 2))] xor
-      FCrcTable[15, Byte(Block01 shr  BitsPerByte)]      xor
-      FCrcTable[16, Byte(Block01)];
+      FCrcTable[12, Byte(Block01 shr (BitsPerByte * 3))] xor
+      FCrcTable[13, Byte(Block01 shr (BitsPerByte * 2))] xor
+      FCrcTable[14, Byte(Block01 shr  BitsPerByte)]      xor
+      FCrcTable[15, Byte(Block01)];
 
-    Dec(L, TABLE_LEVEL_SIZE);
+    Dec(L, TchCrc32Bits.BLOCK_SIZE);
   end;
 
-  var PByteData := PByte(PData);
-  while L > 0 do
-  begin
-    Current := (Current shr BitsPerByte) xor FCrcTable[1, Byte((PByteData^ xor Current))];
-    Inc(PByteData);
-    Dec(L);
-  end;
+  inherited Calculate(Current, PData, L);
 end;
 {$ENDIF ~ USE_ASSEMBLER}
 

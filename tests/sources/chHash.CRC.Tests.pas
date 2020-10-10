@@ -31,20 +31,29 @@ type
     class abstract(TchAlgorithmTests<Bits, Bits, HA>)
   strict private
     function BitsToHex(const Value: Bits): string;{$IF DEFINED(USE_INLINE)}inline;{$ENDIF}
-    function FinalControlCalculate(const Value: Bits): Bits;{$IF DEFINED(USE_INLINE)}inline;{$ENDIF}
   strict protected
-    FCrcTable: TchCrc<Bits>.TOneLevelCrcTable;
     function GetCount: Cardinal; override;
     function GetMaxLength: Cardinal; override;
     function GetCheckValueForEmpty: Bits; override;
     function GetCheckMessage(const Expected, Actual: Bits): string; override;
+  published
+    procedure CombineTest;
+  end;
+
+{ TchCrcWithMultiTableTests<Bits, HA> }
+
+  TchCrcWithMultiTableTests<Bits; HA: {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc<Bits>{$ELSE}TchCrc<Bits>{$ENDIF}> =
+    class abstract(TchCrcTests<Bits, HA>)
+  strict private
+    function FinalControlCalculate(const Value: Bits): Bits;{$IF DEFINED(USE_INLINE)}inline;{$ENDIF}
+  strict protected
+    FCrcTable: TchCrc<Bits>.TOneLevelCrcTable;
     procedure ControlCalculate(var Current: Bits; const Data; const Length: Cardinal); virtual; abstract;
     procedure DataStressTest(const Data: TBytes; const MaxLength, Count: Cardinal); override;
   public
     procedure SetUp; override;
   published
     procedure CheckTest; override;
-    procedure CombineTest;
   end;
 
 implementation
@@ -79,13 +88,65 @@ const
 begin
   const Bytes = (@Value).ToBytes(SizeOfBits);
   Result := '';
-  for var I := 0 to Length(Bytes) - 1 do
+  for var I := Length(Bytes) - 1 downto 0 do
   begin
     Result := Result + IntToHex(Bytes[I]);
   end;
 end;
 
-function TchCrcTests<Bits, HA>.FinalControlCalculate(const Value: Bits): Bits;
+function TchCrcTests<Bits, HA>.GetCheckValueForEmpty: Bits;
+begin
+  Result := FAlgorithm.Final(FAlgorithm.Init);
+end;
+
+function TchCrcTests<Bits, HA>.GetCheckMessage(const Expected, Actual: Bits): string;
+begin
+  Result := Format('%s: Expected = $%s, Actual = $%s', [FAlgorithm.ToString, BitsToHex(Expected), BitsToHex(Actual)]);
+end;
+
+procedure TchCrcTests<Bits, HA>.CombineTest;
+begin
+  Randomize;
+  const RightLength = Random(10);
+  const LeftLength = Length(FTestString) - RightLength;
+
+  var LeftCrc := FAlgorithm.Init;
+  FAlgorithm.Calculate(LeftCrc, FTestString[1], LeftLength);
+  LeftCrc := FAlgorithm.Final(LeftCrc);
+
+  var RightCrc := FAlgorithm.Init;
+  FAlgorithm.Calculate(RightCrc, FTestString[1 + LeftLength], RightLength);
+  RightCrc := FAlgorithm.Final(RightCrc);
+
+  const Actual = FAlgorithm.Combine(LeftCrc, RightCrc, RightLength);
+  CheckResult(FAlgorithm.Check, Actual);
+end;
+
+{ TchCrcWithMultiTableTests<Bits, HA> }
+
+procedure TchCrcWithMultiTableTests<Bits, HA>.DataStressTest(const Data: TBytes; const MaxLength, Count: Cardinal);
+begin
+  var Actual := FAlgorithm.Init;
+  const Stopwatch = TStopwatch.StartNew;
+  for var I := 1 to Count do
+  begin
+    ControlCalculate(Actual, Data[0], MaxLength);
+  end;
+  Stopwatch.Stop;
+  const S = Stopwatch.Elapsed.TotalSeconds;
+  if S = 0 then Status(Format('%s: Control Speed = 0s, %.3f MB/s', [FAlgorithm.ToString, GetMaxLength/1 * Count]))
+  else Status(Format('%s: Control Speed = %.3fs, %.3f MB/s', [FAlgorithm.ToString, S, (GetMaxLength/(1024 * 1024)/S) * Count]));
+
+  inherited DataStressTest(Data, MaxLength, Count);
+end;
+
+procedure TchCrcWithMultiTableTests<Bits, HA>.SetUp;
+begin
+  inherited SetUp;
+  FCrcTable := (FAlgorithm as TchCrc<Bits>).CrcTable;
+end;
+
+function TchCrcWithMultiTableTests<Bits, HA>.FinalControlCalculate(const Value: Bits): Bits;
 const
   SizeOfBits  = Byte(SizeOf(Bits));
   BitsPerBits = Byte(SizeOfBits * BitsPerByte);
@@ -102,46 +163,14 @@ begin
   Result := Algorithm.BitwiseAnd(Result, Algorithm.Mask);
 end;
 
-function TchCrcTests<Bits, HA>.GetCheckValueForEmpty: Bits;
-begin
-  Result := FAlgorithm.Final(FAlgorithm.Init);
-end;
-
-function TchCrcTests<Bits, HA>.GetCheckMessage(const Expected, Actual: Bits): string;
-begin
-  Result := Format('%s: Expected = $%s, Actual = $%s', [FAlgorithm.ToString, BitsToHex(Expected), BitsToHex(Actual)]);
-end;
-
-procedure TchCrcTests<Bits, HA>.DataStressTest(const Data: TBytes; const MaxLength, Count: Cardinal);
-begin
-  var Actual := FAlgorithm.Init;
-  const Stopwatch = TStopwatch.StartNew;
-  for var I := 1 to Count do
-  begin
-    ControlCalculate(Actual, Data[0], MaxLength);
-  end;
-  Stopwatch.Stop;
-  const S = Stopwatch.Elapsed.TotalSeconds;
-  if S = 0 then Status(Format('%s: Control Speed = 0s, %.3f MB/s', [FAlgorithm.ToString, GetMaxLength/1 * Count]))
-  else Status(Format('%s: Control Speed = %.3fs, %.3f MB/s', [FAlgorithm.ToString, S, (GetMaxLength/(1024 * 1024)/S) * Count]));
-
-  inherited DataStressTest(Data, MaxLength, Count);
-end;
-
-procedure TchCrcTests<Bits, HA>.SetUp;
-begin
-  inherited SetUp;
-  FCrcTable := (FAlgorithm as TchCrc<Bits>).CrcTable;
-end;
-
-procedure TchCrcTests<Bits, HA>.CheckTest;
+procedure TchCrcWithMultiTableTests<Bits, HA>.CheckTest;
 begin
   var Expected := FAlgorithm.Init;
   ControlCalculate(Expected, FTestString[1], Length(FTestString));
   CheckResult(FAlgorithm.Check, FinalControlCalculate(Expected));
 
   Randomize;
-  const TestSize = Random((FAlgorithm as TchCrc<Bits>).TABLE_LEVEL_SIZE * 3 - 1) + 1;
+  const TestSize = Random((FAlgorithm as TchCrc<Bits>).BlockSize * 3) + 1;
   var Data: TBytes;
   SetLength(Data, TestSize);
   for var I := 0 to TestSize - 1 do
@@ -161,24 +190,6 @@ begin
     FAlgorithm.Calculate(Actual, Data[0], TestSize);
   end;
   CheckResult(FinalControlCalculate(Expected), FAlgorithm.Final(Actual));
-end;
-
-procedure TchCrcTests<Bits, HA>.CombineTest;
-begin
-  Randomize;
-  const RightLength = Random(10);
-  const LeftLength = Length(FTestString) - RightLength;
-
-  var LeftCrc := FAlgorithm.Init;
-  FAlgorithm.Calculate(LeftCrc, FTestString[1], LeftLength);
-  LeftCrc := FAlgorithm.Final(LeftCrc);
-
-  var RightCrc := FAlgorithm.Init;
-  FAlgorithm.Calculate(RightCrc, FTestString[1 + LeftLength], RightLength);
-  RightCrc := FAlgorithm.Final(RightCrc);
-
-  const Actual = FAlgorithm.Combine(LeftCrc, RightCrc, RightLength);
-  CheckResult(FAlgorithm.Check, Actual);
 end;
 
 end.

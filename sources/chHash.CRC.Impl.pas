@@ -41,13 +41,6 @@ type
   TchCrc<Bits> = class abstract(TchAlgorithm<Bits, Bits>{$IF DEFINED(SUPPORTS_INTERFACES)}, IchCrc<Bits>{$ENDIF})
   strict private const
     TABLE_RESIDUE_SIZE = Byte(255);
-    TABLE_FIRST_LEVEL  = Byte({$IF DEFINED(USE_ASSEMBLER)}0{$ELSE}1{$ENDIF});
-  {$IF DEFINED(HASH_TESTS)}
-  public const
-  {$ELSE}
-  strict protected const
-  {$ENDIF ~ HASH_TESTS}
-    TABLE_LEVEL_SIZE   = Byte({$IF DEFINED(USE_ASSEMBLER)}7{$ELSE}16{$ENDIF});
   {$IF DEFINED(HASH_TESTS)}
   public type
   {$ELSE}
@@ -55,7 +48,7 @@ type
   {$ENDIF ~ HASH_TESTS}
     TOneLevelCrcTable = array[0..TABLE_RESIDUE_SIZE] of Bits;
   strict private type
-    TCrcTable = array[TABLE_FIRST_LEVEL..TABLE_LEVEL_SIZE] of TOneLevelCrcTable;
+    TCrcTable = TArray<TOneLevelCrcTable>;
   strict protected
     FCrcTable: TCrcTable;      // Only first field
   strict private
@@ -66,14 +59,15 @@ type
     FRefOut: Boolean;
     FAliases: TList<string>;
   {$IF DEFINED(HASH_TESTS)}
+    FBlockSize: Byte;
     function GetCrcTable: TOneLevelCrcTable;{$IF DEFINED(USE_INLINE)}inline;{$ENDIF}
   {$ENDIF ~ HASH_TESTS}
     function Gf2MatrixTimes(const Mat: TArray<Bits>; Vec: Bits): Bits;{$IF DEFINED(USE_INLINE)}inline;{$ENDIF}
     procedure Gf2MatrixSquare(Square: TArray<Bits>; const Mat: TArray<Bits>);{$IF DEFINED(USE_INLINE)}inline;{$ENDIF}
-    procedure GenerateTable;{$IF DEFINED(USE_INLINE)}inline;{$ENDIF}
+    procedure GenerateTable(const BlockSize: Byte);{$IF DEFINED(USE_INLINE)}inline;{$ENDIF}
   strict protected
     FMask: Bits;
-    constructor Create(const Name: string; const Width: Byte; const Polynomial, Init, XorOut, Check: Bits;
+    constructor Create(const Name: string; const Width, BlockSize: Byte; const Polynomial, Init, XorOut, Check: Bits;
       const RefIn, RefOut: Boolean); reintroduce;
   {$IF DEFINED(HASH_TESTS)}
   public
@@ -89,6 +83,7 @@ type
     function IsZero(const Value: Bits): Boolean; virtual; abstract;
   public
     destructor Destroy; override;
+    procedure Calculate(var Current: Bits; const Data: Pointer; const Length: Cardinal); override;
     function Final(const Current: Bits): Bits; override;
     function Combine(const LeftCrc, RightCrc: Bits; const RightLength: Cardinal): Bits;{$IF DEFINED(USE_INLINE)}inline;{$ENDIF}
     function Polynomial: Bits;{$IF DEFINED(USE_INLINE)}inline;{$ENDIF}
@@ -109,6 +104,7 @@ type
   {$IF DEFINED(HASH_TESTS)}
     property CrcTable: TOneLevelCrcTable read GetCrcTable;
     property Mask: Bits read FMask;
+    property BlockSize: Byte read FBlockSize;
   {$ENDIF ~ HASH_TESTS}
   end;
 
@@ -116,8 +112,8 @@ implementation
 
 { TchCrc<Bits> }
 
-constructor TchCrc<Bits>.Create(const Name: string; const Width: Byte; const Polynomial, Init, XorOut, Check: Bits;
-  const RefIn, RefOut: Boolean);
+constructor TchCrc<Bits>.Create(const Name: string; const Width, BlockSize: Byte;
+  const Polynomial, Init, XorOut, Check: Bits; const RefIn, RefOut: Boolean);
 const
   SizeOfBits = Byte(SizeOf(Bits));
 
@@ -126,7 +122,7 @@ begin
   if RefIn then
   begin
     ReverseBits(@I, SizeOfBits);
-    if Width < BitsPerByte then I := RightShift(I, BitsPerByte - Width);
+    if Width < BitsPerByte then I := RightShift(I, BitsPerByte - Width);  // I := I shr (BitsPerByte - Width)
   end;
   inherited Create(Name, I, Check);
   FPolynomial := Polynomial;
@@ -141,12 +137,31 @@ begin
   FMask := BitwiseOr(LeftShift(Subtract(LeftShift(OneByte, Width - 1), OneByte), 1), OneByte);
 
   FAliases := TList<string>.Create;
-  GenerateTable;
+  GenerateTable(BlockSize);
+{$IF DEFINED(HASH_TESTS)}
+  FBlockSize := BlockSize;
+{$ENDIF ~ HASH_TESTS}
 end;
 
 destructor TchCrc<Bits>.Destroy;
 begin
   FreeAndNil(FAliases);
+end;
+
+procedure TchCrc<Bits>.Calculate(var Current: Bits; const Data: Pointer; const Length: Cardinal);
+begin
+  if (Data = nil) or (Length = 0) then Exit;
+
+  var L := Length;
+  var PData: PByte := Data;
+  while L > 0 do
+  begin
+//    Current := (Current shr BitsPerByte) xor FCrcTable[0, Byte((PData^ xor Current))];
+    Current :=
+      BitwiseXor(RightShift(Current, BitsPerByte), FCrcTable[0, BitsToByte(BitwiseXor(ByteToBits(PData^), Current))]);
+    Inc(PData);
+    Dec(L);
+  end;
 end;
 
 function TchCrc<Bits>.Combine(const LeftCrc, RightCrc: Bits; const RightLength: Cardinal): Bits;
@@ -230,13 +245,15 @@ begin
   end;
 end;
 
-procedure TchCrc<Bits>.GenerateTable;
+procedure TchCrc<Bits>.GenerateTable(const BlockSize: Byte);
 const
   SizeOfByte  = Byte(SizeOf(Byte));
   SizeOfBits  = Byte(SizeOf(Bits));
   BitsPerBits = Byte(SizeOfBits * BitsPerByte);
 
 begin
+  SetLength(FCrcTable, BlockSize);
+
   const IsSmall = FWidth < BitsPerByte;
   const IsShifted = (not FRefIn and IsSmall) or not IsSmall;
 
@@ -244,10 +261,7 @@ begin
   const ShiftToBits  = IfThenElse<Byte>(IsShifted, BitsPerBits, FWidth) - FWidth;
   const ShiftToWidth = Abs(IfThenElse<Byte>(IsShifted, FWidth, BitsPerByte) - BitsPerByte);
   var Poly := FPolynomial;
-  if IsSmall then
-  begin
-    Poly := LeftShift(Poly, BitsPerByte - FWidth);
-  end;
+  if IsSmall then Poly := LeftShift(Poly, BitsPerByte - FWidth);      // Poly := Poly shl (BitsPerByte - FWidth)
 
   for var I := 0 to TABLE_RESIDUE_SIZE do
   begin
@@ -274,17 +288,20 @@ begin
       Current := LeftShift(Current, ShiftToBits);                     // Current := Current shl ShiftToBits
       ReverseBytes(@Current, SizeOfBits);
     end;
-    FCrcTable[TABLE_FIRST_LEVEL, I] := Current;
+    FCrcTable[0, I] := Current;
   end;
 
-  for var I := 0 to TABLE_RESIDUE_SIZE do
+  if BlockSize > 1 then
   begin
-    var Current := FCrcTable[TABLE_FIRST_LEVEL, I];
-    for var J := TABLE_FIRST_LEVEL + 1 to TABLE_LEVEL_SIZE do
+    for var I := 0 to TABLE_RESIDUE_SIZE do
     begin
-//      Current := (Current shr BitsPerByte) xor FCrcTable[TABLE_FIRST_LEVEL, Byte(Current)]
-      Current := BitwiseXor(RightShift(Current, BitsPerByte), FCrcTable[TABLE_FIRST_LEVEL, BitsToByte(Current)]);
-      FCrcTable[J, I] := Current;
+      var Current := FCrcTable[0, I];
+      for var J := 1 to BlockSize - 1 do
+      begin
+//        Current := (Current shr BitsPerByte) xor FCrcTable[0, Byte(Current)]
+        Current := BitwiseXor(RightShift(Current, BitsPerByte), FCrcTable[0, BitsToByte(Current)]);
+        FCrcTable[J, I] := Current;
+      end;
     end;
   end;
 end;
@@ -364,7 +381,7 @@ const
   BitsPerBits = Byte(SizeOfBits * BitsPerByte);
 
 begin
-  Result := FCrcTable[TABLE_FIRST_LEVEL];
+  Result := FCrcTable[0];
   if not FRefIn then
   begin
     const ShiftToBits  = BitsPerBits - FWidth;

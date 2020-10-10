@@ -28,7 +28,7 @@ type
 
 { TchCrc16Tests }
 
-  TchCrc16Tests = class abstract(TchCrcTests<Word, TCrc16Algorithm>)
+  TchCrc16Tests = class abstract(TchCrcWithMultiTableTests<Word, TCrc16Algorithm>)
   end;
 
 { TchCrc16NormalTests }

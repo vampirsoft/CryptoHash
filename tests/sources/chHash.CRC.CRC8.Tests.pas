@@ -28,7 +28,7 @@ type
 
 { TchCrc8Tests }
 
-  TchCrc8Tests = class abstract(TchCrcTests<Byte, TCrc8Algorithm>)
+  TchCrc8Tests = class abstract(TchCrcWithMultiTableTests<Byte, TCrc8Algorithm>)
   strict protected
     procedure ControlCalculate(var Current: Byte; const Data; const Length: Cardinal); override;
   end;

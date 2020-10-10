@@ -28,7 +28,7 @@ type
 
 { TchCrc32Tests }
 
-  TchCrc32Tests = class abstract(TchCrcTests<Cardinal, TCrc32Algorithm>)
+  TchCrc32Tests = class abstract(TchCrcWithMultiTableTests<Cardinal, TCrc32Algorithm>)
   end;
 
 { TchCrc32NormalTests }

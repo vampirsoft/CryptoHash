@@ -27,6 +27,11 @@ type
 { TchCrc8Bits }
 
   TchCrc8Bits = class abstract(TchCrc<Byte>)
+  strict private const
+    BLOCK_SIZE = Byte($01);
+  strict protected
+    constructor Create(const Name: string; const Width: Byte; const Polynomial, Init, XorOut, Check: Word;
+      const RefIn, RefOut: Boolean; const BlockSize: Byte = TchCrc8Bits.BLOCK_SIZE); reintroduce;
   {$IF DEFINED(HASH_TESTS)}
   public
   {$ELSE ~ NOT HASH_TESTS}
@@ -57,6 +62,12 @@ uses
 {$ENDIF ~ NOT USE_ASSEMBLER}
 
 { TchCrc8Bits }
+
+constructor TchCrc8Bits.Create(const Name: string; const Width: Byte; const Polynomial, Init, XorOut, Check: Word;
+  const RefIn, RefOut: Boolean; const BlockSize: Byte);
+begin
+  inherited Create(Name, Width, BlockSize, Polynomial, Init, XorOut, Check, RefIn, RefOut);
+end;
 
 function TchCrc8Bits.ByteToBits(const Value: Byte): Byte;
 {$IF DEFINED(USE_ASSEMBLER)}
@@ -278,9 +289,9 @@ asm
   PUSH      RBP
   MOV       RBP,        RCX           // addresss Self -> RBP
 {$IF DEFINED(SUPPORTS_INTERFACES)}
-  ADD       RBP,        $38           // offset to Self.FTable -> EBP
+  MOV       RBP,        [RBP + $38]   // offset to Self.FTable -> RBP
 {$ELSE ~ NOT SUPPORTS_INTERFACES}
-  ADD       RBP,        $20           // offset to Self.FTable -> RBP
+  MOV       RBP,        [RBP + $20]   // offset to Self.FTable -> RBP
 {$ENDIF ~ SUPPORTS_INTERFACES}
   MOV       RCX,        R9            // Length -> RCX
   PUSH      RBX
@@ -306,9 +317,9 @@ asm
   PUSH      EBP
   MOV       EBP,        EAX           // addresss Self -> EBP
 {$IF DEFINED(SUPPORTS_INTERFACES)}
-  ADD       EBP,        $1C           // offset to Self.FTable -> EBP
+  MOV       EBP,        [EBP + $1C]   // offset to Self.FTable -> EBP
 {$ELSE ~ NOT SUPPORTS_INTERFACES}
-  ADD       EBP,        $10           // offset to Self.FTable -> EBP
+  MOV       EBP,        [EBP + $10]   // offset to Self.FTable -> EBP
 {$ENDIF ~ SUPPORTS_INTERFACES}
   PUSH      EBX
   MOVZX     EBX,        [EDX]         // Current -> BL
@@ -362,7 +373,7 @@ begin
   var PData: PByte := Data;
   while L > 0 do
   begin
-    Current := FCrcTable[1, Byte(PData^ xor Current)];
+    Current := FCrcTable[0, Byte(PData^ xor Current)];
     Inc(PData);
     Dec(L);
   end;
