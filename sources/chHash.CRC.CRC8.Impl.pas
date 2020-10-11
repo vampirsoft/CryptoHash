@@ -28,6 +28,7 @@ type
   TchCrc8 = class(TchCrc8Bits{$IF DEFINED(SUPPORTS_INTERFACES)}, IchCrc8{$ENDIF})
   strict private const
     Size = Byte(8);
+    BLOCK_SIZE = Byte($02);
   strict protected
     constructor Create(const Name: string; const Polynomial, Init, XorOut, Check: Byte;
       const RefIn, RefOut: Boolean); reintroduce;
@@ -49,7 +50,7 @@ uses
 constructor TchCrc8.Create(const Name: string; const Polynomial, Init, XorOut, Check: Byte;
   const RefIn, RefOut: Boolean);
 begin
-  inherited Create(Name, TchCrc8.Size, Polynomial, Init, XorOut, Check, RefIn, RefOut);
+  inherited Create(Name, TchCrc8.Size, Polynomial, Init, XorOut, Check, RefIn, RefOut, TchCrc8.BLOCK_SIZE);
 end;
 
 {$IF DEFINED(USE_ASSEMBLER)}
@@ -73,9 +74,9 @@ asm
   PUSH      RBP
   MOV       RBP,        RCX           // addresss Self -> RBP
 {$IF DEFINED(SUPPORTS_INTERFACES)}
-  ADD       RBP,        $38           // offset to Self.FTable -> EBP
+  MOV       RBP,        [RBP + $38]   // offset to Self.FTable -> RBP
 {$ELSE ~ NOT SUPPORTS_INTERFACES}
-  ADD       RBP,        $20           // offset to Self.FTable -> RBP
+  MOV       RBP,        [RBP + $20]   // offset to Self.FTable -> RBP
 {$ENDIF ~ SUPPORTS_INTERFACES}
   MOV       RCX,        R9            // Length -> RCX
   PUSH      RBX
@@ -101,9 +102,9 @@ asm
   PUSH      EBP
   MOV       EBP,        EAX           // addresss Self -> EBP
 {$IF DEFINED(SUPPORTS_INTERFACES)}
-  ADD       EBP,        $1C           // offset to Self.FTable -> EBP
+  MOV       EBP,        [EBP + $1C]   // offset to Self.FTable -> EBP
 {$ELSE ~ NOT SUPPORTS_INTERFACES}
-  ADD       EBP,        $10           // offset to Self.FTable -> EBP
+  MOV       EBP,        [EBP + $10]   // offset to Self.FTable -> EBP
 {$ENDIF ~ SUPPORTS_INTERFACES}
   PUSH      EBX
   MOVZX     EBX,        [EDX]         // Current -> BL
@@ -113,9 +114,9 @@ asm
   // Initialized
 
 {$IF DEFINED(X64)}
-  ADD       RCX,        $08
+  ADD       RCX,        BLOCK_SIZE
 {$ELSE ~ X86}
-  ADD       ECX,        $08
+  ADD       ECX,        BLOCK_SIZE
 {$ENDIF ~ X64}
   JG        @NoBlock
 {$IF DEFINED(X64)}
@@ -127,136 +128,54 @@ asm
 
 @BlockNext:
 {$IF DEFINED(X64)}
-  XOR       EDX,        [RSI + RCX - $08]
-  MOV       EAX,        [RSI + RCX - $04]
+  XOR       DX,         [RSI + RCX - $02]
 {$ELSE ~ X86}
-  XOR       EDX,        [ESI + ECX - $08]
-  MOV       EAX,        [ESI + ECX - $04]
+  XOR       DX,         [ESI + ECX - $02]
 {$ENDIF ~ X64}
 
-  MOVZX     EDI,        AL
+  MOVZX     EDI,        DL
 {$IF DEFINED(X64)}
-  MOVZX     EBX,        [RBP + $0300 + RDI]         // (256 * 1) * 3
+  MOVZX     EBX,        [RBP + $0100 + RDI]         // (256 * 1) * 1
 {$ELSE ~ X86}
-  MOVZX     EBX,        [EBP + $0300 + EDI]         // (256 * 1) * 3
+  MOVZX     EBX,        [EBP + $0100 + EDI]         // (256 * 1) * 1
 {$ENDIF ~ X64}
-  MOVZX     EDI,        AH
-{$IF DEFINED(X64)}
-  XOR       BL,         [RBP + $0200 + RDI]         // (256 * 1) * 2
-{$ELSE ~ X86}
-  XOR       BL,         [EBP + $0200 + EDI]         // (256 * 1) * 2
-{$ENDIF ~ X64}
-  SHR       EAX,        16
-  MOVZX     EDI,        AL
-{$IF DEFINED(X64)}
-  XOR       BL,         [RBP + $0100 + RDI]         // (256 * 1) * 1
-{$ELSE ~ X86}
-  XOR       BL,         [EBP + $0100 + EDI]         // (256 * 1) * 1
-{$ENDIF ~ X64}
-  MOVZX     EDI,        AH
+  MOVZX     EDI,        DH
 {$IF DEFINED(X64)}
   XOR       BL,         [RBP + RDI]                 // (256 * 1) * 0
 {$ELSE ~ X86}
   XOR       BL,         [EBP + EDI]                 // (256 * 1) * 0
 {$ENDIF ~ X64}
 
-  MOVZX     EDI,        DL
 {$IF DEFINED(X64)}
-  XOR       BL,         [RBP + $0700 + RDI]         // (256 * 1) * 7
+  ADD       RCX,        BLOCK_SIZE
 {$ELSE ~ X86}
-  XOR       BL,         [EBP + $0700 + EDI]         // (256 * 1) * 7
-{$ENDIF ~ X64}
-  MOVZX     EDI,        DH
-{$IF DEFINED(X64)}
-  XOR       BL,         [RBP + $0600 + RDI]         // (256 * 1) * 6
-{$ELSE ~ X86}
-  XOR       BL,         [EBP + $0600 + EDI]         // (256 * 1) * 6
-{$ENDIF ~ X64}
-  SHR       EDX,        16
-  MOVZX     EDI,        DL
-{$IF DEFINED(X64)}
-  XOR       BL,         [RBP + $0500 + RDI]         // (256 * 1) * 5
-{$ELSE ~ X86}
-  XOR       BL,         [EBP + $0500 + EDI]         // (256 * 1) * 5
-{$ENDIF ~ X64}
-  MOVZX     EDI,        DH
-{$IF DEFINED(X64)}
-  XOR       BL,         [RBP + $0400 + RDI]         // (256 * 4) * 4
-{$ELSE ~ X86}
-  XOR       BL,         [EBP + $0400 + EDI]         // (256 * 1) * 4
-{$ENDIF ~ X64}
-
-{$IF DEFINED(X64)}
-  ADD       RCX,        $08
-{$ELSE ~ X86}
-  ADD       ECX,        $08
+  ADD       ECX,        BLOCK_SIZE
 {$ENDIF ~ X64}
   JG        @BlockDone
 
 {$IF DEFINED(X64)}
-  XOR       EBX,        [RSI + RCX - $08]
-  MOV       EAX,        [RSI + RCX - $04]
+  XOR       BX,         [RSI + RCX - $02]
 {$ELSE ~ X86}
-  XOR       EBX,        [ESI + ECX - $08]
-  MOV       EAX,        [ESI + ECX - $04]
+  XOR       BX,         [ESI + ECX - $02]
 {$ENDIF ~ X64}
 
-  MOVZX     EDI,        AL
+  MOVZX     EDI,        BL
 {$IF DEFINED(X64)}
-  MOVZX     EDX,        [RBP + $0300 + RDI]         // (256 * 1) * 3
+  MOVZX     EDX,        [RBP + $0100 + RDI]         // (256 * 1) * 1
 {$ELSE ~ X86}
-  MOVZX     EDX,        [EBP + $0300 + EDI]         // (256 * 1) * 3
+  MOVZX     EDX,        [EBP + $0100 + EDI]         // (256 * 1) * 1
 {$ENDIF ~ X64}
-  MOVZX     EDI,        AH
-{$IF DEFINED(X64)}
-  XOR       DL,         [RBP + $0200 + RDI]         // (256 * 1) * 2
-{$ELSE ~ X86}
-  XOR       DL,         [EBP + $0200 + EDI]         // (256 * 1) * 2
-{$ENDIF ~ X64}
-  SHR       EAX,        16
-  MOVZX     EDI,        AL
-{$IF DEFINED(X64)}
-  XOR       DL,         [RBP + $0100 + RDI]         // (256 * 1) * 1
-{$ELSE ~ X86}
-  XOR       DL,         [EBP + $0100 + EDI]         // (256 * 1) * 1
-{$ENDIF ~ X64}
-  MOVZX     EDI,        AH
+  MOVZX     EDI,        BH
 {$IF DEFINED(X64)}
   XOR       DL,         [RBP + RDI]                 // (256 * 1) * 0
 {$ELSE ~ X86}
   XOR       DL,         [EBP + EDI]                 // (256 * 1) * 0
 {$ENDIF ~ X64}
 
-  MOVZX     EDI,        BL
 {$IF DEFINED(X64)}
-  XOR       DL,         [RBP + $0700 + RDI]         // (256 * 1) * 7
+  ADD       RCX,        BLOCK_SIZE
 {$ELSE ~ X86}
-  XOR       DL,         [EBP + $0700 + EDI]         // (256 * 1) * 7
-{$ENDIF ~ X64}
-  MOVZX     EDI,        BH
-{$IF DEFINED(X64)}
-  XOR       DL,         [RBP + $0600 + RDI]         // (256 * 1) * 6
-{$ELSE ~ X86}
-  XOR       DL,         [EBP + $0600 + EDI]         // (256 * 1) * 6
-{$ENDIF ~ X64}
-  SHR       EBX,        16
-  MOVZX     EDI,        BL
-{$IF DEFINED(X64)}
-  XOR       DL,         [RBP + $0500 + RDI]         // (256 * 1) * 5
-{$ELSE ~ X86}
-  XOR       DL,         [EBP + $0500 + EDI]         // (256 * 1) * 5
-{$ENDIF ~ X64}
-  MOVZX     EDI,        BH
-{$IF DEFINED(X64)}
-  XOR       DL,         [RBP + $0400 + RDI]         // (256 * 1) * 4
-{$ELSE ~ X86}
-  XOR       DL,         [EBP + $0400 + EDI]         // (256 * 1) * 4
-{$ENDIF ~ X64}
-
-{$IF DEFINED(X64)}
-  ADD       RCX,        $08
-{$ELSE ~ X86}
-  ADD       ECX,        $08
+  ADD       ECX,        BLOCK_SIZE
 {$ENDIF ~ X64}
   JLE       @BlockNext
   MOV       EBX,        EDX
@@ -270,9 +189,9 @@ asm
 
 @NoBlock:
 {$IF DEFINED(X64)}
-  SUB       RCX,        $08
+  SUB       RCX,        BLOCK_SIZE
 {$ELSE ~ X86}
-  SUB       ECX,        $08
+  SUB       ECX,        BLOCK_SIZE
 {$ENDIF ~ X64}
   JGE       @Done
 
@@ -319,40 +238,17 @@ begin
 
   var L := Length;
 
-  var PData: PCardinal := Data;
-  while L >= TABLE_LEVEL_SIZE do
+  var PData: PWord := Data;
+  while L >= TchCrc8.BLOCK_SIZE do
   begin
-    const Block01 = PData^ xor Current;
-    Inc(PData);
-    const Block02 = PData^;
-    Inc(PData);
-    const Block03 = PData^;
-    Inc(PData);
-    const Block04 = PData^;
+    const Block = PData^ xor Current;
     Inc(PData);
 
     Current :=
-      FCrcTable[ 1, Byte(Block04 shr (BitsPerByte * 3))] xor
-      FCrcTable[ 2, Byte(Block04 shr (BitsPerByte * 2))] xor
-      FCrcTable[ 3, Byte(Block04 shr  BitsPerByte)]      xor
-      FCrcTable[ 4, Byte(Block04)]                       xor
+      FCrcTable[0, Byte(Block shr  BitsPerByte)] xor
+      FCrcTable[1, Byte(Block)];
 
-      FCrcTable[ 5, Byte(Block03 shr (BitsPerByte * 3))] xor
-      FCrcTable[ 6, Byte(Block03 shr (BitsPerByte * 2))] xor
-      FCrcTable[ 7, Byte(Block03 shr  BitsPerByte)]      xor
-      FCrcTable[ 8, Byte(Block03)]                       xor
-
-      FCrcTable[ 9, Byte(Block02 shr (BitsPerByte * 3))] xor
-      FCrcTable[10, Byte(Block02 shr (BitsPerByte * 2))] xor
-      FCrcTable[11, Byte(Block02 shr  BitsPerByte)]      xor
-      FCrcTable[12, Byte(Block02)]                       xor
-
-      FCrcTable[13, Byte(Block01 shr (BitsPerByte * 3))] xor
-      FCrcTable[14, Byte(Block01 shr (BitsPerByte * 2))] xor
-      FCrcTable[15, Byte(Block01 shr  BitsPerByte)]      xor
-      FCrcTable[16, Byte(Block01)];
-
-    Dec(L, TABLE_LEVEL_SIZE);
+    Dec(L, TchCrc8.BLOCK_SIZE);
   end;
 
   inherited Calculate(Current, PData, L);
