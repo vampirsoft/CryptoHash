@@ -62,6 +62,13 @@ contains
   chHash.CRC.CRC4.Reverse,
   chHash.CRC.CRC4.G704,
   chHash.CRC.CRC4.INTERLAKEN,
+// crc-5 units
+  chHash.CRC.CRC5,
+  chHash.CRC.CRC5.Impl,
+  chHash.CRC.CRC5.Reverse,
+  chHash.CRC.CRC5.EPCC1G2,
+  chHash.CRC.CRC5.G704,
+  chHash.CRC.CRC5.USB,
 // crc-8 units
   chHash.CRC.CRC8,
   chHash.CRC.CRC8.Impl,
@@ -143,7 +150,7 @@ contains
   chHash.CRC.CRC32.XFER,
   chHash.CRC.CRC32.AUTOSAR,
   chHash.CRC.CRC32.CDROMEDC,
-// unitls units
+// utils units
   chHash.Utils;
 
 end.

@@ -88,11 +88,11 @@ type
     function Combine(const LeftCrc, RightCrc: Bits; const RightLength: Cardinal): Bits;{$IF DEFINED(USE_INLINE)}inline;{$ENDIF}
     function Polynomial: Bits;{$IF DEFINED(USE_INLINE)}inline;{$ENDIF}
   {$IF DEFINED(SUPPORTS_INTERFACES)}
-    function Width: Byte; inline;
-    function XorOut: Bits; inline;
-    function RefIn: Boolean; inline;
-    function RefOut: Boolean; inline;
-    function Aliases: TList<string>; inline;
+    function Width: Byte;{$IF DEFINED(USE_INLINE)}inline;{$ENDIF}
+    function XorOut: Bits;{$IF DEFINED(USE_INLINE)}inline;{$ENDIF}
+    function RefIn: Boolean;{$IF DEFINED(USE_INLINE)}inline;{$ENDIF}
+    function RefOut: Boolean;{$IF DEFINED(USE_INLINE)}inline;{$ENDIF}
+    function Aliases: TList<string>;{$IF DEFINED(USE_INLINE)}inline;{$ENDIF}
   {$ELSE ~ NOT SUPPORTS_INTERFACES}
     property Width: Byte read FWidth;
     property XorOut: Bits read FXorOut;
@@ -132,7 +132,7 @@ begin
   FWidth := Width;
 
   const OneByte = ByteToBits(1);
-// HighBitMask = Bits(1) shl (Width - 1);
+// HighBitMask = 1 shl (Width - 1);
 // FMask := ((HighBitMask - 1) shl 1) or 1;
   FMask := BitwiseOr(LeftShift(Subtract(LeftShift(OneByte, Width - 1), OneByte), 1), OneByte);
 
@@ -170,7 +170,7 @@ const
   BitsPerBits = Byte(SizeOfBits * BitsPerByte);
 
 begin
-  if IsZero(RightCrc) or (RightLength = 0) then Exit(LeftCrc);
+  if RightLength = 0 then Exit(LeftCrc);
 
   const IsReverse = FRefIn xor FRefOut;
   const ShiftToBits  = BitsPerBits - FWidth;
