@@ -32,21 +32,21 @@ type
   strict protected
     FInit: C;
     constructor Create(const Name: string; const Init: C; const Check: R); reintroduce;
-    class function IfThenElse<T>(const Condition: Boolean; const ThenValue, ElseValue: T): T; inline; static;
-    class function InitArray<T>(const Length: Cardinal): TArray<T>; inline; static;
+    class function IfThenElse<T>(const Condition: Boolean; const ThenValue, ElseValue: T): T;{$IF DEFINED(USE_INLINE)}inline;{$ENDIF}static;
+    class function InitArray<T>(const Length: Cardinal): TArray<T>;{$IF DEFINED(USE_INLINE)}inline;{$ENDIF}static;
   public
-    function Calculate(const Data: TBytes): R; overload; inline;
-    function Calculate(const Data: Pointer; const Length: Cardinal): R; overload; inline;
-    function Calculate(const Data; const Length: Cardinal): R; overload; inline;
-    procedure Calculate(var Current: C; const Data: TBytes); overload; inline;
-    procedure Calculate(var Current: C; const Data: TBytes; const Length: Cardinal); overload; inline;
+    function Calculate(const Data: TBytes): R; overload;{$IF DEFINED(USE_INLINE)}inline;{$ENDIF}
+    function Calculate(const Data: Pointer; const Length: Cardinal): R; overload; {$IF DEFINED(USE_INLINE)}inline;{$ENDIF}
+    function Calculate(const Data; const Length: Cardinal): R; overload;{$IF DEFINED(USE_INLINE)}inline;{$ENDIF}
+    procedure Calculate(var Current: C; const Data: TBytes); overload;{$IF DEFINED(USE_INLINE)}inline;{$ENDIF}
+    procedure Calculate(var Current: C; const Data: TBytes; const Length: Cardinal); overload;{$IF DEFINED(USE_INLINE)}inline;{$ENDIF}
+    procedure Calculate(var Current: C; const Data; const Length: Cardinal); overload;{$IF DEFINED(USE_INLINE)}inline;{$ENDIF}
     procedure Calculate(var Current: C; const Data: Pointer; const Length: Cardinal); overload; virtual; abstract;
-    procedure Calculate(var Current: C; const Data; const Length: Cardinal); overload; inline;
     function Final(const Current: C): R; virtual; abstract;
   {$IF DEFINED(SUPPORTS_INTERFACES)}
-    function Name: string; inline;
-    function Init: C; inline;
-    function Check: R; inline;
+    function Name: string;{$IF DEFINED(USE_INLINE)}inline;{$ENDIF}
+    function Init: C;{$IF DEFINED(USE_INLINE)}inline;{$ENDIF}
+    function Check: R;{$IF DEFINED(USE_INLINE)}inline;{$ENDIF}
   {$ELSE ~ NOT SUPPORTS_INTERFACES}
     property Name: string read FName;
     property Init: C read FInit;

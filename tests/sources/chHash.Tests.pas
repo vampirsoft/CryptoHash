@@ -142,6 +142,7 @@ procedure TchAlgorithmTests<C, R, HA>.CalculateTest;
 const
   Count = {$IF DEFINED(BENCHMARK)}16{$ELSE}1{$ENDIF};
   Koef = {$IF DEFINED(BENCHMARK)}1023{$ELSE}1{$ENDIF};
+
 begin
   Randomize;
   const Tail = Random(MaxWord);

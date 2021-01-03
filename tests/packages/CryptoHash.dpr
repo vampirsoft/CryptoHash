@@ -49,6 +49,16 @@ uses
   chHash.CRC.CRC4.INTERLAKEN,
   chHash.CRC.CRC4.G704.Factory,
   chHash.CRC.CRC4.INTERLAKEN.Factory,
+// crc-5 units
+  chHash.CRC.CRC5,
+  chHash.CRC.CRC5.Impl,
+  chHash.CRC.CRC5.Reverse,
+  chHash.CRC.CRC5.EPCC1G2,
+  chHash.CRC.CRC5.G704,
+  chHash.CRC.CRC5.USB,
+  chHash.CRC.CRC5.EPCC1G2.Factory,
+  chHash.CRC.CRC5.G704.Factory,
+  chHash.CRC.CRC5.USB.Factory,
 // crc-8 units
   chHash.CRC.CRC8,
   chHash.CRC.CRC8.Impl,
@@ -195,7 +205,7 @@ uses
   chHash.CRC.CRC32.XFER.Factory,
   chHash.CRC.CRC32.AUTOSAR.Factory,
   chHash.CRC.CRC32.CDROMEDC.Factory,
-// unitls units
+// utils units
   chHash.Utils,
 // tests units
   chHash.Core.Bits.Tests,
@@ -214,6 +224,7 @@ uses
   chHash.CRC.Tests,
   chHash.CRC.CRC3.Tests,
   chHash.CRC.CRC4.Tests,
+  chHash.CRC.CRC5.Tests,
   chHash.CRC.CRC8.Tests,
   chHash.CRC.CRC12.Tests,
   chHash.CRC.CRC16.Tests,
