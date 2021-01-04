@@ -9,7 +9,7 @@
 //*              - https://create.stephan-brumme.com/crc32/                   *//
 //*              - https://github.com/meetanthony/crcjava                     *//
 //*              - https://stackoverflow.com/questions/29915764/generic-crc-8-16-32-64-combine-implementation
-//* Copyright 2019 LordVampir (https://github.com/vampirsoft)                 *//
+//* Copyright 2021 LordVampir (https://github.com/vampirsoft)                 *//
 //* Licensed under the Apache License, Version 2.0                            *//
 //*****************************************************************************//
 /////////////////////////////////////////////////////////////////////////////////
