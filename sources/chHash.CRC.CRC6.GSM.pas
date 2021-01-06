@@ -29,11 +29,14 @@ type
 
 implementation
 
+uses
+  chHash.CRC.CRC6;
+
 { TchCrc6GSM }
 
 constructor TchCrc6GSM.Create;
 begin
-  inherited Create('CRC-6/GSM', $2F, $00, $3F, $13, False, False);
+  inherited Create('CRC-6/GSM', $2F, $00, Bits6Mask, $13, False, False);
 end;
 
 end.

@@ -9,34 +9,32 @@
 //*****************************************************************************//
 /////////////////////////////////////////////////////////////////////////////////
 
-unit chHash.CRC.CRC6.CDMA2000B;
+unit chHash.CRC.CRC7.MMC;
 
 {$INCLUDE CryptoHash.inc}
 
 interface
 
 uses
-  chHash.CRC.CRC6.Reverse;
+  chHash.CRC.CRC7.Reverse;
 
 type
 
-{ TchCrc6CDMA2000B }
+{ TchCrc7MMC }
 
-  TchCrc6CDMA2000B = class(TchReverseCrc6)
+  TchCrc7MMC = class(TchReverseCrc7)
   public
     constructor Create; reintroduce;
   end;
 
 implementation
 
-uses
-  chHash.CRC.CRC6;
+{ TchCrc7MMC }
 
-{ TchCrc6CDMA2000B }
-
-constructor TchCrc6CDMA2000B.Create;
+constructor TchCrc7MMC.Create;
 begin
-  inherited Create('CRC-6/CDMA2000-B', $07, Bits6Mask, $00, $3B, False, False);
+  inherited Create('CRC-7/MMC', $09, $00, $00, $75, False, False);
+  Aliases.Add('CRC-7');
 end;
 
 end.

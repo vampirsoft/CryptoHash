@@ -9,7 +9,7 @@
 //*****************************************************************************//
 /////////////////////////////////////////////////////////////////////////////////
 
-unit chHash.CRC.CRC6;
+unit chHash.CRC.CRC7.Reverse;
 
 {$INCLUDE CryptoHash.inc}
 
@@ -17,23 +17,48 @@ interface
 
 uses
 {$IF DEFINED(SUPPORTS_INTERFACES)}
-  chHash.CRC;
+  chHash.CRC.CRC7.Impl;
 {$ELSE ~ NOT SUPPORTS_INTERFACES}
-  chHash.CRC.CRC6.Impl;
+  chHash.CRC.CRC7;
 {$ENDIF ~ SUPPORTS_INTERFACES}
 
 type
-{$IF DEFINED(SUPPORTS_INTERFACES)}
-  IchCrc6 = interface(IchCrc<Byte>)
-    ['{E705BF27-8970-437C-A9E3-0D823643122F}']
-  end;
-{$ELSE ~ NOT SUPPORTS_INTERFACES}
-  TchCrc6 = chHash.CRC.CRC6.Impl.TchCrc6;
-{$ENDIF ~ SUPPORTS_INTERFACES}
 
-const
-  Bits6Mask = Byte($3F);
+{ TchReverseCrc7 }
+
+  TchReverseCrc7 = class(TchCrc7)
+  public
+    procedure Calculate(var Current: Byte; const Data: Pointer; const Length: Cardinal); override;
+    function Final(const Current: Byte): Byte; override;
+  end;
 
 implementation
+
+uses
+{$IF DEFINED(USE_JEDI_CORE_LIBRARY)}
+  JclLogic;
+{$ELSE ~ NOT USE_JEDI_CORE_LIBRARY}
+  chHash.Core.Bits;
+{$ENDIF ~ USE_JEDI_CORE_LIBRARY}
+
+{ TchReverseCrc7 }
+
+procedure TchReverseCrc7.Calculate(var Current: Byte; const Data: Pointer; const Length: Cardinal);
+const
+  ShiftToBits = Byte(BitsPerByte - TchCrc7.Size);
+
+begin
+  Current := Current shl ShiftToBits;
+  inherited Calculate(Current, Data, Length);
+  Current := Current shr ShiftToBits;
+end;
+
+function TchReverseCrc7.Final(const Current: Byte): Byte;
+const
+  ShiftToBits = Byte(BitsPerByte - TchCrc7.Size);
+
+begin
+  Result := inherited Final(Current shl ShiftToBits);
+end;
 
 end.

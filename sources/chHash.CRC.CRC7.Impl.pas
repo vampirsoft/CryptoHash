@@ -9,34 +9,38 @@
 //*****************************************************************************//
 /////////////////////////////////////////////////////////////////////////////////
 
-unit chHash.CRC.CRC6.CDMA2000B;
+unit chHash.CRC.CRC7.Impl;
 
 {$INCLUDE CryptoHash.inc}
 
 interface
 
 uses
-  chHash.CRC.CRC6.Reverse;
+{$IF DEFINED(SUPPORTS_INTERFACES)}
+  chHash.CRC.CRC7,
+{$ENDIF ~ SUPPORTS_INTERFACES}
+  chHash.CRC.CRC8Bits;
 
 type
 
-{ TchCrc6CDMA2000B }
+{ TchCrc7 }
 
-  TchCrc6CDMA2000B = class(TchReverseCrc6)
-  public
-    constructor Create; reintroduce;
+  TchCrc7 = class(TchCrc8Bits{$IF DEFINED(SUPPORTS_INTERFACES)}, IchCrc7{$ENDIF})
+  strict protected const
+    Size = Byte(7);
+  strict protected
+    constructor Create(const Name: string; const Polynomial, Init, XorOut, Check: Word;
+      const RefIn, RefOut: Boolean); reintroduce;
   end;
 
 implementation
 
-uses
-  chHash.CRC.CRC6;
+{ TchCrc7 }
 
-{ TchCrc6CDMA2000B }
-
-constructor TchCrc6CDMA2000B.Create;
+constructor TchCrc7.Create(const Name: string; const Polynomial, Init, XorOut, Check: Word;
+  const RefIn, RefOut: Boolean);
 begin
-  inherited Create('CRC-6/CDMA2000-B', $07, Bits6Mask, $00, $3B, False, False);
+  inherited Create(Name, TchCrc7.Size, Polynomial, Init, XorOut, Check, RefIn, RefOut);
 end;
 
 end.
