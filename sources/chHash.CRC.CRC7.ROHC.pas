@@ -9,34 +9,34 @@
 //*****************************************************************************//
 /////////////////////////////////////////////////////////////////////////////////
 
-unit chHash.CRC.CRC6.CDMA2000B;
+unit chHash.CRC.CRC7.ROHC;
 
 {$INCLUDE CryptoHash.inc}
 
 interface
 
 uses
-  chHash.CRC.CRC6.Reverse;
+{$IF DEFINED(SUPPORTS_INTERFACES)}
+  chHash.CRC.CRC7.Impl,
+{$ENDIF ~ SUPPORTS_INTERFACES}
+  chHash.CRC.CRC7;
 
 type
 
-{ TchCrc6CDMA2000B }
+{ TchCrc7ROHC }
 
-  TchCrc6CDMA2000B = class(TchReverseCrc6)
+  TchCrc7ROHC = class({$IF DEFINED(SUPPORTS_INTERFACES)}chHash.CRC.CRC7.Impl{$ELSE}chHash.CRC.CRC7{$ENDIF}.TchCrc7)
   public
     constructor Create; reintroduce;
   end;
 
 implementation
 
-uses
-  chHash.CRC.CRC6;
+{ TchCrc7ROHC }
 
-{ TchCrc6CDMA2000B }
-
-constructor TchCrc6CDMA2000B.Create;
+constructor TchCrc7ROHC.Create;
 begin
-  inherited Create('CRC-6/CDMA2000-B', $07, Bits6Mask, $00, $3B, False, False);
+  inherited Create('CRC-7/ROHC', $4F, Bits7Mask, $00, $53, True, True);
 end;
 
 end.

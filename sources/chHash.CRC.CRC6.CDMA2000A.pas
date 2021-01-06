@@ -29,11 +29,14 @@ type
 
 implementation
 
+uses
+  chHash.CRC.CRC6;
+
 { TchCrc6CDMA2000A }
 
 constructor TchCrc6CDMA2000A.Create;
 begin
-  inherited Create('CRC-6/CDMA2000-A', $27, $3F, $00, $0D, False, False);
+  inherited Create('CRC-6/CDMA2000-A', $27, Bits6Mask, $00, $0D, False, False);
 end;
 
 end.

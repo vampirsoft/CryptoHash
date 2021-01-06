@@ -9,34 +9,51 @@
 //*****************************************************************************//
 /////////////////////////////////////////////////////////////////////////////////
 
-unit chHash.CRC.CRC6.CDMA2000B;
+unit chHash.CRC.CRC7.ROHC.Factory;
 
 {$INCLUDE CryptoHash.inc}
 
 interface
 
 uses
-  chHash.CRC.CRC6.Reverse;
+  chHash.CRC.CRC7,
+  chHash.CRC.CRC7.ROHC;
 
 type
 
-{ TchCrc6CDMA2000B }
+{ TchCrc7ROHC }
 
-  TchCrc6CDMA2000B = class(TchReverseCrc6)
-  public
+  TchCrc7ROHC = class sealed(chHash.CRC.CRC7.ROHC.TchCrc7ROHC)
+  private type
+    TInstance = {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc7{$ELSE}TchCrc7{$ENDIF};
+  private
+    class var FInstance: TInstance;
+  private
     constructor Create; reintroduce;
+  public
+    class property Instance: TInstance read FInstance;
   end;
 
 implementation
 
+{$IF NOT DEFINED(SUPPORTS_INTERFACES)}
 uses
-  chHash.CRC.CRC6;
+  System.SysUtils;
+{$ENDIF ~ NOT SUPPORTS_INTERFACES}
 
-{ TchCrc6CDMA2000B }
+{ TchCrc7ROHC }
 
-constructor TchCrc6CDMA2000B.Create;
+constructor TchCrc7ROHC.Create;
 begin
-  inherited Create('CRC-6/CDMA2000-B', $07, Bits6Mask, $00, $3B, False, False);
+  inherited Create;
 end;
+
+initialization
+  TchCrc7ROHC.FInstance := TchCrc7ROHC.Create;
+
+{$IF NOT DEFINED(SUPPORTS_INTERFACES)}
+finalization
+  FreeAndNil(TchCrc7ROHC.FInstance);
+{$ENDIF ~ NOT SUPPORTS_INTERFACES}
 
 end.

@@ -78,6 +78,13 @@ contains
   chHash.CRC.CRC6.DARC,
   chHash.CRC.CRC6.G704,
   chHash.CRC.CRC6.GSM,
+// crc-7 units
+  chHash.CRC.CRC7,
+  chHash.CRC.CRC7.Impl,
+  chHash.CRC.CRC7.Reverse,
+  chHash.CRC.CRC7.MMC,
+  chHash.CRC.CRC7.ROHC,
+  chHash.CRC.CRC7.UMTS,
 // crc-8 units
   chHash.CRC.CRC8,
   chHash.CRC.CRC8.Impl,

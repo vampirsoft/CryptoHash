@@ -9,34 +9,31 @@
 //*****************************************************************************//
 /////////////////////////////////////////////////////////////////////////////////
 
-unit chHash.CRC.CRC6.CDMA2000B;
+unit chHash.CRC.CRC7;
 
 {$INCLUDE CryptoHash.inc}
 
 interface
 
 uses
-  chHash.CRC.CRC6.Reverse;
+{$IF DEFINED(SUPPORTS_INTERFACES)}
+  chHash.CRC;
+{$ELSE ~ NOT SUPPORTS_INTERFACES}
+  chHash.CRC.CRC7.Impl;
+{$ENDIF ~ SUPPORTS_INTERFACES}
 
 type
-
-{ TchCrc6CDMA2000B }
-
-  TchCrc6CDMA2000B = class(TchReverseCrc6)
-  public
-    constructor Create; reintroduce;
+{$IF DEFINED(SUPPORTS_INTERFACES)}
+  IchCrc7 = interface(IchCrc<Byte>)
+    ['{AC6EA4D5-E3AC-483C-9E2B-9F629561DC1C}']
   end;
+{$ELSE ~ NOT SUPPORTS_INTERFACES}
+  TchCrc7 = chHash.CRC.CRC7.Impl.TchCrc7;
+{$ENDIF ~ SUPPORTS_INTERFACES}
+
+const
+  Bits7Mask = Byte($7F);
 
 implementation
-
-uses
-  chHash.CRC.CRC6;
-
-{ TchCrc6CDMA2000B }
-
-constructor TchCrc6CDMA2000B.Create;
-begin
-  inherited Create('CRC-6/CDMA2000-B', $07, Bits6Mask, $00, $3B, False, False);
-end;
 
 end.

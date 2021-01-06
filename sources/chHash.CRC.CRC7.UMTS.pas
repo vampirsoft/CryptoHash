@@ -9,34 +9,31 @@
 //*****************************************************************************//
 /////////////////////////////////////////////////////////////////////////////////
 
-unit chHash.CRC.CRC6.CDMA2000B;
+unit chHash.CRC.CRC7.UMTS;
 
 {$INCLUDE CryptoHash.inc}
 
 interface
 
 uses
-  chHash.CRC.CRC6.Reverse;
+  chHash.CRC.CRC7.Reverse;
 
 type
 
-{ TchCrc6CDMA2000B }
+{ TchCrc7UMTS }
 
-  TchCrc6CDMA2000B = class(TchReverseCrc6)
+  TchCrc7UMTS = class(TchReverseCrc7)
   public
     constructor Create; reintroduce;
   end;
 
 implementation
 
-uses
-  chHash.CRC.CRC6;
+{ TchCrc7UMTS }
 
-{ TchCrc6CDMA2000B }
-
-constructor TchCrc6CDMA2000B.Create;
+constructor TchCrc7UMTS.Create;
 begin
-  inherited Create('CRC-6/CDMA2000-B', $07, Bits6Mask, $00, $3B, False, False);
+  inherited Create('CRC-7/UMTS', $45, $00, $00, $61, False, False);
 end;
 
 end.
