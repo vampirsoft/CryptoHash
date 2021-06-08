@@ -25,12 +25,13 @@ package CryptoHashD;
 {$VARSTRINGCHECKS ON}
 {$MINENUMSIZE 1}
 {$IMAGEBASE $400000}
+{$LIBSUFFIX '260'}
 {$IMPLICITBUILD OFF}
 
 {$R *.res}
 
 requires
-  rtl,
-  CryptoHash;
+  CryptoHash,
+  rtl;
 
 end.

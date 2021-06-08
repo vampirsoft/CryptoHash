@@ -9,29 +9,31 @@
 //*****************************************************************************//
 /////////////////////////////////////////////////////////////////////////////////
 
-package CryptoHashD;
+unit chHash.CRC.CRC10;
 
 {$INCLUDE CryptoHash.inc}
 
-{$DESCRIPTION 'CryptoHash Library by Developer Dvornikov Sergey'}
-{$DESIGNONLY}
-{$ALIGN 8}
-{$EXTENDEDSYNTAX ON}
-{$IMPORTEDDATA ON}
-{$IOCHECKS ON}
-{$LONGSTRINGS ON}
-{$OPENSTRINGS ON}
-{$REFERENCEINFO OFF}
-{$VARSTRINGCHECKS ON}
-{$MINENUMSIZE 1}
-{$IMAGEBASE $400000}
-{$LIBSUFFIX '260'}
-{$IMPLICITBUILD OFF}
+interface
 
-{$R *.res}
+uses
+{$IF DEFINED(SUPPORTS_INTERFACES)}
+  chHash.CRC;
+{$ELSE ~ NOT SUPPORTS_INTERFACES}
+  chHash.CRC.CRC10.Impl;
+{$ENDIF ~ SUPPORTS_INTERFACES}
 
-requires
-  CryptoHash,
-  rtl;
+type
+{$IF DEFINED(SUPPORTS_INTERFACES)}
+  IchCrc10 = interface(IchCrc<Word>)
+    ['{30C90A1E-64E1-4950-B5DE-070AEA941DC7}']
+  end;
+{$ELSE ~ NOT SUPPORTS_INTERFACES}
+  TchCrc10 = chHash.CRC.CRC10.Impl.TchCrc10;
+{$ENDIF ~ SUPPORTS_INTERFACES}
+
+const
+  Bits10Mask = Word($3FF);
+
+implementation
 
 end.

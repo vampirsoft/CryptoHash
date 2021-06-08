@@ -9,29 +9,35 @@
 //*****************************************************************************//
 /////////////////////////////////////////////////////////////////////////////////
 
-package CryptoHashD;
+unit chHash.CRC.CRC10.CDMA2000;
 
 {$INCLUDE CryptoHash.inc}
 
-{$DESCRIPTION 'CryptoHash Library by Developer Dvornikov Sergey'}
-{$DESIGNONLY}
-{$ALIGN 8}
-{$EXTENDEDSYNTAX ON}
-{$IMPORTEDDATA ON}
-{$IOCHECKS ON}
-{$LONGSTRINGS ON}
-{$OPENSTRINGS ON}
-{$REFERENCEINFO OFF}
-{$VARSTRINGCHECKS ON}
-{$MINENUMSIZE 1}
-{$IMAGEBASE $400000}
-{$LIBSUFFIX '260'}
-{$IMPLICITBUILD OFF}
+interface
 
-{$R *.res}
+uses
+{$IF DEFINED(SUPPORTS_INTERFACES)}
+  chHash.CRC.CRC10.Impl,
+{$ENDIF ~ SUPPORTS_INTERFACES}
+  chHash.CRC.CRC10;
 
-requires
-  CryptoHash,
-  rtl;
+type
+
+{ TchCrc10CDMA2000 }
+
+  TchCrc10CDMA2000 =
+    class({$IF DEFINED(SUPPORTS_INTERFACES)}chHash.CRC.CRC10.Impl{$ELSE}chHash.CRC.CRC10{$ENDIF}.TchCrc10)
+  public
+    constructor Create; reintroduce;
+  end;
+
+implementation
+
+{ TchCrc10CDMA2000 }
+
+constructor TchCrc10CDMA2000.Create;
+begin
+  inherited Create('CRC-10/CDMA2000', $3D9, Bits10Mask, $000, $233, False, False);
+end;
 
 end.

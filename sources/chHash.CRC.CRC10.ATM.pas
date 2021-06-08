@@ -9,29 +9,36 @@
 //*****************************************************************************//
 /////////////////////////////////////////////////////////////////////////////////
 
-package CryptoHashD;
+unit chHash.CRC.CRC10.ATM;
 
 {$INCLUDE CryptoHash.inc}
 
-{$DESCRIPTION 'CryptoHash Library by Developer Dvornikov Sergey'}
-{$DESIGNONLY}
-{$ALIGN 8}
-{$EXTENDEDSYNTAX ON}
-{$IMPORTEDDATA ON}
-{$IOCHECKS ON}
-{$LONGSTRINGS ON}
-{$OPENSTRINGS ON}
-{$REFERENCEINFO OFF}
-{$VARSTRINGCHECKS ON}
-{$MINENUMSIZE 1}
-{$IMAGEBASE $400000}
-{$LIBSUFFIX '260'}
-{$IMPLICITBUILD OFF}
+interface
 
-{$R *.res}
+uses
+{$IF DEFINED(SUPPORTS_INTERFACES)}
+  chHash.CRC.CRC10.Impl,
+{$ENDIF ~ SUPPORTS_INTERFACES}
+  chHash.CRC.CRC10;
 
-requires
-  CryptoHash,
-  rtl;
+type
+
+{ TchCrc10ATM }
+
+  TchCrc10ATM = class({$IF DEFINED(SUPPORTS_INTERFACES)}chHash.CRC.CRC10.Impl{$ELSE}chHash.CRC.CRC10{$ENDIF}.TchCrc10)
+  public
+    constructor Create; reintroduce;
+  end;
+
+implementation
+
+{ TchCrc10ATM }
+
+constructor TchCrc10ATM.Create;
+begin
+  inherited Create('CRC-10/ATM', $233, $000, $000, $199, False, False);
+  Aliases.Add('CRC-10');
+  Aliases.Add('CRC-10/I-610');
+end;
 
 end.
