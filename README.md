@@ -41,3 +41,6 @@
 - [CRC Calculator (Javascript)](http://www.sunshine2k.de/coding/javascript/crc/crc_js.html)
 
 ### [История изменений](/CHANGELOG.md)
+
+Copyright 2021 LordVampir
+Licensed under MIT

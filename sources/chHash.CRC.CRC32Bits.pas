@@ -8,7 +8,7 @@
 //*              - asm   : http://guildalfa.ru/alsha/node/2                   *//
 //*              - delphi: https://create.stephan-brumme.com/crc32/           *//
 //* Copyright 2021 LordVampir (https://github.com/vampirsoft)                 *//
-//* Licensed under the Apache License, Version 2.0                            *//
+//* Licensed under MIT                                                        *//
 //*****************************************************************************//
 /////////////////////////////////////////////////////////////////////////////////
 
