@@ -5,7 +5,7 @@
 //* Unit Name    : CryptoHash.inc                                             *//
 //* Author       : Сергей (LordVampir) Дворников                              *//
 //* Copyright 2021 LordVampir (https://github.com/vampirsoft)                 *//
-//* Licensed under the Apache License, Version 2.0                            *//
+//* Licensed under MIT                                                        *//
 //*****************************************************************************//
 /////////////////////////////////////////////////////////////////////////////////
 
