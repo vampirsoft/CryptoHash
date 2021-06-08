@@ -9,29 +9,51 @@
 //*****************************************************************************//
 /////////////////////////////////////////////////////////////////////////////////
 
-package CryptoHashD;
+unit chHash.CRC.CRC10.ATM.Factory;
 
 {$INCLUDE CryptoHash.inc}
 
-{$DESCRIPTION 'CryptoHash Library by Developer Dvornikov Sergey'}
-{$DESIGNONLY}
-{$ALIGN 8}
-{$EXTENDEDSYNTAX ON}
-{$IMPORTEDDATA ON}
-{$IOCHECKS ON}
-{$LONGSTRINGS ON}
-{$OPENSTRINGS ON}
-{$REFERENCEINFO OFF}
-{$VARSTRINGCHECKS ON}
-{$MINENUMSIZE 1}
-{$IMAGEBASE $400000}
-{$LIBSUFFIX '260'}
-{$IMPLICITBUILD OFF}
+interface
 
-{$R *.res}
+uses
+  chHash.CRC.CRC10,
+  chHash.CRC.CRC10.ATM;
 
-requires
-  CryptoHash,
-  rtl;
+type
+
+{ TchCrc10ATM }
+
+  TchCrc10ATM = class sealed(chHash.CRC.CRC10.ATM.TchCrc10ATM)
+  private type
+    TInstance = {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc10{$ELSE}TchCrc10{$ENDIF};
+  private
+    class var FInstance: TInstance;
+  private
+    constructor Create; reintroduce;
+  public
+    class property Instance: TInstance read FInstance;
+  end;
+
+implementation
+
+{$IF NOT DEFINED(SUPPORTS_INTERFACES)}
+uses
+  System.SysUtils;
+{$ENDIF ~ NOT SUPPORTS_INTERFACES}
+
+{ TchCrc10ATM }
+
+constructor TchCrc10ATM.Create;
+begin
+  inherited Create;
+end;
+
+initialization
+  TchCrc10ATM.FInstance := TchCrc10ATM.Create;
+
+{$IF NOT DEFINED(SUPPORTS_INTERFACES)}
+finalization
+  FreeAndNil(TchCrc10ATM.FInstance);
+{$ENDIF ~ NOT SUPPORTS_INTERFACES}
 
 end.

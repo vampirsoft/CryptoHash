@@ -9,29 +9,34 @@
 //*****************************************************************************//
 /////////////////////////////////////////////////////////////////////////////////
 
-package CryptoHashD;
+unit chHash.CRC.CRC10.GSM;
 
 {$INCLUDE CryptoHash.inc}
 
-{$DESCRIPTION 'CryptoHash Library by Developer Dvornikov Sergey'}
-{$DESIGNONLY}
-{$ALIGN 8}
-{$EXTENDEDSYNTAX ON}
-{$IMPORTEDDATA ON}
-{$IOCHECKS ON}
-{$LONGSTRINGS ON}
-{$OPENSTRINGS ON}
-{$REFERENCEINFO OFF}
-{$VARSTRINGCHECKS ON}
-{$MINENUMSIZE 1}
-{$IMAGEBASE $400000}
-{$LIBSUFFIX '260'}
-{$IMPLICITBUILD OFF}
+interface
 
-{$R *.res}
+uses
+{$IF DEFINED(SUPPORTS_INTERFACES)}
+  chHash.CRC.CRC10.Impl,
+{$ENDIF ~ SUPPORTS_INTERFACES}
+  chHash.CRC.CRC10;
 
-requires
-  CryptoHash,
-  rtl;
+type
+
+{ TchCrc10GSM }
+
+  TchCrc10GSM = class({$IF DEFINED(SUPPORTS_INTERFACES)}chHash.CRC.CRC10.Impl{$ELSE}chHash.CRC.CRC10{$ENDIF}.TchCrc10)
+  public
+    constructor Create; reintroduce;
+  end;
+
+implementation
+
+{ TchCrc10GSM }
+
+constructor TchCrc10GSM.Create;
+begin
+  inherited Create('CRC-10/GSM', $175, $000, Bits10Mask, $12A, False, False);
+end;
 
 end.

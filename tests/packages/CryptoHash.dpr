@@ -124,6 +124,15 @@ uses
   chHash.CRC.CRC8.SMBUS.Factory,
   chHash.CRC.CRC8.TECH3250.Factory,
   chHash.CRC.CRC8.WCDMA.Factory,
+// crc-10 units
+  chHash.CRC.CRC10,
+  chHash.CRC.CRC10.Impl,
+  chHash.CRC.CRC10.ATM,
+  chHash.CRC.CRC10.CDMA2000,
+  chHash.CRC.CRC10.GSM,
+  chHash.CRC.CRC10.ATM.Factory,
+  chHash.CRC.CRC10.CDMA2000.Factory,
+  chHash.CRC.CRC10.GSM.Factory,
 // crc-12 units
   chHash.CRC.CRC12,
   chHash.CRC.CRC12.Impl,
@@ -252,6 +261,7 @@ uses
   chHash.CRC.CRC6.Tests,
   chHash.CRC.CRC7.Tests,
   chHash.CRC.CRC8.Tests,
+  chHash.CRC.CRC10.Tests,
   chHash.CRC.CRC12.Tests,
   chHash.CRC.CRC16.Tests,
   chHash.CRC.CRC31.Tests,

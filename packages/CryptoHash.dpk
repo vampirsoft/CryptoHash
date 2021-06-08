@@ -25,6 +25,7 @@ package CryptoHash;
 {$VARSTRINGCHECKS ON}
 {$MINENUMSIZE 1}
 {$IMAGEBASE $400000}
+{$LIBSUFFIX '260'}
 {$IMPLICITBUILD OFF}
 
 {$R *.res}
@@ -107,6 +108,12 @@ contains
   chHash.CRC.CRC8.SMBUS,
   chHash.CRC.CRC8.TECH3250,
   chHash.CRC.CRC8.WCDMA,
+// crc-10 units
+  chHash.CRC.CRC10,
+  chHash.CRC.CRC10.Impl,
+  chHash.CRC.CRC10.ATM,
+  chHash.CRC.CRC10.CDMA2000,
+  chHash.CRC.CRC10.GSM,
 // crc-12 units
   chHash.CRC.CRC12,
   chHash.CRC.CRC12.Impl,
