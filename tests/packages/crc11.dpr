@@ -6,11 +6,11 @@
 //* Author       : Сергей (LordVampir) Дворников                              *//
 //* Copyright 2021 LordVampir (https://github.com/vampirsoft)                 *//
 //* Licensed under MIT                                                        *//
-//* Реализовано 03                                                            *//
+//* Реализовано 02                                                            *//
 //*****************************************************************************//
 /////////////////////////////////////////////////////////////////////////////////
 
-program crc5;
+program crc11;
 
 {$INCLUDE CryptoHash.Tests.inc}
 
@@ -28,20 +28,17 @@ uses
   chHash.Impl,
   chHash.CRC,
   chHash.CRC.Impl,
-  chHash.CRC.CRC8Bits,
-  chHash.CRC.CRC5,
-  chHash.CRC.CRC5.Impl,
-  chHash.CRC.CRC5.Reverse,
-  chHash.CRC.CRC5.EPCC1G2,
-  chHash.CRC.CRC5.G704,
-  chHash.CRC.CRC5.USB,
-  chHash.CRC.CRC5.EPCC1G2.Factory,
-  chHash.CRC.CRC5.G704.Factory,
-  chHash.CRC.CRC5.USB.Factory,
+  chHash.CRC.CRC16Bits,
+  chHash.CRC.CRC11,
+  chHash.CRC.CRC11.Impl,
+  chHash.CRC.CRC11.FLEXRAY,
+  chHash.CRC.CRC11.UMTS,
+  chHash.CRC.CRC11.FLEXRAY.Factory,
+  chHash.CRC.CRC11.UMTS.Factory,
   chHash.Utils,
   chHash.Tests,
   chHash.CRC.Tests,
-  chHash.CRC.CRC5.Tests;
+  chHash.CRC.CRC11.Tests;
 
 {$R *.RES}
 

@@ -9,7 +9,7 @@
 //*****************************************************************************//
 /////////////////////////////////////////////////////////////////////////////////
 
-unit chHash.CRC.CRC10.Tests;
+unit chHash.CRC.CRC11.Tests;
 
 {$INCLUDE CryptoHash.Tests.inc}
 
@@ -17,45 +17,38 @@ interface
 
 uses
 {$IF DEFINED(SUPPORTS_INTERFACES)}
-  chHash.CRC.CRC10,
+  chHash.CRC.CRC11,
 {$ENDIF ~ SUPPORTS_INTERFACES}
-  chHash.CRC.CRC10.Impl,
+  chHash.CRC.CRC11.Impl,
   chHash.CRC.Tests;
 
 type
-  TCrc10Algorithm = {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc10{$ELSE}TchCrc10{$ENDIF};
+  TCrc11Algorithm = {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc11{$ELSE}TchCrc11{$ENDIF};
 
-{ TchCrc10Tests }
+{ TchCrc11Tests }
 
-  TchCrc10Tests = class abstract(TchCrcWithMultiTableTests<Word, TCrc10Algorithm>)
+  TchCrc11Tests = class abstract(TchCrcWithMultiTableTests<Word, TCrc11Algorithm>)
   end;
 
-{ TchCrc10NormalTests }
+{ TchCrc11NormalTests }
 
-  TchCrc10NormalTests = class abstract(TchCrc10Tests)
+  TchCrc11NormalTests = class abstract(TchCrc11Tests)
   strict protected
     procedure ControlCalculate(var Current: Word; const Data; const Length: Cardinal); override;
   end;
 
-{ TchCrc10ATMTests }
+{ TchCrc11FLEXRAYTests }
 
-  TchCrc10ATMTests = class(TchCrc10NormalTests)
+  TchCrc11FLEXRAYTests = class(TchCrc11NormalTests)
   strict protected
-    function CreateAlgorithm: TCrc10Algorithm; override;
+    function CreateAlgorithm: TCrc11Algorithm; override;
   end;
 
-{ TchCrc10CDMA2000Tests }
+{ TchCrc11UMTSTests }
 
-  TchCrc10CDMA2000Tests = class(TchCrc10NormalTests)
+  TchCrc11UMTSTests = class(TchCrc11NormalTests)
   strict protected
-    function CreateAlgorithm: TCrc10Algorithm; override;
-  end;
-
-{ TchCrc10GSMTests }
-
-  TchCrc10GSMTests = class(TchCrc10NormalTests)
-  strict protected
-    function CreateAlgorithm: TCrc10Algorithm; override;
+    function CreateAlgorithm: TCrc11Algorithm; override;
   end;
 
 implementation
@@ -66,14 +59,13 @@ uses
 {$ELSE ~ NOT USE_JEDI_CORE_LIBRARY}
   chHash.Core.Bits,
 {$ENDIF ~ USE_JEDI_CORE_LIBRARY}
-  chHash.CRC.CRC10.ATM.Factory,
-  chHash.CRC.CRC10.CDMA2000.Factory,
-  chHash.CRC.CRC10.GSM.Factory,
+  chHash.CRC.CRC11.FLEXRAY.Factory,
+  chHash.CRC.CRC11.UMTS.Factory,
   TestFramework;
 
-{ TchCrc10NormalTests }
+{ TchCrc11NormalTests }
 
-procedure TchCrc10NormalTests.ControlCalculate(var Current: Word; const Data; const Length: Cardinal);
+procedure TchCrc11NormalTests.ControlCalculate(var Current: Word; const Data; const Length: Cardinal);
 begin
   if Length = 0 then Exit;
 
@@ -88,30 +80,22 @@ begin
   end;
 end;
 
-{ TchCrc10ATMTests }
+{ TchCrc11FLEXRAYTests }
 
-function TchCrc10ATMTests.CreateAlgorithm: TCrc10Algorithm;
+function TchCrc11FLEXRAYTests.CreateAlgorithm: TCrc11Algorithm;
 begin
-  Result := TchCrc10ATM.Instance;
+  Result := TchCrc11FLEXRAY.Instance;
 end;
 
-{ TchCrc10CDMA2000Tests }
+{ TchCrc11UMTSTests }
 
-function TchCrc10CDMA2000Tests.CreateAlgorithm: TCrc10Algorithm;
+function TchCrc11UMTSTests.CreateAlgorithm: TCrc11Algorithm;
 begin
-  Result := TchCrc10CDMA2000.Instance;
-end;
-
-{ TchCrc10GSMTests }
-
-function TchCrc10GSMTests.CreateAlgorithm: TCrc10Algorithm;
-begin
-  Result := TchCrc10GSM.Instance;
+  Result := TchCrc11UMTS.Instance;
 end;
 
 initialization
-  RegisterTest(TchCrc10ATMTests.Suite);
-  RegisterTest(TchCrc10CDMA2000Tests.Suite);
-  RegisterTest(TchCrc10GSMTests.Suite);
+  RegisterTest(TchCrc11FLEXRAYTests.Suite);
+  RegisterTest(TchCrc11UMTSTests.Suite);
 
 end.

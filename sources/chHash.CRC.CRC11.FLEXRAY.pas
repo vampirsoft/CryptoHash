@@ -6,45 +6,39 @@
 //* Author       : Сергей (LordVampir) Дворников                              *//
 //* Copyright 2021 LordVampir (https://github.com/vampirsoft)                 *//
 //* Licensed under MIT                                                        *//
-//* Реализовано 01                                                            *//
 //*****************************************************************************//
 /////////////////////////////////////////////////////////////////////////////////
 
-program crc31;
+unit chHash.CRC.CRC11.FLEXRAY;
 
-{$INCLUDE CryptoHash.Tests.inc}
+{$INCLUDE CryptoHash.inc}
 
-{$IFDEF CONSOLE_TESTRUNNER}
-{$APPTYPE CONSOLE}
-{$ENDIF ~ CONSOLE_TESTRUNNER}
+interface
 
 uses
-  DUnitTestRunner,
-  {$IF NOT DEFINED(USE_JEDI_CORE_LIBRARY)}
-  chHash.Core,
-  {$ENDIF ~ USE_JEDI_CORE_LIBRARY}
-  chHash.Core.Bits,
-  chHash,
-  chHash.Impl,
-  chHash.CRC,
-  chHash.CRC.Impl,
-  chHash.CRC.CRC32Bits,
-  chHash.CRC.CRC31,
-  chHash.CRC.CRC31.Impl,
-  chHash.CRC.CRC31.PHILIPS,
-  chHash.CRC.CRC31.PHILIPS.Factory,
-  chHash.Utils,
-  chHash.Tests,
-  chHash.CRC.Tests,
-  chHash.CRC.CRC31.Tests;
+{$IF DEFINED(SUPPORTS_INTERFACES)}
+  chHash.CRC.CRC11.Impl,
+{$ENDIF ~ SUPPORTS_INTERFACES}
+  chHash.CRC.CRC11;
 
-{$R *.RES}
+type
 
+{ TchCrc11FLEXRAY }
+
+  TchCrc11FLEXRAY =
+    class({$IF DEFINED(SUPPORTS_INTERFACES)}chHash.CRC.CRC11.Impl{$ELSE}chHash.CRC.CRC11{$ENDIF}.TchCrc11)
+  public
+    constructor Create; reintroduce;
+  end;
+
+implementation
+
+{ TchCrc11FLEXRAY }
+
+constructor TchCrc11FLEXRAY.Create;
 begin
-  ReportMemoryLeaksOnShutdown := True;
-  DUnitTestRunner.RunRegisteredTests;
-{$IFDEF CONSOLE_TESTRUNNER}
-  Write('Для завершения нажмите "ENTER"');
-  Readln;
-{$ENDIF ~ CONSOLE_TESTRUNNER}
+  inherited Create('CRC-11/FLEXRAY', $385, $01A, $000, $5A3, False, False);
+  Aliases.Add('CRC-11');
+end;
+
 end.
