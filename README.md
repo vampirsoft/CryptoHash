@@ -42,5 +42,5 @@
 
 ### [История изменений](/CHANGELOG.md)
 
-Copyright 2021 LordVampir
+Copyright 2021 LordVampir\
 Licensed under MIT

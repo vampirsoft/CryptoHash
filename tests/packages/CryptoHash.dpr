@@ -133,6 +133,13 @@ uses
   chHash.CRC.CRC10.ATM.Factory,
   chHash.CRC.CRC10.CDMA2000.Factory,
   chHash.CRC.CRC10.GSM.Factory,
+// crc-11 units
+  chHash.CRC.CRC11,
+  chHash.CRC.CRC11.Impl,
+  chHash.CRC.CRC11.FLEXRAY,
+  chHash.CRC.CRC11.UMTS,
+  chHash.CRC.CRC11.FLEXRAY.Factory,
+  chHash.CRC.CRC11.UMTS.Factory,
 // crc-12 units
   chHash.CRC.CRC12,
   chHash.CRC.CRC12.Impl,
@@ -262,6 +269,7 @@ uses
   chHash.CRC.CRC7.Tests,
   chHash.CRC.CRC8.Tests,
   chHash.CRC.CRC10.Tests,
+  chHash.CRC.CRC11.Tests,
   chHash.CRC.CRC12.Tests,
   chHash.CRC.CRC16.Tests,
   chHash.CRC.CRC31.Tests,

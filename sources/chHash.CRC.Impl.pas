@@ -336,7 +336,8 @@ const
 
 begin
   Result := FPolynomial;
-  if FRefIn then begin
+  if FRefIn then
+  begin
     ReverseBits(@Result, SizeOfBits);
     Result := RightShift(Result, BitsPerBits - FWidth);       // Result := Result shr (BitsPerBits - FWidth);
   end;

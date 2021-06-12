@@ -114,6 +114,11 @@ contains
   chHash.CRC.CRC10.ATM,
   chHash.CRC.CRC10.CDMA2000,
   chHash.CRC.CRC10.GSM,
+// crc-11 units
+  chHash.CRC.CRC11,
+  chHash.CRC.CRC11.Impl,
+  chHash.CRC.CRC11.FLEXRAY,
+  chHash.CRC.CRC11.UMTS,
 // crc-12 units
   chHash.CRC.CRC12,
   chHash.CRC.CRC12.Impl,
