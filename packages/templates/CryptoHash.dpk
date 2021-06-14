@@ -126,6 +126,10 @@ contains
   chHash.CRC.CRC12.DECT,
   chHash.CRC.CRC12.GSM,
   chHash.CRC.CRC12.UMTS,
+// crc-13 units
+  chHash.CRC.CRC13,
+  chHash.CRC.CRC13.Impl,
+  chHash.CRC.CRC13.BBC,
 // crc-16 units
   chHash.CRC.CRC16,
   chHash.CRC.CRC16.Impl,

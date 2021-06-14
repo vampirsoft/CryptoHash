@@ -151,6 +151,11 @@ uses
   chHash.CRC.CRC12.DECT.Factory,
   chHash.CRC.CRC12.GSM.Factory,
   chHash.CRC.CRC12.UMTS.Factory,
+// crc-13 units
+  chHash.CRC.CRC13,
+  chHash.CRC.CRC13.Impl,
+  chHash.CRC.CRC13.BBC,
+  chHash.CRC.CRC13.BBC.Factory,
 // crc-16 units
   chHash.CRC.CRC16,
   chHash.CRC.CRC16.Impl,
@@ -271,6 +276,7 @@ uses
   chHash.CRC.CRC10.Tests,
   chHash.CRC.CRC11.Tests,
   chHash.CRC.CRC12.Tests,
+  chHash.CRC.CRC13.Tests,
   chHash.CRC.CRC16.Tests,
   chHash.CRC.CRC31.Tests,
   chHash.CRC.CRC32.Tests;
