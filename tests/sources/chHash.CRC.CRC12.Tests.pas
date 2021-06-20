@@ -37,13 +37,6 @@ type
     procedure ControlCalculate(var Current: Word; const Data; const Length: Cardinal); override;
   end;
 
-{ TchCrc12ReverseTests }
-
-  TchCrc12ReverseTests = class abstract(TchCrc12Tests)
-  strict protected
-    procedure ControlCalculate(var Current: Word; const Data; const Length: Cardinal); override;
-  end;
-
 { TchCrc12CDMA2000Tests }
 
   TchCrc12CDMA2000Tests = class(TchCrc12NormalTests)
@@ -98,22 +91,6 @@ begin
   while L > 0 do
   begin
     Current := (Current shl BitsPerByte) xor FCrcTable[Byte(PData^ xor (Current shr Shift))];
-    Inc(PData);
-    Dec(L);
-  end;
-end;
-
-{ TchCrc12ReverseTests }
-
-procedure TchCrc12ReverseTests.ControlCalculate(var Current: Word; const Data; const Length: Cardinal);
-begin
-  if Length = 0 then Exit;
-
-  var L := Length;
-  var PData: PByte := @Data;
-  while L > 0 do
-  begin
-    Current := (Current shr BitsPerByte) xor FCrcTable[Byte(PData^ xor Current)];
     Inc(PData);
     Dec(L);
   end;

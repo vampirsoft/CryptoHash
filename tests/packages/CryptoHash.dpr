@@ -156,6 +156,14 @@ uses
   chHash.CRC.CRC13.Impl,
   chHash.CRC.CRC13.BBC,
   chHash.CRC.CRC13.BBC.Factory,
+// crc-14 units
+  chHash.CRC.CRC14,
+  chHash.CRC.CRC14.Impl,
+  chHash.CRC.CRC14.Reverse,
+  chHash.CRC.CRC14.DARC,
+  chHash.CRC.CRC14.GSM,
+  chHash.CRC.CRC14.DARC.Factory,
+  chHash.CRC.CRC14.GSM.Factory,
 // crc-16 units
   chHash.CRC.CRC16,
   chHash.CRC.CRC16.Impl,
@@ -277,6 +285,7 @@ uses
   chHash.CRC.CRC11.Tests,
   chHash.CRC.CRC12.Tests,
   chHash.CRC.CRC13.Tests,
+  chHash.CRC.CRC14.Tests,
   chHash.CRC.CRC16.Tests,
   chHash.CRC.CRC31.Tests,
   chHash.CRC.CRC32.Tests;
