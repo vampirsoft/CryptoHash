@@ -130,6 +130,12 @@ contains
   chHash.CRC.CRC13,
   chHash.CRC.CRC13.Impl,
   chHash.CRC.CRC13.BBC,
+// crc-14 units
+  chHash.CRC.CRC14,
+  chHash.CRC.CRC14.Impl,
+  chHash.CRC.CRC14.Reverse,
+  chHash.CRC.CRC14.DARC,
+  chHash.CRC.CRC14.GSM,
 // crc-16 units
   chHash.CRC.CRC16,
   chHash.CRC.CRC16.Impl,
