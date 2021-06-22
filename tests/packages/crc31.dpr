@@ -36,6 +36,7 @@ uses
   chHash.Utils,
   chHash.Tests,
   chHash.CRC.Tests,
+  chHash.CRC.CRC32Bits.Tests,
   chHash.CRC.CRC31.Tests;
 
 {$R *.RES}

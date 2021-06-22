@@ -30,7 +30,7 @@ type
   strict private const
     BLOCK_SIZE = Byte($01);
   strict protected
-    constructor Create(const Name: string; const Width: Byte; const Polynomial, Init, XorOut, Check: Word;
+    constructor Create(const Name: string; const Width: Byte; const Polynomial, Init, XorOut, Check: Byte;
       const RefIn, RefOut: Boolean; const BlockSize: Byte = TchCrc8Bits.BLOCK_SIZE); reintroduce;
   {$IF DEFINED(HASH_TESTS)}
   public
@@ -63,7 +63,7 @@ uses
 
 { TchCrc8Bits }
 
-constructor TchCrc8Bits.Create(const Name: string; const Width: Byte; const Polynomial, Init, XorOut, Check: Word;
+constructor TchCrc8Bits.Create(const Name: string; const Width: Byte; const Polynomial, Init, XorOut, Check: Byte;
   const RefIn, RefOut: Boolean; const BlockSize: Byte);
 begin
   inherited Create(Name, Width, BlockSize, Polynomial, Init, XorOut, Check, RefIn, RefOut);

@@ -40,6 +40,7 @@ uses
   chHash.Utils,
   chHash.Tests,
   chHash.CRC.Tests,
+  chHash.CRC.CRC16Bits.Tests,
   chHash.CRC.CRC10.Tests;
 
 {$R *.RES}

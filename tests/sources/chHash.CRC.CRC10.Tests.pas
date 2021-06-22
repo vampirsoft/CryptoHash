@@ -18,42 +18,31 @@ interface
 uses
 {$IF DEFINED(SUPPORTS_INTERFACES)}
   chHash.CRC.CRC10,
-{$ENDIF ~ SUPPORTS_INTERFACES}
+{$ELSE ~ NOT SUPPORTS_INTERFACES}
   chHash.CRC.CRC10.Impl,
-  chHash.CRC.Tests;
+{$ENDIF ~ SUPPORTS_INTERFACES}
+  chHash.CRC.CRC16Bits.Tests;
 
 type
   TCrc10Algorithm = {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc10{$ELSE}TchCrc10{$ENDIF};
 
-{ TchCrc10Tests }
-
-  TchCrc10Tests = class abstract(TchCrcWithMultiTableTests<Word, TCrc10Algorithm>)
-  end;
-
-{ TchCrc10NormalTests }
-
-  TchCrc10NormalTests = class abstract(TchCrc10Tests)
-  strict protected
-    procedure ControlCalculate(var Current: Word; const Data; const Length: Cardinal); override;
-  end;
-
 { TchCrc10ATMTests }
 
-  TchCrc10ATMTests = class(TchCrc10NormalTests)
+  TchCrc10ATMTests = class(TchCrc16BitsNormalTests<TCrc10Algorithm>)
   strict protected
     function CreateAlgorithm: TCrc10Algorithm; override;
   end;
 
 { TchCrc10CDMA2000Tests }
 
-  TchCrc10CDMA2000Tests = class(TchCrc10NormalTests)
+  TchCrc10CDMA2000Tests = class(TchCrc16BitsNormalTests<TCrc10Algorithm>)
   strict protected
     function CreateAlgorithm: TCrc10Algorithm; override;
   end;
 
 { TchCrc10GSMTests }
 
-  TchCrc10GSMTests = class(TchCrc10NormalTests)
+  TchCrc10GSMTests = class(TchCrc16BitsNormalTests<TCrc10Algorithm>)
   strict protected
     function CreateAlgorithm: TCrc10Algorithm; override;
   end;
@@ -61,32 +50,10 @@ type
 implementation
 
 uses
-{$IF DEFINED(USE_JEDI_CORE_LIBRARY)}
-  JclLogic,
-{$ELSE ~ NOT USE_JEDI_CORE_LIBRARY}
-  chHash.Core.Bits,
-{$ENDIF ~ USE_JEDI_CORE_LIBRARY}
   chHash.CRC.CRC10.ATM.Factory,
   chHash.CRC.CRC10.CDMA2000.Factory,
   chHash.CRC.CRC10.GSM.Factory,
   TestFramework;
-
-{ TchCrc10NormalTests }
-
-procedure TchCrc10NormalTests.ControlCalculate(var Current: Word; const Data; const Length: Cardinal);
-begin
-  if Length = 0 then Exit;
-
-  const Shift = FAlgorithm.Width - BitsPerByte;
-  var L := Length;
-  var PData: PByte := @Data;
-  while L > 0 do
-  begin
-    Current := (Current shl BitsPerByte) xor FCrcTable[Byte(PData^ xor (Current shr Shift))];
-    Inc(PData);
-    Dec(L);
-  end;
-end;
 
 { TchCrc10ATMTests }
 

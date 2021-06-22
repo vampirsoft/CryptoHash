@@ -18,49 +18,38 @@ interface
 uses
 {$IF DEFINED(SUPPORTS_INTERFACES)}
   chHash.CRC.CRC12,
-{$ENDIF ~ SUPPORTS_INTERFACES}
+{$ELSE ~ NOT SUPPORTS_INTERFACES}
   chHash.CRC.CRC12.Impl,
-  chHash.CRC.Tests;
+{$ENDIF ~ SUPPORTS_INTERFACES}
+  chHash.CRC.CRC16Bits.Tests;
 
 type
   TCrc12Algorithm = {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc12{$ELSE}TchCrc12{$ENDIF};
 
-{ TchCrc12Tests }
-
-  TchCrc12Tests = class abstract(TchCrcWithMultiTableTests<Word, TCrc12Algorithm>)
-  end;
-
-{ TchCrc12NormalTests }
-
-  TchCrc12NormalTests = class abstract(TchCrc12Tests)
-  strict protected
-    procedure ControlCalculate(var Current: Word; const Data; const Length: Cardinal); override;
-  end;
-
 { TchCrc12CDMA2000Tests }
 
-  TchCrc12CDMA2000Tests = class(TchCrc12NormalTests)
+  TchCrc12CDMA2000Tests = class(TchCrc16BitsNormalTests<TCrc12Algorithm>)
   strict protected
     function CreateAlgorithm: TCrc12Algorithm; override;
   end;
 
 { TchCrc12DECTTests }
 
-  TchCrc12DECTTests = class(TchCrc12NormalTests)
+  TchCrc12DECTTests = class(TchCrc16BitsNormalTests<TCrc12Algorithm>)
   strict protected
     function CreateAlgorithm: TCrc12Algorithm; override;
   end;
 
 { TchCrc12GSMTests }
 
-  TchCrc12GSMTests = class(TchCrc12NormalTests)
+  TchCrc12GSMTests = class(TchCrc16BitsNormalTests<TCrc12Algorithm>)
   strict protected
     function CreateAlgorithm: TCrc12Algorithm; override;
   end;
 
 { TchCrc12UMTSTests }
 
-  TchCrc12UMTSTests = class(TchCrc12NormalTests)
+  TchCrc12UMTSTests = class(TchCrc16BitsNormalTests<TCrc12Algorithm>)
   strict protected
     function CreateAlgorithm: TCrc12Algorithm; override;
   end;
@@ -68,33 +57,11 @@ type
 implementation
 
 uses
-{$IF DEFINED(USE_JEDI_CORE_LIBRARY)}
-  JclLogic,
-{$ELSE ~ NOT USE_JEDI_CORE_LIBRARY}
-  chHash.Core.Bits,
-{$ENDIF ~ USE_JEDI_CORE_LIBRARY}
   chHash.CRC.CRC12.CDMA2000.Factory,
   chHash.CRC.CRC12.DECT.Factory,
   chHash.CRC.CRC12.GSM.Factory,
   chHash.CRC.CRC12.UMTS.Factory,
   TestFramework;
-
-{ TchCrc12NormalTests }
-
-procedure TchCrc12NormalTests.ControlCalculate(var Current: Word; const Data; const Length: Cardinal);
-begin
-  if Length = 0 then Exit;
-
-  const Shift = FAlgorithm.Width - BitsPerByte;
-  var L := Length;
-  var PData: PByte := @Data;
-  while L > 0 do
-  begin
-    Current := (Current shl BitsPerByte) xor FCrcTable[Byte(PData^ xor (Current shr Shift))];
-    Inc(PData);
-    Dec(L);
-  end;
-end;
 
 { TchCrc12CDMA2000Tests }
 
