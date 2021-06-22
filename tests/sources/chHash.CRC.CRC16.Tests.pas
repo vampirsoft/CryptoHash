@@ -21,236 +21,217 @@ uses
 {$ELSE ~ NOT SUPPORTS_INTERFACES}
   chHash.CRC.CRC16.Impl,
 {$ENDIF ~ SUPPORTS_INTERFACES}
-  chHash.CRC.Tests;
+  chHash.CRC.CRC16Bits.Tests;
 
 type
   TCrc16Algorithm = {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc16{$ELSE}TchCrc16{$ENDIF};
 
-{ TchCrc16Tests }
-
-  TchCrc16Tests = class abstract(TchCrcWithMultiTableTests<Word, TCrc16Algorithm>)
-  end;
-
-{ TchCrc16NormalTests }
-
-  TchCrc16NormalTests = class abstract(TchCrc16Tests)
-  strict protected
-    procedure ControlCalculate(var Current: Word; const Data; const Length: Cardinal); override;
-  end;
-
-{ TchCrc16ReverseTests }
-
-  TchCrc16ReverseTests = class abstract(TchCrc16Tests)
-  strict protected
-    procedure ControlCalculate(var Current: Word; const Data; const Length: Cardinal); override;
-  end;
-
 { TchCrc16ARCTests }
 
-  TchCrc16ARCTests = class(TchCrc16ReverseTests)
+  TchCrc16ARCTests = class(TchCrc16BitsReverseTests<TCrc16Algorithm>)
   strict protected
     function CreateAlgorithm: TCrc16Algorithm; override;
   end;
 
 { TchCrc16CDMA2000Tests }
 
-  TchCrc16CDMA2000Tests = class(TchCrc16NormalTests)
+  TchCrc16CDMA2000Tests = class(TchCrc16BitsNormalTests<TCrc16Algorithm>)
   strict protected
     function CreateAlgorithm: TCrc16Algorithm; override;
   end;
 
 { TchCrc16CMSTests }
 
-  TchCrc16CMSTests = class(TchCrc16NormalTests)
+  TchCrc16CMSTests = class(TchCrc16BitsNormalTests<TCrc16Algorithm>)
   strict protected
     function CreateAlgorithm: TCrc16Algorithm; override;
   end;
 
 { TchCrc16DDS110Tests }
 
-  TchCrc16DDS110Tests = class(TchCrc16NormalTests)
+  TchCrc16DDS110Tests = class(TchCrc16BitsNormalTests<TCrc16Algorithm>)
   strict protected
     function CreateAlgorithm: TCrc16Algorithm; override;
   end;
 
 { TchCrc16DECTRTests }
 
-  TchCrc16DECTRTests = class(TchCrc16NormalTests)
+  TchCrc16DECTRTests = class(TchCrc16BitsNormalTests<TCrc16Algorithm>)
   strict protected
     function CreateAlgorithm: TCrc16Algorithm; override;
   end;
 
 { TchCrc16DECTXTests }
 
-  TchCrc16DECTXTests = class(TchCrc16NormalTests)
+  TchCrc16DECTXTests = class(TchCrc16BitsNormalTests<TCrc16Algorithm>)
   strict protected
     function CreateAlgorithm: TCrc16Algorithm; override;
   end;
 
 { TchCrc16DNPTests }
 
-  TchCrc16DNPTests = class(TchCrc16ReverseTests)
+  TchCrc16DNPTests = class(TchCrc16BitsReverseTests<TCrc16Algorithm>)
   strict protected
     function CreateAlgorithm: TCrc16Algorithm; override;
   end;
 
 { TchCrc16EN13757Tests }
 
-  TchCrc16EN13757Tests = class(TchCrc16NormalTests)
+  TchCrc16EN13757Tests = class(TchCrc16BitsNormalTests<TCrc16Algorithm>)
   strict protected
     function CreateAlgorithm: TCrc16Algorithm; override;
   end;
 
 { TchCrc16GSMTests }
 
-  TchCrc16GSMTests = class(TchCrc16NormalTests)
+  TchCrc16GSMTests = class(TchCrc16BitsNormalTests<TCrc16Algorithm>)
   strict protected
     function CreateAlgorithm: TCrc16Algorithm; override;
   end;
 
 { TchCrc16GENIBUSTests }
 
-  TchCrc16GENIBUSTests = class(TchCrc16NormalTests)
+  TchCrc16GENIBUSTests = class(TchCrc16BitsNormalTests<TCrc16Algorithm>)
   strict protected
     function CreateAlgorithm: TCrc16Algorithm; override;
   end;
 
 { TchCrc16IBM3740Tests }
 
-  TchCrc16IBM3740Tests = class(TchCrc16NormalTests)
+  TchCrc16IBM3740Tests = class(TchCrc16BitsNormalTests<TCrc16Algorithm>)
   strict protected
     function CreateAlgorithm: TCrc16Algorithm; override;
   end;
 
 { TchCrc16IBMSDLCTests }
 
-  TchCrc16IBMSDLCTests = class(TchCrc16ReverseTests)
+  TchCrc16IBMSDLCTests = class(TchCrc16BitsReverseTests<TCrc16Algorithm>)
   strict protected
     function CreateAlgorithm: TCrc16Algorithm; override;
   end;
 
 { TchCrc16ISOIEC144433ATests }
 
-  TchCrc16ISOIEC144433ATests = class(TchCrc16ReverseTests)
+  TchCrc16ISOIEC144433ATests = class(TchCrc16BitsReverseTests<TCrc16Algorithm>)
   strict protected
     function CreateAlgorithm: TCrc16Algorithm; override;
   end;
 
 { TchCrc16KERMITTests }
 
-  TchCrc16KERMITTests = class(TchCrc16ReverseTests)
+  TchCrc16KERMITTests = class(TchCrc16BitsReverseTests<TCrc16Algorithm>)
   strict protected
     function CreateAlgorithm: TCrc16Algorithm; override;
   end;
 
 { TchCrc16LJ1200Tests }
 
-  TchCrc16LJ1200Tests = class(TchCrc16NormalTests)
+  TchCrc16LJ1200Tests = class(TchCrc16BitsNormalTests<TCrc16Algorithm>)
   strict protected
     function CreateAlgorithm: TCrc16Algorithm; override;
   end;
 
 { TchCrc16MAXIMDOWTests }
 
-  TchCrc16MAXIMDOWTests = class(TchCrc16ReverseTests)
+  TchCrc16MAXIMDOWTests = class(TchCrc16BitsReverseTests<TCrc16Algorithm>)
   strict protected
     function CreateAlgorithm: TCrc16Algorithm; override;
   end;
 
 { TchCrc16MCRF4XXTests }
 
-  TchCrc16MCRF4XXTests = class(TchCrc16ReverseTests)
+  TchCrc16MCRF4XXTests = class(TchCrc16BitsReverseTests<TCrc16Algorithm>)
   strict protected
     function CreateAlgorithm: TCrc16Algorithm; override;
   end;
 
 { TchCrc16MODBUSTests }
 
-  TchCrc16MODBUSTests = class(TchCrc16ReverseTests)
+  TchCrc16MODBUSTests = class(TchCrc16BitsReverseTests<TCrc16Algorithm>)
   strict protected
     function CreateAlgorithm: TCrc16Algorithm; override;
   end;
 
 { TchCrc16NRSC5Tests }
 
-  TchCrc16NRSC5Tests = class(TchCrc16ReverseTests)
+  TchCrc16NRSC5Tests = class(TchCrc16BitsReverseTests<TCrc16Algorithm>)
   strict protected
     function CreateAlgorithm: TCrc16Algorithm; override;
   end;
 
 { TchCrc16OPENSAFETYATests }
 
-  TchCrc16OPENSAFETYATests = class(TchCrc16NormalTests)
+  TchCrc16OPENSAFETYATests = class(TchCrc16BitsNormalTests<TCrc16Algorithm>)
   strict protected
     function CreateAlgorithm: TCrc16Algorithm; override;
   end;
 
 { TchCrc16OPENSAFETYBTests }
 
-  TchCrc16OPENSAFETYBTests = class(TchCrc16NormalTests)
+  TchCrc16OPENSAFETYBTests = class(TchCrc16BitsNormalTests<TCrc16Algorithm>)
   strict protected
     function CreateAlgorithm: TCrc16Algorithm; override;
   end;
 
 { TchCrc16PROFIBUSTests }
 
-  TchCrc16PROFIBUSTests = class(TchCrc16NormalTests)
+  TchCrc16PROFIBUSTests = class(TchCrc16BitsNormalTests<TCrc16Algorithm>)
   strict protected
     function CreateAlgorithm: TCrc16Algorithm; override;
   end;
 
 { TchCrc16RIELLOTests }
 
-  TchCrc16RIELLOTests = class(TchCrc16ReverseTests)
+  TchCrc16RIELLOTests = class(TchCrc16BitsReverseTests<TCrc16Algorithm>)
   strict protected
     function CreateAlgorithm: TCrc16Algorithm; override;
   end;
 
 { TchCrc16SPIFUJITSUTests }
 
-  TchCrc16SPIFUJITSUTests = class(TchCrc16NormalTests)
+  TchCrc16SPIFUJITSUTests = class(TchCrc16BitsNormalTests<TCrc16Algorithm>)
   strict protected
     function CreateAlgorithm: TCrc16Algorithm; override;
   end;
 
 { TchCrc16T10DIFTests }
 
-  TchCrc16T10DIFTests = class(TchCrc16NormalTests)
+  TchCrc16T10DIFTests = class(TchCrc16BitsNormalTests<TCrc16Algorithm>)
   strict protected
     function CreateAlgorithm: TCrc16Algorithm; override;
   end;
 
 { TchCrc16TELEDISKTests }
 
-  TchCrc16TELEDISKTests = class(TchCrc16NormalTests)
+  TchCrc16TELEDISKTests = class(TchCrc16BitsNormalTests<TCrc16Algorithm>)
   strict protected
     function CreateAlgorithm: TCrc16Algorithm; override;
   end;
 
 { TchCrc16TMS37157Tests }
 
-  TchCrc16TMS37157Tests = class(TchCrc16ReverseTests)
+  TchCrc16TMS37157Tests = class(TchCrc16BitsReverseTests<TCrc16Algorithm>)
   strict protected
     function CreateAlgorithm: TCrc16Algorithm; override;
   end;
 
 { TchCrc16UMTSTests }
 
-  TchCrc16UMTSTests = class(TchCrc16NormalTests)
+  TchCrc16UMTSTests = class(TchCrc16BitsNormalTests<TCrc16Algorithm>)
   strict protected
     function CreateAlgorithm: TCrc16Algorithm; override;
   end;
 
 { TchCrc16USBTests }
 
-  TchCrc16USBTests = class(TchCrc16ReverseTests)
+  TchCrc16USBTests = class(TchCrc16BitsReverseTests<TCrc16Algorithm>)
   strict protected
     function CreateAlgorithm: TCrc16Algorithm; override;
   end;
 
 { TchCrc16XMODEMTests }
 
-  TchCrc16XMODEMTests = class(TchCrc16NormalTests)
+  TchCrc16XMODEMTests = class(TchCrc16BitsNormalTests<TCrc16Algorithm>)
   strict protected
     function CreateAlgorithm: TCrc16Algorithm; override;
   end;
@@ -258,11 +239,6 @@ type
 implementation
 
 uses
-{$IF DEFINED(USE_JEDI_CORE_LIBRARY)}
-  JclLogic,
-{$ELSE ~ NOT USE_JEDI_CORE_LIBRARY}
-  chHash.Core.Bits,
-{$ENDIF ~ USE_JEDI_CORE_LIBRARY}
   chHash.CRC.CRC16.ARC.Factory,
   chHash.CRC.CRC16.CDMA2000.Factory,
   chHash.CRC.CRC16.CMS.Factory,
@@ -294,38 +270,6 @@ uses
   chHash.CRC.CRC16.USB.Factory,
   chHash.CRC.CRC16.XMODEM.Factory,
   TestFramework;
-
-{ TchCrc16NormalTests }
-
-procedure TchCrc16NormalTests.ControlCalculate(var Current: Word; const Data; const Length: Cardinal);
-begin
-  if Length = 0 then Exit;
-
-  var L := Length;
-  var PData: PByte := @Data;
-  while L > 0 do
-  begin
-    Current := (Current shl BitsPerByte) xor FCrcTable[Byte(PData^ xor (Current shr BitsPerByte))];
-    Inc(PData);
-    Dec(L);
-  end;
-end;
-
-{ TchCrc16ReverseTests }
-
-procedure TchCrc16ReverseTests.ControlCalculate(var Current: Word; const Data; const Length: Cardinal);
-begin
-  if Length = 0 then Exit;
-
-  var L := Length;
-  var PData: PByte := @Data;
-  while L > 0 do
-  begin
-    Current := (Current shr BitsPerByte) xor FCrcTable[Byte(PData^ xor Current)];
-    Inc(PData);
-    Dec(L);
-  end;
-end;
 
 { TchCrc16ARCTests }
 

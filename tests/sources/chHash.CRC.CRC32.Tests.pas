@@ -21,103 +21,84 @@ uses
 {$ELSE ~ NOT SUPPORTS_INTERFACES}
   chHash.CRC.CRC32.Impl,
 {$ENDIF ~ SUPPORTS_INTERFACES}
-  chHash.CRC.Tests;
+  chHash.CRC.CRC32Bits.Tests;
 
 type
   TCrc32Algorithm = {$IF DEFINED(SUPPORTS_INTERFACES)}IchCrc32{$ELSE}TchCrc32{$ENDIF};
 
-{ TchCrc32Tests }
-
-  TchCrc32Tests = class abstract(TchCrcWithMultiTableTests<Cardinal, TCrc32Algorithm>)
-  end;
-
-{ TchCrc32NormalTests }
-
-  TchCrc32NormalTests = class abstract(TchCrc32Tests)
-  strict protected
-    procedure ControlCalculate(var Current: Cardinal; const Data; const Length: Cardinal); override;
-  end;
-
-{ TchCrc32ReverseTests }
-
-  TchCrc32ReverseTests = class abstract(TchCrc32Tests)
-  strict protected
-    procedure ControlCalculate(var Current: Cardinal; const Data; const Length: Cardinal); override;
-  end;
-
 { TchCrc32CRC32Tests }
 
-  TchCrc32CRC32Tests = class(TchCrc32ReverseTests)
+  TchCrc32CRC32Tests = class(TchCrc32BitsReverseTests<TCrc32Algorithm>)
   strict protected
     function CreateAlgorithm: TCrc32Algorithm; override;
   end;
 
 { TchCrc32BZip2Tests }
 
-  TchCrc32BZip2Tests = class(TchCrc32NormalTests)
+  TchCrc32BZip2Tests = class(TchCrc32BitsNormalTests<TCrc32Algorithm>)
   strict protected
     function CreateAlgorithm: TCrc32Algorithm; override;
   end;
 
 { TchCrc32ISCSITests }
 
-  TchCrc32ISCSITests = class(TchCrc32ReverseTests)
+  TchCrc32ISCSITests = class(TchCrc32BitsReverseTests<TCrc32Algorithm>)
   strict protected
     function CreateAlgorithm: TCrc32Algorithm; override;
   end;
 
 { TchCrc32BASE91DTests }
 
-  TchCrc32BASE91DTests = class(TchCrc32ReverseTests)
+  TchCrc32BASE91DTests = class(TchCrc32BitsReverseTests<TCrc32Algorithm>)
   strict protected
     function CreateAlgorithm: TCrc32Algorithm; override;
   end;
 
 { TchCrc32MPEG2Tests }
 
-  TchCrc32MPEG2Tests = class(TchCrc32NormalTests)
+  TchCrc32MPEG2Tests = class(TchCrc32BitsNormalTests<TCrc32Algorithm>)
   strict protected
     function CreateAlgorithm: TCrc32Algorithm; override;
   end;
 
 { TchCrc32CKSUMTests }
 
-  TchCrc32CKSUMTests = class(TchCrc32NormalTests)
+  TchCrc32CKSUMTests = class(TchCrc32BitsNormalTests<TCrc32Algorithm>)
   strict protected
     function CreateAlgorithm: TCrc32Algorithm; override;
   end;
 
 { TchCrc32AIXMTests }
 
-  TchCrc32AIXMTests = class(TchCrc32NormalTests)
+  TchCrc32AIXMTests = class(TchCrc32BitsNormalTests<TCrc32Algorithm>)
   strict protected
     function CreateAlgorithm: TCrc32Algorithm; override;
   end;
 
 { TchCrc32JAMCRCTests }
 
-  TchCrc32JAMCRCTests = class(TchCrc32ReverseTests)
+  TchCrc32JAMCRCTests = class(TchCrc32BitsReverseTests<TCrc32Algorithm>)
   strict protected
     function CreateAlgorithm: TCrc32Algorithm; override;
   end;
 
 { TchCrc32XFERTests }
 
-  TchCrc32XFERTests = class(TchCrc32NormalTests)
+  TchCrc32XFERTests = class(TchCrc32BitsNormalTests<TCrc32Algorithm>)
   strict protected
     function CreateAlgorithm: TCrc32Algorithm; override;
   end;
 
 { TchCrc32AUTOSARTests }
 
-  TchCrc32AUTOSARTests = class(TchCrc32ReverseTests)
+  TchCrc32AUTOSARTests = class(TchCrc32BitsReverseTests<TCrc32Algorithm>)
   strict protected
     function CreateAlgorithm: TCrc32Algorithm; override;
   end;
 
 { TchCrc32CDROMEDCTests }
 
-  TchCrc32CDROMEDCTests = class(TchCrc32ReverseTests)
+  TchCrc32CDROMEDCTests = class(TchCrc32BitsReverseTests<TCrc32Algorithm>)
   strict protected
     function CreateAlgorithm: TCrc32Algorithm; override;
   end;
@@ -125,11 +106,6 @@ type
 implementation
 
 uses
-{$IF DEFINED(USE_JEDI_CORE_LIBRARY)}
-  JclLogic,
-{$ELSE ~ NOT USE_JEDI_CORE_LIBRARY}
-  chHash.Core.Bits,
-{$ENDIF ~ USE_JEDI_CORE_LIBRARY}
   chHash.CRC.CRC32.PKZIP.Factory,
   chHash.CRC.CRC32.BZIP2.Factory,
   chHash.CRC.CRC32.ISCSI.Factory,
@@ -142,38 +118,6 @@ uses
   chHash.CRC.CRC32.AUTOSAR.Factory,
   chHash.CRC.CRC32.CDROMEDC.Factory,
   TestFramework;
-
-{ TchCrc32NormalTests }
-
-procedure TchCrc32NormalTests.ControlCalculate(var Current: Cardinal; const Data; const Length: Cardinal);
-begin
-  if Length = 0 then Exit;
-
-  var L := Length;
-  var PData: PByte := @Data;
-  while L > 0 do
-  begin
-    Current := (Current shl BitsPerByte) xor FCrcTable[Byte(PData^ xor (Current shr (BitsPerByte * 3)))];
-    Inc(PData);
-    Dec(L);
-  end;
-end;
-
-{ TchCrc32ReverseTests }
-
-procedure TchCrc32ReverseTests.ControlCalculate(var Current: Cardinal; const Data; const Length: Cardinal);
-begin
-  if Length = 0 then Exit;
-
-  var L := Length;
-  var PData: PByte := @Data;
-  while L > 0 do
-  begin
-    Current := (Current shr BitsPerByte) xor FCrcTable[Byte(PData^ xor Current)];
-    Inc(PData);
-    Dec(L);
-  end;
-end;
 
 { TchCrc32CRC32Tests }
 

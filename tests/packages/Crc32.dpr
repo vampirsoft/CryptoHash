@@ -56,6 +56,7 @@ uses
   chHash.Utils,
   chHash.Tests,
   chHash.CRC.Tests,
+  chHash.CRC.CRC32Bits.Tests,
   chHash.CRC.CRC32.Tests;
 
 {$R *.RES}

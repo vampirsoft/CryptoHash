@@ -275,6 +275,8 @@ uses
   chHash.Core.Pointer.Tests,
   chHash.Tests,
   chHash.CRC.Tests,
+  chHash.CRC.CRC16Bits.Tests,
+  chHash.CRC.CRC32Bits.Tests,
   chHash.CRC.CRC3.Tests,
   chHash.CRC.CRC4.Tests,
   chHash.CRC.CRC5.Tests,

@@ -29,7 +29,7 @@ type
   strict protected const
     Size = Byte(4);
   strict protected
-    constructor Create(const Name: string; const Polynomial, Init, XorOut, Check: Word;
+    constructor Create(const Name: string; const Polynomial, Init, XorOut, Check: Byte;
       const RefIn, RefOut: Boolean); reintroduce;
   end;
 
@@ -37,7 +37,7 @@ implementation
 
 { TchCrc4 }
 
-constructor TchCrc4.Create(const Name: string; const Polynomial, Init, XorOut, Check: Word;
+constructor TchCrc4.Create(const Name: string; const Polynomial, Init, XorOut, Check: Byte;
   const RefIn, RefOut: Boolean);
 begin
   inherited Create(Name, TchCrc4.Size, Polynomial, Init, XorOut, Check, RefIn, RefOut);
