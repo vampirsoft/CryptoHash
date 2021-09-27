@@ -235,6 +235,11 @@ uses
   chHash.CRC.CRC16.UMTS.Factory,
   chHash.CRC.CRC16.USB.Factory,
   chHash.CRC.CRC16.XMODEM.Factory,
+// crc-17 units
+  chHash.CRC.CRC17,
+  chHash.CRC.CRC17.Impl,
+  chHash.CRC.CRC17.CANFD,
+  chHash.CRC.CRC17.CANFD.Factory,
 // crc-31 units
   chHash.CRC.CRC31,
   chHash.CRC.CRC31.Impl,
@@ -297,6 +302,7 @@ uses
   chHash.CRC.CRC14.Tests,
   chHash.CRC.CRC15.Tests,
   chHash.CRC.CRC16.Tests,
+  chHash.CRC.CRC17.Tests,
   chHash.CRC.CRC31.Tests,
   chHash.CRC.CRC32.Tests;
 
