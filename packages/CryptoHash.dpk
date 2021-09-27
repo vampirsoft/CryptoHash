@@ -175,6 +175,10 @@ contains
   chHash.CRC.CRC16.UMTS,
   chHash.CRC.CRC16.USB,
   chHash.CRC.CRC16.XMODEM,
+// crc-17 units
+  chHash.CRC.CRC17,
+  chHash.CRC.CRC17.Impl,
+  chHash.CRC.CRC17.CANFD,
 // crc-31 units
   chHash.CRC.CRC31,
   chHash.CRC.CRC31.Impl,
