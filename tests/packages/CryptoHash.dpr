@@ -240,6 +240,11 @@ uses
   chHash.CRC.CRC17.Impl,
   chHash.CRC.CRC17.CANFD,
   chHash.CRC.CRC17.CANFD.Factory,
+// crc-21 units
+  chHash.CRC.CRC21,
+  chHash.CRC.CRC21.Impl,
+  chHash.CRC.CRC21.CANFD,
+  chHash.CRC.CRC21.CANFD.Factory,
 // crc-31 units
   chHash.CRC.CRC31,
   chHash.CRC.CRC31.Impl,
@@ -304,7 +309,8 @@ uses
   chHash.CRC.CRC16.Tests,
   chHash.CRC.CRC17.Tests,
   chHash.CRC.CRC31.Tests,
-  chHash.CRC.CRC32.Tests;
+  chHash.CRC.CRC32.Tests,
+  chHash.CRC.CRC21.Tests;
 
 {$R *.RES}
 
