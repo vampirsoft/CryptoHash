@@ -179,6 +179,10 @@ contains
   chHash.CRC.CRC17,
   chHash.CRC.CRC17.Impl,
   chHash.CRC.CRC17.CANFD,
+// crc-21 units
+  chHash.CRC.CRC21,
+  chHash.CRC.CRC21.Impl,
+  chHash.CRC.CRC21.CANFD,
 // crc-31 units
   chHash.CRC.CRC31,
   chHash.CRC.CRC31.Impl,
